@@ -1,26 +1,26 @@
-# RxOperators
-[![CI Status](https://img.shields.io/travis/Voidilov/RxOperators.svg?style=flat)](https://travis-ci.org/Voidilov/RxOperators)
-[![Version](https://img.shields.io/cocoapods/v/RxOperators.svg?style=flat)](https://cocoapods.org/pods/RxOperators)
-[![License](https://img.shields.io/cocoapods/l/RxOperators.svg?style=flat)](https://cocoapods.org/pods/RxOperators)
-[![Platform](https://img.shields.io/cocoapods/p/RxOperators.svg?style=flat)](https://cocoapods.org/pods/RxOperators)
+# CombineOperators
+[![CI Status](https://img.shields.io/travis/Voidilov/CombineOperators.svg?style=flat)](https://travis-ci.org/Voidilov/CombineOperators)
+[![Version](https://img.shields.io/cocoapods/v/CombineOperators.svg?style=flat)](https://cocoapods.org/pods/CombineOperators)
+[![License](https://img.shields.io/cocoapods/l/CombineOperators.svg?style=flat)](https://cocoapods.org/pods/CombineOperators)
+[![Platform](https://img.shields.io/cocoapods/p/CombineOperators.svg?style=flat)](https://cocoapods.org/pods/CombineOperators)
 
 ## Description
 
-This repo includes operators for RxSwift and some additional features.
+This repo includes operators for Combine, almost complete re-implementation of RxCocoa, RxViewController, RxGestures and RxKeyboard libraries and some additional features.
 
 Example
 
 ```swift
 import UIKit
-import RxSwift
-import RxCocoa
-import RxOperators
+import Combine
+import CombineCocoa
+import CombineOperators
 
 final class SomeViewModel {
-  let title = ValueSubject("Title")
-  let icon = ValueSubject<UIImage?>(nil)
-  let color = ValueSubject(UIColor.white)
-  let bool = ValueSubject(false)
+  let title = CurrentValueSubject<String, Never>("Title")
+  let icon = CurrentValueSubject<UIImage?, Never>(nil)
+  let color = CurrentValueSubject<UIColor, Never>(UIColor.white)
+  let bool = CurrentValueSubject<Bool, Never>(false)
   ...
 } 
 
@@ -33,11 +33,11 @@ class ViewController: UIViewController {
   let viewModel = SomeViewModel()
   ...
   private func configureSubscriptions() {
-    viewModel.title ==> titleLabel.rx.text
-    viewModel.iconView ==> iconView.rx.image
-    viewModel.bool <==> switchView.rx.isOn
+    viewModel.title ==> titleLabel.cb.text
+    viewModel.iconView ==> iconView.cb.image
+    viewModel.bool ==> switchView.cb.isOn
     viewModel.color ==> (self, ViewController.setTint)
-    //or viewModel.color ==> rx.weak(method: ViewController.setTint)
+    //or viewModel.color ==> cb.weak(method: ViewController.setTint)
     //or viewModel.color ==> {[weak self] in self?.setTint(color: $0) }
   }
 
@@ -52,51 +52,65 @@ class ViewController: UIViewController {
 
 1. Operator `=>` 
 
-  - From `Publisher` to `Subscriber`, creates a subscription and returns `Cancellable`:
+- From `Publisher` to `Subscriber`, creates a subscription:
   
   ```swift
-  let Cancellable = intObservable => intObserver
+  intPublisher => intSubscriber
   ```
+
+- From `Publisher` to `Subject`, creates a subscription and returns `Cancellable`:
+
+```swift
+let Cancellable = intPublisher => intSubject
+```
 
   - From `Cancellable` to `DisposeBag`:
   
   ```swift
-  someCancellable => disposeBag
-  someObservable => someObserver => disposeBag
+  someCancellable => cancellableSet
+  somePublisher => someSubject => cancellableSet
   ```
   
-  - From `Publisher` to `Scheduler`, returns `Observable<E>`:
+  - From `Publisher` to `Scheduler`, returns `AnyPublisher<Output, Failure>`:
   
   ```swift
   let scheduler = SerialDispatchQueueScheduler(internalSerialQueueName: "Scheduler")
-  someObservable => scheduler => someObserver => disposeBag
+  somePublisher => scheduler => someSubscriber => cancellableSet
+  ```
+  
+  - From `Publisher` to `(Output) -> Void`:
+  
+  ```swift
+  somePublisher => { print($0) }
+  ```
+  
+  - From `Publisher` to `@autoescaping () -> Void`:
+  
+  ```swift
+  somePublisher => print("action")
   ```
   
 2. Operator `==>`
   
-Drive `Publisher` to `Subscriber` on main queue and returns `Cancellable`:
+Drive `Publisher` to `Subscriber` on main queue:
 ```swift
-intObservable ==> intObserver => disposeBag
+intPublisher ==> intSubscriber => cancellableSet
 ```
 
-3. Operators `<=>` and `<==>` create bidirectional subscriptions for `Equatable` sequences
+3. Operators `=>>` and `==>>` replaces `.removeDublicates()`
 
-4. Operator `=>>` replaces `.distinctUntilChanged()`
+4. `CancellableBuilder` and `PublisherBuilder` - result builders
 
-5. `CancellableSubscriber` and `CancellablePublisher` - protocols for observer and observeables that dispose all subscriptions on deinit, so you don't have to control disposing for each subscription.
-
-6. `ValueSubject<Output>` - analog of `Variable<Output>` with `DisposeBag` inside.
-
-7. Some features:
+5. Some features:
 
 - `skipNil()` operator
 - `or(Bool), .toggle(), !` operators for boolean sequences
 - use `+` and `+=` operator for merging observables, creating Cancellables, etc
 - `interval(...)` 
-- `withLast() -> Observable<(previous: Output?, current: Output)>`
-- `rx.asDisposeBag`
+- `withLast() -> Publisher<(previous: Output?, current: Output)>`
+- `cb.asDisposeBag`
 - `.mp` - `@dynamicMemberLookup` mapper
-- `asResult() -> Observable<Result<Output, Error>>`
+- `asResult() -> Publisher<Result<Output, Error>>`
 - `nilIfEmpty`
 - `isEmpty`
 - `isNil`
@@ -106,18 +120,18 @@ intObservable ==> intObserver => disposeBag
 - `smooth(...)` methods to smooth changes, example: sequence`[0, 1]` turns to `[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]`
 - `onNext, afterNext, onError, afterError, onCompleted, afterCompleted, onSubscribe, onSubscribed, onDispose` wrappers on `do(...)` operator
 - `guard()`
-- `rx.isFirstResponder`
-- `UIStackView().rx.update(...)`
-- `UIView().rx.transform.scale(), .rotation(), .translation()`
+- `cb.isFirstResponder`
+- `UIStackView().cb.update(...)`
+- `UIView().cb.transform.scale(), .rotation(), .translation()`
 
 ## Installation
 
 1.  [CocoaPods](https://cocoapods.org)
 
-RxOperators is available through [CocoaPods](https://cocoapods.org). To install
+CombineOperators is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 ```ruby
-pod 'RxOperators'
+pod 'CombineOperators'
 ```
 and run `pod update` from the podfile directory first.
 
@@ -131,10 +145,10 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/RxOperators.git", from: "2.8.0")
+    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "2.8.0")
     ],
   targets: [
-    .target(name: "SomeProject", dependencies: ["RxOperators"])
+    .target(name: "SomeProject", dependencies: ["CombineOperators"])
     ]
 )
 ```
@@ -147,4 +161,4 @@ Voidilov, voidilov@gmail.com
 
 ## License
 
-RxOperators is available under the MIT license. See the LICENSE file for more info.
+CombineOperators is available under the MIT license. See the LICENSE file for more info.
