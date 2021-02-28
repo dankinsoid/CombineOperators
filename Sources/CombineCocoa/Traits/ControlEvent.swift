@@ -50,8 +50,8 @@ public struct ControlEvent<PropertyType>: ControlEventType {
     /// - parameter events: Observable sequence that represents events.
     /// - returns: Control event created with a observable sequence of events.
 	public init<Ev: Publisher>(events: Ev) where Ev.Output == Output {
-		self.events = events.subscribe(on: DispatchQueue.main).catch({_ in Empty() }).eraseToAnyPublisher()
-    }
+		self.events = events.catch({_ in Empty() }).eraseToAnyPublisher()
+	}
 
 	public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, PropertyType == S.Input {
 		events.receive(subscriber: subscriber)

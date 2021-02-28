@@ -302,9 +302,9 @@ private let deallocSelector = NSSelectorFromString("dealloc")
 @available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: AnyObject {
     func synchronized<T>( _ action: () -> T) -> T {
-//        objc_sync_enter(self.base)
+        objc_sync_enter(self.base)
         let result = action()
-//        objc_sync_exit(self.base)
+        objc_sync_exit(self.base)
         return result
     }
 }

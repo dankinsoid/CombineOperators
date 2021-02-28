@@ -38,17 +38,17 @@ import Combine
  */
 
 @available(iOS 13.0, macOS 10.15, *)
-public typealias Driver<Source: Publisher, Catch: Publisher> = Publishers.SubscribeOn<Publishers.Catch<Publishers.Share<Source>, Catch>, DispatchQueue> where Catch.Output == Source.Output
+public typealias Driver<Source: Publisher, Catch: Publisher> = Publishers.ReceiveOn<Publishers.Catch<Publishers.Share<Source>, Catch>, DispatchQueue> where Catch.Output == Source.Output
 
 @available(iOS 13.0, macOS 10.15, *)
 extension Publisher {
     /// Adds `asDriver` to `SharingSequence` with `DriverSharingStrategy`.
     public func asDriver() -> Driver<Self, Empty<Output, Never>> {
-			share().catch { _ in Empty<Output, Never>(completeImmediately: true) }.subscribe(on: DispatchQueue.main)
+			share().catch { _ in Empty<Output, Never>(completeImmediately: true) }.receive(on: DispatchQueue.main)
     }
 	
 	public func asDriver(replaceError: Output) -> Driver<Self, Just<Output>> {
-		share().catch { _ in Just(replaceError) }.subscribe(on: DispatchQueue.main)
+		share().catch { _ in Just(replaceError) }.receive(on: DispatchQueue.main)
 	}
 }
 
