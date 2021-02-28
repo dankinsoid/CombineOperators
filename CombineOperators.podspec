@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CombineOperators'
-  s.version          = '1.26.0'
+  s.version          = '1.27.0'
   s.summary          = 'A short description of CombineOperators.'
   s.description      = <<-DESC
 TODO: Add long description of the pod here.
@@ -27,12 +27,9 @@ TODO: Add long description of the pod here.
   s.frameworks = 'Foundation', 'UIKit', 'Combine'
 
   s.subspec 'CombineCocoa' do |provider|
-    provider.source_files = 'Sources/CombineCocoa/**/*'
-    provider.dependency 'CombineOperators/CombineCocoaRuntime'
-  end
-  
-  s.subspec 'CombineCocoaRuntime' do |provider|
-    provider.source_files = 'Sources/CombineCocoaRuntime/**/*'
+    provider.source_files = 'Sources/CombineCocoa/**/*.swift', 'Sources/CombineCocoaRuntime/**/*', 'Sources/CombineOperators/**/*'
+  	provider.frameworks = 'Foundation', 'UIKit', 'Combine'
+  	provider.dependency 'VD'
   end
   
 end
