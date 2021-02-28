@@ -74,8 +74,7 @@ let Cancellable = intPublisher => intSubject
   - From `Publisher` to `Scheduler`, returns `AnyPublisher<Output, Failure>`:
   
   ```swift
-  let scheduler = SerialDispatchQueueScheduler(internalSerialQueueName: "Scheduler")
-  somePublisher => scheduler => someSubscriber => cancellableSet
+  somePublisher => DispatchQueue.main => someSubscriber
   ```
   
   - From `Publisher` to `(Output) -> Void`:
@@ -145,7 +144,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.19.0")
+    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.20.0")
     ],
   targets: [
     .target(name: "SomeProject", dependencies: ["CombineOperators"])
