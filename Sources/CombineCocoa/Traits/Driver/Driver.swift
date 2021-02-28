@@ -8,6 +8,7 @@
 
 import Foundation
 import Combine
+import CombineOperators
 
 /**
  Trait that represents observable sequence with following properties:
@@ -61,11 +62,11 @@ public struct Driver<Output>: Publisher {
 	private let publisher: AnyPublisher<Output, Failure>
 	
 	public init<P: Publisher, C: Publisher>(_ source: P, catch handler: @escaping (Error) -> C) where C.Output == P.Output, C.Output == Output {
-		publisher = source.share().catch(handler).receive(on: DispatchQueue.main).skipFailure().eraseToAnyPublisher()
+		publisher = source.share(replay: 1).catch(handler).receive(on: DispatchQueue.main).skipFailure().eraseToAnyPublisher()
 	}
 	
 	public init<P: Publisher>(_ source: P) where Never == P.Failure, P.Output == Output {
-		publisher = source.share().receive(on: DispatchQueue.main).eraseToAnyPublisher()
+		publisher = source.share(replay: 1).receive(on: DispatchQueue.main).eraseToAnyPublisher()
 	}
 	
 	public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, Output == S.Input {
