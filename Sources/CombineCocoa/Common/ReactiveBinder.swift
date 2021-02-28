@@ -18,8 +18,7 @@ public final class ReactiveBinder<Target: AnyObject, Input, KP: KeyPath<Target, 
 	/// Initializes `Binder`
 	///
 	/// - parameter target: Target object.
-	/// - parameter scheduler: Scheduler used to bind the events.
-	/// - parameter binding: Binding logic.
+	/// - parameter keyPath
 	public init(_ target: Target?, keyPath: KP) {
 		self.target = target
 		self.keyPath = keyPath
