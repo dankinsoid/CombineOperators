@@ -107,7 +107,6 @@ intPublisher ==> intSubscriber => cancellableSet
 - use `+` and `+=` operator for merging observables, creating Cancellables, etc
 - `interval(...)` 
 - `withLast() -> AnyPublisher<(previous: Output?, current: Output), Failure>`
-- `cb.asDisposeBag`
 - `.mp` - `@dynamicMemberLookup` mapper
 - `asResult() -> AnyPublisher<Result<Output, Error>, Never>`
 - `nilIfEmpty`
@@ -143,7 +142,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.21.0")
+    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.22.0")
     ],
   targets: [
     .target(name: "SomeProject", dependencies: ["CombineOperators"])
