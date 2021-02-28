@@ -129,7 +129,7 @@ intPublisher ==> intSubscriber => cancellableSet
 CombineOperators is available through [CocoaPods](https://cocoapods.org). To install
 it, simply add the following line to your Podfile:
 ```ruby
-pod 'CombineOperators'
+pod 'CombineOperators/CombineCocoa'
 ```
 and run `pod update` from the podfile directory first.
 
@@ -143,7 +143,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.27.0")
+    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.28.0")
     ],
   targets: [
     .target(name: "SomeProject", dependencies: ["CombineOperators"])
