@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "VDKit",
+        "repositoryURL": "https://github.com/dankinsoid/VDKit.git",
+        "state": {
+          "branch": null,
+          "revision": "32abaca0ef45484d7fe23c40abbf6fb6ad1967c4",
+          "version": "1.11.0"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
