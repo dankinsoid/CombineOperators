@@ -23,7 +23,7 @@ extension Reactive where Base: AnyObject {
 				}
 			}
 		}
-		//publishers.publishers[id] = publisher
+		publishers.publishers[id] = publisher
 		return publisher
 	}
 	
