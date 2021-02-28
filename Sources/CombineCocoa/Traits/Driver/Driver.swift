@@ -37,18 +37,39 @@ import Combine
  To find out more about traits and how to use them, please visit `Documentation/Traits.md`.
  */
 
-@available(iOS 13.0, macOS 10.15, *)
-public typealias Driver<Source: Publisher, Catch: Publisher> = Publishers.ReceiveOn<Publishers.Catch<Publishers.Share<Source>, Catch>, DispatchQueue> where Catch.Output == Source.Output
 
 @available(iOS 13.0, macOS 10.15, *)
 extension Publisher {
-    /// Adds `asDriver` to `SharingSequence` with `DriverSharingStrategy`.
-    public func asDriver() -> Driver<Self, Empty<Output, Never>> {
-			share().catch { _ in Empty<Output, Never>(completeImmediately: true) }.receive(on: DispatchQueue.main)
-    }
 	
-	public func asDriver(replaceError: Output) -> Driver<Self, Just<Output>> {
-		share().catch { _ in Just(replaceError) }.receive(on: DispatchQueue.main)
+	public func asDriver() -> Driver<Output> {
+		Driver(self.skipFailure())
 	}
+
+	public func asDriver(replaceError: Output) -> Driver<Output> {
+		Driver(self) { _ in Just(replaceError) }
+	}
+	
+	public func asDriver<C: Publisher>(catch handler: @escaping (Error) -> C) -> Driver<Output> where C.Output == Output {
+		Driver(self, catch: handler)
+	}
+	
 }
 
+@available(iOS 13.0, macOS 10.15, *)
+public struct Driver<Output>: Publisher {
+	public typealias Failure = Never
+	private let publisher: AnyPublisher<Output, Failure>
+	
+	public init<P: Publisher, C: Publisher>(_ source: P, catch handler: @escaping (Error) -> C) where C.Output == P.Output, C.Output == Output {
+		publisher = source.share().catch(handler).receive(on: DispatchQueue.main).skipFailure().eraseToAnyPublisher()
+	}
+	
+	public init<P: Publisher>(_ source: P) where Never == P.Failure, P.Output == Output {
+		publisher = source.share().receive(on: DispatchQueue.main).eraseToAnyPublisher()
+	}
+	
+	public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, Output == S.Input {
+		publisher.receive(subscriber: subscriber)
+	}
+	
+}
