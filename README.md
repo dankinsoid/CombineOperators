@@ -107,10 +107,10 @@ intPublisher ==> intSubscriber => cancellableSet
 - `or(Bool), .toggle(), !` operators for boolean sequences
 - use `+` and `+=` operator for merging observables, creating Cancellables, etc
 - `interval(...)` 
-- `withLast() -> Publisher<(previous: Output?, current: Output)>`
+- `withLast() -> AnyPublisher<(previous: Output?, current: Output), Failure>`
 - `cb.asDisposeBag`
 - `.mp` - `@dynamicMemberLookup` mapper
-- `asResult() -> Publisher<Result<Output, Error>>`
+- `asResult() -> AnyPublisher<Result<Output, Error>, Never>`
 - `nilIfEmpty`
 - `isEmpty`
 - `isNil`
@@ -118,7 +118,7 @@ intPublisher ==> intSubscriber => cancellableSet
 - `wrap(...), guarantee(...)` static methods on Single to create Single from functions with completions
 - `append(...)`
 - `smooth(...)` methods to smooth changes, example: sequence`[0, 1]` turns to `[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]`
-- `onNext, afterNext, onError, afterError, onCompleted, afterCompleted, onSubscribe, onSubscribed, onDispose` wrappers on `do(...)` operator
+- `onValue, onFailure, onFinished, onSubscribe, onCancel, onRequest` wrappers on `handleEvents(...)` operator
 - `guard()`
 - `cb.isFirstResponder`
 - `UIStackView().cb.update(...)`
@@ -145,7 +145,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "2.8.0")
+    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.19.0")
     ],
   targets: [
     .target(name: "SomeProject", dependencies: ["CombineOperators"])
