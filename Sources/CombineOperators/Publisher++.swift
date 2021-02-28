@@ -79,6 +79,10 @@ extension Publisher {
 	public func value<T>(_ value: T) -> Publishers.Map<Self, T> {
 		map { _ in value }
 	}
+	
+	public func any() -> AnyPublisher<Output, Failure> {
+		eraseToAnyPublisher()
+	}
 
 	public func asResult() -> Publishers.Create<Result<Output, Failure>, Never> {
 		Publishers.Create { subscriber in

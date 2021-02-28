@@ -24,6 +24,10 @@ extension Subscriber {
 		Subscribers.IgnoreNil(source: self)
 	}
 	
+	public func any() -> AnySubscriber<Input, Failure> {
+		AnySubscriber(self)
+	}
+	
 }
 
 @available(iOS 13.0, macOS 10.15, *)
