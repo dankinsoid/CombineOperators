@@ -56,13 +56,13 @@ class ViewController: UIViewController {
   
   ```swift
   intPublisher => intSubscriber
-  ```
+```
 
 - From `Publisher` to `Subject`, creates a subscription and returns `Cancellable`:
 
 ```swift
-let Cancellable = intPublisher => intSubject
-```
+  let Cancellable = intPublisher => intSubject
+  ```
 
   - From `Cancellable` to `DisposeBag`:
   
@@ -88,6 +88,7 @@ let Cancellable = intPublisher => intSubject
   ```swift
   somePublisher => print("action")
   ```
+  All operators casts output-input types and errors types where possible
   
 2. Operator `==>`
   
@@ -142,7 +143,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.23.0")
+    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.24.0")
     ],
   targets: [
     .target(name: "SomeProject", dependencies: ["CombineOperators"])
