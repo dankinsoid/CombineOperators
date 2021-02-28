@@ -114,7 +114,6 @@ intPublisher ==> intSubscriber => cancellableSet
 - `isEmpty`
 - `isNil`
 - `isNilOrEmpty`
-- `wrap(...), guarantee(...)` static methods on Single to create Single from functions with completions
 - `append(...)`
 - `smooth(...)` methods to smooth changes, example: sequence`[0, 1]` turns to `[0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]`
 - `onValue, onFailure, onFinished, onSubscribe, onCancel, onRequest` wrappers on `handleEvents(...)` operator
@@ -144,7 +143,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.20.0")
+    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.21.0")
     ],
   targets: [
     .target(name: "SomeProject", dependencies: ["CombineOperators"])
