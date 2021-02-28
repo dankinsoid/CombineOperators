@@ -1,6 +1,6 @@
 //
-//  UICollectionView+Rx.swift
-//  RxCocoa
+//  UICollectionView+Combine.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 4/2/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -18,13 +18,13 @@ extension Reactive where Base: UICollectionView {
     /**
     Binds sequences of elements to collection view items.
     
-    - parameter source: Observable sequence of items.
+    - parameter source: Publisher sequence of items.
     - parameter cellFactory: Transform between sequence elements and view cells.
     - returns: Cancellable object that can be used to unbind.
      
      Example
     
-         let items = Observable.just([
+         let items = Publisher.just([
              1,
              2,
              3
@@ -44,7 +44,7 @@ extension Reactive where Base: UICollectionView {
         -> (_ cellFactory: @escaping (UICollectionView, Int, Sequence.Element) -> UICollectionViewCell)
         -> Cancellable where Source.Output == Sequence {
         return { cellFactory in
-            let dataSource = RxCollectionViewReactiveArrayDataSourceSequenceWrapper<Sequence>(cellFactory: cellFactory)
+            let dataSource = CombineCollectionViewReactiveArrayDataSourceSequenceWrapper<Sequence>(cellFactory: cellFactory)
             return self.items(dataSource: dataSource)(source)
         }
         
@@ -54,14 +54,14 @@ extension Reactive where Base: UICollectionView {
     Binds sequences of elements to collection view items.
     
     - parameter cellIdentifier: Identifier used to dequeue cells.
-    - parameter source: Observable sequence of items.
+    - parameter source: Publisher sequence of items.
     - parameter configureCell: Transform between sequence elements and view cells.
     - parameter cellType: Type of collection view cell.
     - returns: Cancellable object that can be used to unbind.
      
      Example
 
-         let items = Observable.just([
+         let items = Publisher.just([
              1,
              2,
              3
@@ -80,7 +80,7 @@ extension Reactive where Base: UICollectionView {
         -> Cancellable where Source.Output == Sequence {
         return { source in
             return { configureCell in
-                let dataSource = RxCollectionViewReactiveArrayDataSourceSequenceWrapper<Sequence> { cv, i, item in
+                let dataSource = CombineCollectionViewReactiveArrayDataSourceSequenceWrapper<Sequence> { cv, i, item in
                     let indexPath = IndexPath(item: i, section: 0)
                     let cell = cv.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as! Cell
                     configureCell(i, item, cell)
@@ -97,14 +97,14 @@ extension Reactive where Base: UICollectionView {
     Binds sequences of elements to collection view items using a custom reactive data used to perform the transformation.
     
     - parameter dataSource: Data source used to transform elements to view cells.
-    - parameter source: Observable sequence of items.
+    - parameter source: Publisher sequence of items.
     - returns: Cancellable object that can be used to unbind.
      
      Example
      
-         let dataSource = RxCollectionViewSectionedReloadDataSource<SectionModel<String, Double>>()
+         let dataSource = CombineCollectionViewSectionedReloadDataSource<SectionModel<String, Double>>()
 
-         let items = Observable.just([
+         let items = Publisher.just([
              SectionModel(model: "First section", items: [
                  1.0,
                  2.0,
@@ -133,7 +133,7 @@ extension Reactive where Base: UICollectionView {
             .disposed(by: disposeBag)
     */
     public func items<
-            DataSource: RxCollectionViewDataSourceType & UICollectionViewDataSource,
+            DataSource: CombineCollectionViewDataSourceType & UICollectionViewDataSource,
             Source: Publisher>
         (dataSource: DataSource)
         -> (_ source: Source)
@@ -148,7 +148,7 @@ extension Reactive where Base: UICollectionView {
             // Therefore it's better to set delegate proxy first, just to be sure.
             _ = self.delegate
             // Strong reference is needed because data source is in use until result subscription is disposed
-            return source.subscribeProxyDataSource(ofObject: self.base, dataSource: dataSource, retainDataSource: true) { [weak collectionView = self.base] (_: RxCollectionViewDataSourceProxy, event) -> Void in
+            return source.subscribeProxyDataSource(ofObject: self.base, dataSource: dataSource, retainDataSource: true) { [weak collectionView = self.base] (_: CombineCollectionViewDataSourceProxy, event) -> Void in
                 guard let collectionView = collectionView else {
                     return
                 }
@@ -166,7 +166,7 @@ extension Reactive where Base: UICollectionView {
     ///
     /// For more information take a look at `DelegateProxyType` protocol documentation.
     public var dataSource: DelegateProxy<UICollectionView, UICollectionViewDataSource> {
-        RxCollectionViewDataSourceProxy.proxy(for: base)
+        CombineCollectionViewDataSourceProxy.proxy(for: base)
     }
     
     /// Installs data source as forwarding delegate on `rx.dataSource`.
@@ -178,7 +178,7 @@ extension Reactive where Base: UICollectionView {
     /// - returns: Cancellable object that can be used to unbind the data source.
     public func setDataSource(_ dataSource: UICollectionViewDataSource)
         -> Cancellable {
-        RxCollectionViewDataSourceProxy.installForwardDelegate(dataSource, retainDelegate: false, onProxyForObject: self.base)
+        CombineCollectionViewDataSourceProxy.installForwardDelegate(dataSource, retainDelegate: false, onProxyForObject: self.base)
     }
    
     /// Reactive wrapper for `delegate` message `collectionView(_:didSelectItemAtIndexPath:)`.
@@ -322,7 +322,7 @@ extension Reactive where Base: UICollectionView {
     ///
     /// For more information take a look at `DelegateProxyType` protocol documentation.
     public var prefetchDataSource: DelegateProxy<UICollectionView, UICollectionViewDataSourcePrefetching> {
-        RxCollectionViewDataSourcePrefetchingProxy.proxy(for: base)
+        CombineCollectionViewDataSourcePrefetchingProxy.proxy(for: base)
     }
 
     /**
@@ -336,12 +336,12 @@ extension Reactive where Base: UICollectionView {
      */
     public func setPrefetchDataSource(_ prefetchDataSource: UICollectionViewDataSourcePrefetching)
         -> Cancellable {
-            return RxCollectionViewDataSourcePrefetchingProxy.installForwardDelegate(prefetchDataSource, retainDelegate: false, onProxyForObject: self.base)
+            return CombineCollectionViewDataSourcePrefetchingProxy.installForwardDelegate(prefetchDataSource, retainDelegate: false, onProxyForObject: self.base)
     }
 
     /// Reactive wrapper for `prefetchDataSource` message `collectionView(_:prefetchItemsAt:)`.
     public var prefetchItems: ControlEvent<[IndexPath]> {
-        let source = RxCollectionViewDataSourcePrefetchingProxy.proxy(for: base).prefetchItemsPublishSubject
+        let source = CombineCollectionViewDataSourcePrefetchingProxy.proxy(for: base).prefetchItemsPublishSubject
         return ControlEvent(events: source)
     }
 

@@ -1,6 +1,6 @@
 //
 //  Binder.swift
-//  RxSwift
+//  CombineSwift
 //
 //  Created by Krunoslav Zaher on 9/17/17.
 //  Copyright © 2017 Krunoslav Zaher. All rights reserved.

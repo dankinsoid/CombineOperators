@@ -1,6 +1,6 @@
 //
-//  RxTableViewDataSourcePrefetchingProxy.swift
-//  RxCocoa
+//  CombineTableViewDataSourcePrefetchingProxy.swift
+//  CombineCocoa
 //
 //  Created by Rowan Livingstone on 2/15/18.
 //  Copyright © 2018 Krunoslav Zaher. All rights reserved.
@@ -29,7 +29,7 @@ private final class TableViewPrefetchDataSourceNotSet
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-open class RxTableViewDataSourcePrefetchingProxy
+open class CombineTableViewDataSourcePrefetchingProxy
     : DelegateProxy<UITableView, UITableViewDataSourcePrefetching>
     , DelegateProxyType
     , UITableViewDataSourcePrefetching {
@@ -40,12 +40,12 @@ open class RxTableViewDataSourcePrefetchingProxy
     /// - parameter tableView: Parent object for delegate proxy.
     public init(tableView: ParentObject) {
         self.tableView = tableView
-        super.init(parentObject: tableView, delegateProxy: RxTableViewDataSourcePrefetchingProxy.self)
+        super.init(parentObject: tableView, delegateProxy: CombineTableViewDataSourcePrefetchingProxy.self)
     }
 
     // Register known implementations
     public static func registerKnownImplementations() {
-        self.register { RxTableViewDataSourcePrefetchingProxy(tableView: $0) }
+        self.register { CombineTableViewDataSourcePrefetchingProxy(tableView: $0) }
     }
 
     private var _prefetchRowsPublishSubject: PassthroughSubject<[IndexPath], Error>?

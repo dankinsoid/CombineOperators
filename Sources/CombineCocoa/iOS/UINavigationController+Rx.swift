@@ -1,6 +1,6 @@
 //
-//  UINavigationController+Rx.swift
-//  RxCocoa
+//  UINavigationController+Combine.swift
+//  CombineCocoa
 //
 //  Created by Diogo on 13/04/17.
 //  Copyright © 2017 Krunoslav Zaher. All rights reserved.
@@ -18,7 +18,7 @@ extension Reactive where Base: UINavigationController {
     ///
     /// For more information take a look at `DelegateProxyType` protocol documentation.
     public var delegate: DelegateProxy<UINavigationController, UINavigationControllerDelegate> {
-        RxNavigationControllerDelegateProxy.proxy(for: base)
+        CombineNavigationControllerDelegateProxy.proxy(for: base)
     }
 
     /// Reactive wrapper for delegate method `navigationController(:willShow:animated:)`.

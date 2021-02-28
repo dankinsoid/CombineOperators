@@ -1,6 +1,6 @@
 //
-//  RxTableViewDelegateProxy.swift
-//  RxCocoa
+//  CombineTableViewDelegateProxy.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/15/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -13,8 +13,8 @@ import Combine
 
 /// For more information take a look at `DelegateProxyType`.
 @available(iOS 13.0, macOS 10.15, *)
-open class RxTableViewDelegateProxy
-    : RxScrollViewDelegateProxy
+open class CombineTableViewDelegateProxy
+    : CombineScrollViewDelegateProxy
     , UITableViewDelegate {
 
     /// Typed parent object.

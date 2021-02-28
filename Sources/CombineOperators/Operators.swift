@@ -1,5 +1,5 @@
 //
-//  RxOperators.swift
+//  CombineOperators.swift
 //
 //  Created by Данил Войдилов on 19.07.2018.
 //

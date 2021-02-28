@@ -1,6 +1,6 @@
 //
 //  DelegateProxy.swift
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/14/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -10,7 +10,7 @@
 
     import Combine
     #if SWIFT_PACKAGE && !os(Linux)
-        import RxCocoaRuntime
+        import CombineCocoaRuntime
     #endif
 
     /// Base class for `DelegateProxyType` protocol.
@@ -64,7 +64,7 @@
 
          e.g.
 
-             // delegate proxy part (RxScrollViewDelegateProxy)
+             // delegate proxy part (CombineScrollViewDelegateProxy)
 
              let internalSubject = PassthroughSubject<CGPoint, Error>
 
@@ -77,8 +77,8 @@
 
              // reactive property implementation in a real class (`UIScrollView`)
              public var property: AnyPublisher<CGPoint, Error> {
-                 let proxy = RxScrollViewDelegateProxy.proxy(for: base)
-                 return proxy.internalSubject.asObservable()
+                 let proxy = CombineScrollViewDelegateProxy.proxy(for: base)
+                 return proxy.internalSubject.asPublisher()
              }
 
          **In case calling this method prints "Delegate proxy is already implementing `\(selector)`,
@@ -86,7 +86,7 @@
          is required analog to the example above because delegate method has already been implemented.**
 
          - parameter selector: Selector used to filter observed invocations of delegate methods.
-         - returns: Observable sequence of arguments passed to `selector` method.
+         - returns: Publisher sequence of arguments passed to `selector` method.
          */
         open func sentMessage(_ selector: Selector) -> AnyPublisher<[Any], Error> {
             DispatchQueue.ensureRunningOnMainThread()
@@ -121,7 +121,7 @@
 
          e.g.
 
-             // delegate proxy part (RxScrollViewDelegateProxy)
+             // delegate proxy part (CombineScrollViewDelegateProxy)
 
              let internalSubject = PassthroughSubject<CGPoint, Error>
 
@@ -134,8 +134,8 @@
 
              // reactive property implementation in a real class (`UIScrollView`)
              public var property: AnyPublisher<CGPoint, Error> {
-                 let proxy = RxScrollViewDelegateProxy.proxy(for: base)
-                 return proxy.internalSubject.asObservable()
+                 let proxy = CombineScrollViewDelegateProxy.proxy(for: base)
+                 return proxy.internalSubject.asPublisher()
              }
 
          **In case calling this method prints "Delegate proxy is already implementing `\(selector)`,
@@ -143,7 +143,7 @@
          is required analog to the example above because delegate method has already been implemented.**
 
          - parameter selector: Selector used to filter observed invocations of delegate methods.
-         - returns: Observable sequence of arguments passed to `selector` method.
+         - returns: Publisher sequence of arguments passed to `selector` method.
          */
         open func methodInvoked(_ selector: Selector) -> AnyPublisher<[Any], Error> {
             DispatchQueue.ensureRunningOnMainThread()
@@ -160,7 +160,7 @@
             }
         }
 
-        fileprivate func checkSelectorIsObservable(_ selector: Selector) {
+        fileprivate func checkSelectorIsPublisher(_ selector: Selector) {
             DispatchQueue.ensureRunningOnMainThread()
 
             if self.hasWiredImplementation(for: selector) {
@@ -214,7 +214,7 @@
             let allUsedSelectors = sentSelectors + invokedSelectors
 
             for selector in Set(allUsedSelectors) {
-                self.checkSelectorIsObservable(selector)
+                self.checkSelectorIsPublisher(selector)
             }
 
             self.reset()
@@ -275,7 +275,7 @@ private let mainScheduler = DispatchQueue.main
 
             self.result = dispatcher
 							.handleEvents(
-								receiveSubscription: { _ in weakDelegateProxy?.checkSelectorIsObservable(selector); weakDelegateProxy?.reset() },
+								receiveSubscription: { _ in weakDelegateProxy?.checkSelectorIsPublisher(selector); weakDelegateProxy?.reset() },
 								receiveCancel: { weakDelegateProxy?.reset() }
 							)
 							.share()

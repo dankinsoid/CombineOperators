@@ -1,6 +1,6 @@
 //
-//  RxPickerViewDataSourceProxy.swift
-//  RxCocoa
+//  CombinePickerViewDataSourceProxy.swift
+//  CombineCocoa
 //
 //  Created by Sergey Shulga on 05/07/2017.
 //  Copyright © 2017 Krunoslav Zaher. All rights reserved.
@@ -32,7 +32,7 @@ private final class PickerViewDataSourceNotSet: NSObject, UIPickerViewDataSource
 
 /// For more information take a look at `DelegateProxyType`.
 @available(iOS 13.0, macOS 10.15, *)
-public class RxPickerViewDataSourceProxy
+public class CombinePickerViewDataSourceProxy
     : DelegateProxy<UIPickerView, UIPickerViewDataSource>
     , DelegateProxyType
     , UIPickerViewDataSource {
@@ -43,12 +43,12 @@ public class RxPickerViewDataSourceProxy
     /// - parameter pickerView: Parent object for delegate proxy.
     public init(pickerView: ParentObject) {
         self.pickerView = pickerView
-        super.init(parentObject: pickerView, delegateProxy: RxPickerViewDataSourceProxy.self)
+        super.init(parentObject: pickerView, delegateProxy: CombinePickerViewDataSourceProxy.self)
     }
 
     // Register known implementations
     public static func registerKnownImplementations() {
-        self.register { RxPickerViewDataSourceProxy(pickerView: $0) }
+        self.register { CombinePickerViewDataSourceProxy(pickerView: $0) }
     }
 
     private weak var _requiredMethodsDataSource: UIPickerViewDataSource? = pickerViewDataSourceNotSet

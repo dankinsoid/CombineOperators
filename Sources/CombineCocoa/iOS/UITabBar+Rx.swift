@@ -1,6 +1,6 @@
 //
-//  UITabBar+Rx.swift
-//  RxCocoa
+//  UITabBar+Combine.swift
+//  CombineCocoa
 //
 //  Created by Jesse Farless on 5/13/16.
 //  Copyright © 2016 Krunoslav Zaher. All rights reserved.
@@ -76,7 +76,7 @@ extension Reactive where Base: UITabBar {
     ///
     /// For more information take a look at `DelegateProxyType` protocol documentation.
     public var delegate: DelegateProxy<UITabBar, UITabBarDelegate> {
-        RxTabBarDelegateProxy.proxy(for: base)
+        CombineTabBarDelegateProxy.proxy(for: base)
     }
 
     /// Reactive wrapper for `delegate` message `tabBar(_:didSelect:)`.

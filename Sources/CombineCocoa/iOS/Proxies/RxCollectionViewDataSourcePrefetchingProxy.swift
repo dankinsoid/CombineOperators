@@ -1,6 +1,6 @@
 //
-//  RxCollectionViewDataSourcePrefetchingProxy.swift
-//  RxCocoa
+//  CombineCollectionViewDataSourcePrefetchingProxy.swift
+//  CombineCocoa
 //
 //  Created by Rowan Livingstone on 2/15/18.
 //  Copyright © 2018 Krunoslav Zaher. All rights reserved.
@@ -29,7 +29,7 @@ private final class CollectionViewPrefetchDataSourceNotSet
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-open class RxCollectionViewDataSourcePrefetchingProxy
+open class CombineCollectionViewDataSourcePrefetchingProxy
     : DelegateProxy<UICollectionView, UICollectionViewDataSourcePrefetching>
     , DelegateProxyType
     , UICollectionViewDataSourcePrefetching {
@@ -40,12 +40,12 @@ open class RxCollectionViewDataSourcePrefetchingProxy
     /// - parameter collectionView: Parent object for delegate proxy.
     public init(collectionView: ParentObject) {
         self.collectionView = collectionView
-        super.init(parentObject: collectionView, delegateProxy: RxCollectionViewDataSourcePrefetchingProxy.self)
+        super.init(parentObject: collectionView, delegateProxy: CombineCollectionViewDataSourcePrefetchingProxy.self)
     }
 
     // Register known implementations
     public static func registerKnownImplementations() {
-        self.register { RxCollectionViewDataSourcePrefetchingProxy(collectionView: $0) }
+        self.register { CombineCollectionViewDataSourcePrefetchingProxy(collectionView: $0) }
     }
 
     private var _prefetchItemsPublishSubject: PassthroughSubject<[IndexPath], Error>?

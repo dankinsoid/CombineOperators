@@ -1,6 +1,6 @@
 //
-//  NSControl+Rx.swift
-//  RxCocoa
+//  NSControl+Combine.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 5/31/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

@@ -1,6 +1,6 @@
 //
 //  _RXObjCRuntime.m
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 7/11/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -39,7 +39,7 @@ typedef BOOL (^RXInterceptWithOptimizedObserver)(RXObjCRuntime * __nonnull self,
 static CFTypeID  defaultTypeID;
 static SEL       deallocSelector;
 
-static int RxSwizzlingTargetClassKey = 0;
+static int CombineSwizzlingTargetClassKey = 0;
 
 #if TRACE_RESOURCES
 _Atomic static int32_t numberOInterceptedMethods = 0;
@@ -743,7 +743,7 @@ static NSMutableDictionary<NSString *, RXInterceptWithOptimizedObserver> *optimi
 }
 
 -(Class __nullable)prepareTargetClassForObserving:(id __nonnull)target error:(NSErrorParam)error {
-    Class swizzlingClass = objc_getAssociatedObject(target, &RxSwizzlingTargetClassKey);
+    Class swizzlingClass = objc_getAssociatedObject(target, &CombineSwizzlingTargetClassKey);
     if (swizzlingClass != nil) {
         return swizzlingClass;
     }
@@ -813,7 +813,7 @@ static NSMutableDictionary<NSString *, RXInterceptWithOptimizedObserver> *optimi
                                        userInfo:nil], nil);
     }
 
-    objc_setAssociatedObject(target, &RxSwizzlingTargetClassKey, dynamicFakeSubclass, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(target, &CombineSwizzlingTargetClassKey, dynamicFakeSubclass, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     return dynamicFakeSubclass;
 }
 
@@ -881,7 +881,7 @@ static NSMutableDictionary<NSString *, RXInterceptWithOptimizedObserver> *optimi
         }
     }
 
-    DLOG(@"Rx uses forwarding to observe `%@` for `%@`.", NSStringFromSelector(selector), swizzlingImplementorClass);
+    DLOG(@"Combine uses forwarding to observe `%@` for `%@`.", NSStringFromSelector(selector), swizzlingImplementorClass);
     [self registerForwardedSelector:selector forClass:swizzlingImplementorClass];
 
     return YES;
@@ -976,7 +976,7 @@ replacementImplementationGenerator:(IMP (^)(IMP originalImplementation))replacem
     atomic_fetch_add(&numberOInterceptedMethods, 1);
 #endif
     
-    DLOG(@"Rx is swizzling `%@` for `%@`", NSStringFromSelector(selector), class);
+    DLOG(@"Combine is swizzling `%@` for `%@`", NSStringFromSelector(selector), class);
 
     Method existingMethod = class_getInstanceMethod(class, selector);
     ALWAYS(existingMethod != nil, @"Method doesn't exist");

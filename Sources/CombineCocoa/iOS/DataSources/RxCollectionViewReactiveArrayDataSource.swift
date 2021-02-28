@@ -1,6 +1,6 @@
 //
-//  RxCollectionViewReactiveArrayDataSource.swift
-//  RxCocoa
+//  CombineCollectionViewReactiveArrayDataSource.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/29/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -40,9 +40,9 @@ class _RxCollectionViewReactiveArrayDataSource
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-class RxCollectionViewReactiveArrayDataSourceSequenceWrapper<Sequence: Swift.Sequence>
-    : RxCollectionViewReactiveArrayDataSource<Sequence.Element>
-    , RxCollectionViewDataSourceType {
+class CombineCollectionViewReactiveArrayDataSourceSequenceWrapper<Sequence: Swift.Sequence>
+    : CombineCollectionViewReactiveArrayDataSource<Sequence.Element>
+    , CombineCollectionViewDataSourceType {
     typealias Element = Sequence
 
     override init(cellFactory: @escaping CellFactory) {
@@ -60,7 +60,7 @@ class RxCollectionViewReactiveArrayDataSourceSequenceWrapper<Sequence: Swift.Seq
 
 // Please take a look at `DelegateProxyType.swift`
 @available(iOS 13.0, macOS 10.15, *)
-class RxCollectionViewReactiveArrayDataSource<Element>
+class CombineCollectionViewReactiveArrayDataSource<Element>
     : _RxCollectionViewReactiveArrayDataSource
     , SectionedViewDataSourceType {
     
@@ -75,7 +75,7 @@ class RxCollectionViewReactiveArrayDataSource<Element>
     func model(at indexPath: IndexPath) throws -> Any {
         precondition(indexPath.section == 0)
         guard let item = itemModels?[indexPath.item] else {
-            throw RxCocoaError.itemsNotYetBound(object: self)
+            throw CombineCocoaError.itemsNotYetBound(object: self)
         }
         return item
     }

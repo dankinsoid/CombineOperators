@@ -1,6 +1,6 @@
 //
-//  RxPickerViewDataSourceType.swift
-//  RxCocoa
+//  CombinePickerViewDataSourceType.swift
+//  CombineCocoa
 //
 //  Created by Sergey Shulga on 05/07/2017.
 //  Copyright © 2017 Krunoslav Zaher. All rights reserved.
@@ -13,7 +13,7 @@ import Combine
 
 /// Marks data source as `UIPickerView` reactive data source enabling it to be used with one of the `bindTo` methods.
 @available(iOS 13.0, macOS 10.15, *)
-public protocol RxPickerViewDataSourceType {
+public protocol CombinePickerViewDataSourceType {
     /// Type of elements that can be bound to picker view.
     associatedtype Element
     

@@ -1,28 +1,28 @@
 //
-//  RxCocoaObjCRuntimeError+Extensions.swift
-//  RxCocoa
+//  CombineCocoaObjCRuntimeError+Extensions.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 10/9/16.
 //  Copyright © 2016 Krunoslav Zaher. All rights reserved.
 //
 
 #if SWIFT_PACKAGE && !DISABLE_SWIZZLING && !os(Linux)
-    import RxCocoaRuntime
+    import CombineCocoaRuntime
 #endif
 
 #if !DISABLE_SWIZZLING && !os(Linux)
-    /// RxCocoa ObjC runtime interception mechanism.
+    /// CombineCocoa ObjC runtime interception mechanism.
 @available(iOS 13.0, macOS 10.15, *)
-    public enum RxCocoaInterceptionMechanism {
+    public enum CombineCocoaInterceptionMechanism {
         /// Unknown message interception mechanism.
         case unknown
         /// Key value observing interception mechanism.
         case kvo
     }
 
-    /// RxCocoa ObjC runtime modification errors.
+    /// CombineCocoa ObjC runtime modification errors.
 @available(iOS 13.0, macOS 10.15, *)
-    public enum RxCocoaObjCRuntimeError: Swift.Error, CustomDebugStringConvertible {
+    public enum CombineCocoaObjCRuntimeError: Swift.Error, CustomDebugStringConvertible {
         /// Unknown error has occurred.
         case unknown(target: AnyObject)
 
@@ -51,7 +51,7 @@
         it's highly unlikely it would have any benefit in real world use cases, and it's even more
         dangerous.
         */
-        case objectMessagesAlreadyBeingIntercepted(target: AnyObject, interceptionMechanism: RxCocoaInterceptionMechanism)
+        case objectMessagesAlreadyBeingIntercepted(target: AnyObject, interceptionMechanism: CombineCocoaInterceptionMechanism)
 
         /// Trying to observe messages for selector that isn't implemented.
         case selectorNotImplemented(target: AnyObject)
@@ -92,7 +92,7 @@
     }
 
 @available(iOS 13.0, macOS 10.15, *)
-extension RxCocoaObjCRuntimeError {
+extension CombineCocoaObjCRuntimeError {
         /// A textual representation of `self`, suitable for debugging.
         public var debugDescription: String {
             switch self {
@@ -100,7 +100,7 @@ extension RxCocoaObjCRuntimeError {
                 return "Unknown error occurred.\nTarget: `\(target)`"
             case let .objectMessagesAlreadyBeingIntercepted(target, interceptionMechanism):
                 let interceptionMechanismDescription = interceptionMechanism == .kvo ? "KVO" : "other interception mechanism"
-                return "Collision between RxCocoa interception mechanism and \(interceptionMechanismDescription)."
+                return "Collision between CombineCocoa interception mechanism and \(interceptionMechanismDescription)."
                     + " To resolve this conflict please use this interception mechanism first.\nTarget: \(target)"
             case let .selectorNotImplemented(target):
                 return "Trying to observe messages for selector that isn't implemented.\nTarget: \(target)"
@@ -120,11 +120,11 @@ extension RxCocoaObjCRuntimeError {
         }
     }
     
-    // MARK: Conversions `NSError` > `RxCocoaObjCRuntimeError`
+    // MARK: Conversions `NSError` > `CombineCocoaObjCRuntimeError`
 
 @available(iOS 13.0, macOS 10.15, *)
 extension Error {
-        func rxCocoaErrorForTarget(_ target: AnyObject) -> RxCocoaObjCRuntimeError {
+        func rxCocoaErrorForTarget(_ target: AnyObject) -> CombineCocoaObjCRuntimeError {
             let error = self as NSError
             
             if error.domain == RXObjCRuntimeErrorDomain {
@@ -155,7 +155,7 @@ extension Error {
                 }
             }
             
-            return RxCocoaObjCRuntimeError.unknown(target: target)
+            return CombineCocoaObjCRuntimeError.unknown(target: target)
         }
     }
 

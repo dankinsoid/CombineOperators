@@ -1,6 +1,6 @@
 //
-//  UISearchController+Rx.swift
-//  RxCocoa
+//  UISearchController+Combine.swift
+//  CombineCocoa
 //
 //  Created by Segii Shulga on 3/17/16.
 //  Copyright © 2016 Krunoslav Zaher. All rights reserved.
@@ -16,7 +16,7 @@ extension Reactive where Base: UISearchController {
         /// Reactive wrapper for `delegate`.
         /// For more information take a look at `DelegateProxyType` protocol documentation.
         public var delegate: DelegateProxy<UISearchController, UISearchControllerDelegate> {
-            return RxSearchControllerDelegateProxy.proxy(for: base)
+            return CombineSearchControllerDelegateProxy.proxy(for: base)
         }
 
         /// Reactive wrapper for `delegate` message.

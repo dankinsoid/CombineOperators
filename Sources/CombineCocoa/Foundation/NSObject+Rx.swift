@@ -1,6 +1,6 @@
 //
-//  NSObject+Rx.swift
-//  RxCocoa
+//  NSObject+Combine.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 2/21/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -11,7 +11,7 @@
 import Foundation
 import Combine
 #if SWIFT_PACKAGE && !DISABLE_SWIZZLING && !os(Linux)
-    import RxCocoaRuntime
+    import CombineCocoaRuntime
 #endif
 
 #if !DISABLE_SWIZZLING && !os(Linux)
@@ -69,38 +69,38 @@ extension Reactive where Base: NSObject {
 extension Reactive where Base: AnyObject {
     
     /**
-    Observable sequence of object deallocated events.
+    Publisher sequence of object deallocated events.
     
     After object is deallocated one `()` element will be produced and sequence will immediately complete.
     
-    - returns: Observable sequence of object deallocated events.
+    - returns: Publisher sequence of object deallocated events.
     */
     public var deallocated: AnyPublisher<Void, Never> {
         return self.synchronized {
-            if let deallocObservable = objc_getAssociatedObject(self.base, &deallocatedSubjectContext) as? DeallocObservable {
-							return deallocObservable.subject.eraseToAnyPublisher()
+            if let deallocPublisher = objc_getAssociatedObject(self.base, &deallocatedSubjectContext) as? DeallocPublisher {
+							return deallocPublisher.subject.eraseToAnyPublisher()
             }
 
-            let deallocObservable = DeallocObservable()
+            let deallocPublisher = DeallocPublisher()
 
-            objc_setAssociatedObject(self.base, &deallocatedSubjectContext, deallocObservable, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-					return deallocObservable.subject.eraseToAnyPublisher()
+            objc_setAssociatedObject(self.base, &deallocatedSubjectContext, deallocPublisher, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+					return deallocPublisher.subject.eraseToAnyPublisher()
         }
     }
 
 #if !DISABLE_SWIZZLING && !os(Linux)
 
     /**
-     Observable sequence of message arguments that completes when object is deallocated.
+     Publisher sequence of message arguments that completes when object is deallocated.
      
      Each element is produced before message is invoked on target object. `methodInvoked`
      exists in case observing of invoked messages is needed.
 
-     In case an error occurs sequence will fail with `RxCocoaObjCRuntimeError`.
+     In case an error occurs sequence will fail with `CombineCocoaObjCRuntimeError`.
      
      In case some argument is `nil`, instance of `NSNull()` will be sent.
 
-     - returns: Observable sequence of arguments passed to `selector` method.
+     - returns: Publisher sequence of arguments passed to `selector` method.
      */
     public func sentMessage(_ selector: Selector) -> AnyPublisher<[Any], Error> {
         return self.synchronized {
@@ -120,16 +120,16 @@ extension Reactive where Base: AnyObject {
     }
 
     /**
-     Observable sequence of message arguments that completes when object is deallocated.
+     Publisher sequence of message arguments that completes when object is deallocated.
 
      Each element is produced after message is invoked on target object. `sentMessage`
      exists in case interception of sent messages before they were invoked is needed.
 
-     In case an error occurs sequence will fail with `RxCocoaObjCRuntimeError`.
+     In case an error occurs sequence will fail with `CombineCocoaObjCRuntimeError`.
 
      In case some argument is `nil`, instance of `NSNull()` will be sent.
 
-     - returns: Observable sequence of arguments passed to `selector` method.
+     - returns: Publisher sequence of arguments passed to `selector` method.
      */
     public func methodInvoked(_ selector: Selector) -> AnyPublisher<[Any], Error> {
         return self.synchronized {
@@ -150,14 +150,14 @@ extension Reactive where Base: AnyObject {
     }
 
     /**
-    Observable sequence of object deallocating events.
+    Publisher sequence of object deallocating events.
     
     When `dealloc` message is sent to `self` one `()` element will be produced and after object is deallocated sequence
     will immediately complete.
      
-    In case an error occurs sequence will fail with `RxCocoaObjCRuntimeError`.
+    In case an error occurs sequence will fail with `CombineCocoaObjCRuntimeError`.
     
-    - returns: Observable sequence of object deallocating events.
+    - returns: Publisher sequence of object deallocating events.
     */
     public var deallocating: AnyPublisher<(), Error> {
         return self.synchronized {
@@ -196,7 +196,7 @@ extension Reactive where Base: AnyObject {
         var error: NSError?
         let targetImplementation = RX_ensure_observing(self.base, selector, &error)
         if targetImplementation == nil {
-            throw error?.rxCocoaErrorForTarget(self.base) ?? RxCocoaError.unknown
+            throw error?.rxCocoaErrorForTarget(self.base) ?? CombineCocoaError.unknown
         }
 
         subject.targetImplementation = targetImplementation!
@@ -283,7 +283,7 @@ private protocol MessageInterceptorSubject: AnyObject {
 
 
 @available(iOS 13.0, macOS 10.15, *)
-private final class DeallocObservable {
+private final class DeallocPublisher {
     let subject = PassthroughSubject<Void, Never>()
 
     init() {}
@@ -312,15 +312,15 @@ extension Reactive where Base: AnyObject {
 @available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: AnyObject {
     /**
-     Helper to make sure that `Observable` returned from `createCachedObservable` is only created once.
+     Helper to make sure that `Publisher` returned from `createCachedPublisher` is only created once.
      This is important because there is only one `target` and `action` properties on `NSControl` or `UIBarButtonItem`.
      */
-    func lazyInstanceAnyPublisher<T>(_ key: UnsafeRawPointer, createCachedObservable: () -> T) -> T {
+    func lazyInstanceAnyPublisher<T>(_ key: UnsafeRawPointer, createCachedPublisher: () -> T) -> T {
         if let value = objc_getAssociatedObject(self.base, key) {
 					return (value as! Wrapper<T>).t
         }
         
-        let observable = createCachedObservable()
+        let observable = createCachedPublisher()
         
         objc_setAssociatedObject(self.base, key, Wrapper(observable), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         

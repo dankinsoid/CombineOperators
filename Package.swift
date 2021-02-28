@@ -16,8 +16,8 @@ let package = Package(
     ],
     targets: [
 			.target(name: "CombineOperators", dependencies: ["VDKit"]),
-			.target(name: "RxCocoaRuntime", dependencies: []),
-			.target(name: "CombineCocoa", dependencies: ["RxCocoaRuntime", "CombineOperators", "VDKit"]),
+			.target(name: "CombineCocoaRuntime", dependencies: []),
+			.target(name: "CombineCocoa", dependencies: ["CombineCocoaRuntime", "CombineOperators", "VDKit"]),
 			.testTarget(name: "CombineOperatorsTests", dependencies: ["CombineOperators", "CombineCocoa"])
     ]
 )

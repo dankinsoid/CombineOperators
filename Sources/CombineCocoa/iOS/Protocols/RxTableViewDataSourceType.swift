@@ -1,6 +1,6 @@
 //
-//  RxTableViewDataSourceType.swift
-//  RxCocoa
+//  CombineTableViewDataSourceType.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/26/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -13,7 +13,7 @@ import Combine
 
 /// Marks data source as `UITableView` reactive data source enabling it to be used with one of the `bindTo` methods.
 @available(iOS 13.0, macOS 10.15, *)
-public protocol RxTableViewDataSourceType /*: UITableViewDataSource*/ {
+public protocol CombineTableViewDataSourceType /*: UITableViewDataSource*/ {
     
     /// Type of elements that can be bound to table view.
     associatedtype Element

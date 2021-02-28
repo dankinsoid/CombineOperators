@@ -1,6 +1,6 @@
 //
 //  ControlEvent.swift
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 8/28/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -18,7 +18,7 @@ public protocol ControlEventType: Publisher {
 }
 
 /**
-    A trait for `Observable`/`Publisher` that represents an event on a UI element.
+    A trait for `Publisher`/`Publisher` that represents an event on a UI element.
 
     Properties:
 
@@ -47,7 +47,7 @@ public struct ControlEvent<PropertyType>: ControlEventType {
 
     /// Initializes control event with a observable sequence that represents events.
     ///
-    /// - parameter events: Observable sequence that represents events.
+    /// - parameter events: Publisher sequence that represents events.
     /// - returns: Control event created with a observable sequence of events.
 	public init<Ev: Publisher>(events: Ev) where Ev.Output == Output {
 		self.events = events.catch({_ in Empty() }).eraseToAnyPublisher()

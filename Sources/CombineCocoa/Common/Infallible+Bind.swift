@@ -1,6 +1,6 @@
 //
 //  Infallible+Bind.swift
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Shai Mishali on 27/08/2020.
 //  Copyright © 2020 Krunoslav Zaher. All rights reserved.

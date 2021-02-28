@@ -1,6 +1,6 @@
 //
-//  UIScrollView+Rx.swift
-//  RxCocoa
+//  UIScrollView+Combine.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 4/3/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -20,12 +20,12 @@ extension Reactive where Base: UIScrollView {
         ///
         /// For more information take a look at `DelegateProxyType` protocol documentation.
         public var delegate: DelegateProxy<UIScrollView, UIScrollViewDelegate> {
-            return RxScrollViewDelegateProxy.proxy(for: base)
+            return CombineScrollViewDelegateProxy.proxy(for: base)
         }
         
         /// Reactive wrapper for `contentOffset`.
         public var contentOffset: ControlProperty<CGPoint> {
-            let proxy = RxScrollViewDelegateProxy.proxy(for: base)
+            let proxy = CombineScrollViewDelegateProxy.proxy(for: base)
 
             let bindingObserver = Binder(self.base) { scrollView, contentOffset in
                 scrollView.contentOffset = contentOffset
@@ -36,7 +36,7 @@ extension Reactive where Base: UIScrollView {
 
         /// Reactive wrapper for delegate method `scrollViewDidScroll`
         public var didScroll: ControlEvent<Void> {
-            let source = RxScrollViewDelegateProxy.proxy(for: base).contentOffsetPublishSubject
+            let source = CombineScrollViewDelegateProxy.proxy(for: base).contentOffsetPublishSubject
             return ControlEvent(events: source)
         }
         
@@ -65,7 +65,7 @@ extension Reactive where Base: UIScrollView {
                     let velocity = try castOrThrow(CGPoint.self, value[1])
                     let targetContentOffsetValue = try castOrThrow(NSValue.self, value[2])
 
-                    guard let rawPointer = targetContentOffsetValue.pointerValue else { throw RxCocoaError.unknown }
+                    guard let rawPointer = targetContentOffsetValue.pointerValue else { throw CombineCocoaError.unknown }
                     let typedPointer = rawPointer.bindMemory(to: CGPoint.self, capacity: MemoryLayout<CGPoint>.size)
 
                     return (velocity, typedPointer)
@@ -125,7 +125,7 @@ extension Reactive where Base: UIScrollView {
         /// - returns: Cancellable object that can be used to unbind the delegate.
         public func setDelegate(_ delegate: UIScrollViewDelegate)
             -> Cancellable {
-            return RxScrollViewDelegateProxy.installForwardDelegate(delegate, retainDelegate: false, onProxyForObject: self.base)
+            return CombineScrollViewDelegateProxy.installForwardDelegate(delegate, retainDelegate: false, onProxyForObject: self.base)
         }
     }
 

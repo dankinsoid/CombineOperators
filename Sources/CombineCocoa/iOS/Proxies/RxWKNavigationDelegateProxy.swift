@@ -1,6 +1,6 @@
 //
-//  RxWKNavigationDelegateProxy.swift
-//  RxCocoa
+//  CombineWKNavigationDelegateProxy.swift
+//  CombineCocoa
 //
 //  Created by Giuseppe Lanza on 14/02/2020.
 //  Copyright © 2020 Krunoslav Zaher. All rights reserved.
@@ -13,7 +13,7 @@ import WebKit
 
 @available(iOS 8.0, OSX 10.10, OSXApplicationExtension 10.10, *)
 @available(iOS 13.0, macOS 10.15, *)
-open class RxWKNavigationDelegateProxy
+open class CombineWKNavigationDelegateProxy
     : DelegateProxy<WKWebView, WKNavigationDelegate>
     , DelegateProxyType
 , WKNavigationDelegate {
@@ -24,12 +24,12 @@ open class RxWKNavigationDelegateProxy
     /// - parameter webView: Parent object for delegate proxy.
     public init(webView: ParentObject) {
         self.webView = webView
-        super.init(parentObject: webView, delegateProxy: RxWKNavigationDelegateProxy.self)
+        super.init(parentObject: webView, delegateProxy: CombineWKNavigationDelegateProxy.self)
     }
 
     // Register known implementations
     public static func registerKnownImplementations() {
-        self.register { RxWKNavigationDelegateProxy(webView: $0) }
+        self.register { CombineWKNavigationDelegateProxy(webView: $0) }
     }
     
     public static func currentDelegate(for object: WKWebView) -> WKNavigationDelegate? {

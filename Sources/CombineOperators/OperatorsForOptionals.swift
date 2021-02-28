@@ -1,6 +1,6 @@
 //
-//  RxOperatorsForOptionals.swift
-//  RxOperators
+//  CombineOperatorsForOptionals.swift
+//  CombineOperators
 //
 //  Created by Daniil on 16.08.2019.
 //

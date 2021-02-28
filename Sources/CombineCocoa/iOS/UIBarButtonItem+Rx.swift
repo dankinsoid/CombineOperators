@@ -1,6 +1,6 @@
 //
-//  UIBarButtonItem+Rx.swift
-//  RxCocoa
+//  UIBarButtonItem+Combine.swift
+//  CombineCocoa
 //
 //  Created by Daniel Tartaglia on 5/31/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -38,7 +38,7 @@ extension Reactive where Base: UIBarButtonItem {
 
 @objc
 @available(iOS 13.0, macOS 10.15, *)
-final class BarButtonItemTarget: RxTarget {
+final class BarButtonItemTarget: CombineTarget {
     typealias Callback = () -> Void
     
     weak var barButtonItem: UIBarButtonItem?

@@ -1,6 +1,6 @@
 //
-//  UITableView+Rx.swift
-//  RxCocoa
+//  UITableView+Combine.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 4/2/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -18,13 +18,13 @@ extension Reactive where Base: UITableView {
     /**
     Binds sequences of elements to table view rows.
     
-    - parameter source: Observable sequence of items.
+    - parameter source: Publisher sequence of items.
     - parameter cellFactory: Transform between sequence elements and view cells.
     - returns: Cancellable object that can be used to unbind.
      
      Example:
     
-         let items = Observable.just([
+         let items = Publisher.just([
              "First Item",
              "Second Item",
              "Third Item"
@@ -45,7 +45,7 @@ extension Reactive where Base: UITableView {
         -> Cancellable
         where Source.Output == Sequence {
             return { cellFactory in
-                let dataSource = RxTableViewReactiveArrayDataSourceSequenceWrapper<Sequence>(cellFactory: cellFactory)
+                let dataSource = CombineTableViewReactiveArrayDataSourceSequenceWrapper<Sequence>(cellFactory: cellFactory)
                 return self.items(dataSource: dataSource)(source)
             }
     }
@@ -54,14 +54,14 @@ extension Reactive where Base: UITableView {
     Binds sequences of elements to table view rows.
     
     - parameter cellIdentifier: Identifier used to dequeue cells.
-    - parameter source: Observable sequence of items.
+    - parameter source: Publisher sequence of items.
     - parameter configureCell: Transform between sequence elements and view cells.
     - parameter cellType: Type of table view cell.
     - returns: Cancellable object that can be used to unbind.
      
      Example:
 
-         let items = Observable.just([
+         let items = Publisher.just([
              "First Item",
              "Second Item",
              "Third Item"
@@ -81,7 +81,7 @@ extension Reactive where Base: UITableView {
         where Source.Output == Sequence {
         return { source in
             return { configureCell in
-                let dataSource = RxTableViewReactiveArrayDataSourceSequenceWrapper<Sequence> { tv, i, item in
+                let dataSource = CombineTableViewReactiveArrayDataSourceSequenceWrapper<Sequence> { tv, i, item in
                     let indexPath = IndexPath(item: i, section: 0)
                     let cell = tv.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as! Cell
                     configureCell(i, item, cell)
@@ -101,11 +101,11 @@ extension Reactive where Base: UITableView {
     until the subscription isn't disposed.
     
     - parameter dataSource: Data source used to transform elements to view cells.
-    - parameter source: Observable sequence of items.
+    - parameter source: Publisher sequence of items.
     - returns: Cancellable object that can be used to unbind.
     */
     public func items<
-            DataSource: RxTableViewDataSourceType & UITableViewDataSource,
+            DataSource: CombineTableViewDataSourceType & UITableViewDataSource,
             Source: Publisher>
         (dataSource: DataSource)
         -> (_ source: Source)
@@ -120,7 +120,7 @@ extension Reactive where Base: UITableView {
             // Therefore it's better to set delegate proxy first, just to be sure.
             _ = self.delegate
             // Strong reference is needed because data source is in use until result subscription is disposed
-            return source.subscribeProxyDataSource(ofObject: self.base, dataSource: dataSource as UITableViewDataSource, retainDataSource: true) { [weak tableView = self.base] (_: RxTableViewDataSourceProxy, event) -> Void in
+            return source.subscribeProxyDataSource(ofObject: self.base, dataSource: dataSource as UITableViewDataSource, retainDataSource: true) { [weak tableView = self.base] (_: CombineTableViewDataSourceProxy, event) -> Void in
                 guard let tableView = tableView else {
                     return
                 }
@@ -138,7 +138,7 @@ extension Reactive where Base: UITableView {
     For more information take a look at `DelegateProxyType` protocol documentation.
     */
     public var dataSource: DelegateProxy<UITableView, UITableViewDataSource> {
-        RxTableViewDataSourceProxy.proxy(for: base)
+        CombineTableViewDataSourceProxy.proxy(for: base)
     }
    
     /**
@@ -152,7 +152,7 @@ extension Reactive where Base: UITableView {
     */
     public func setDataSource(_ dataSource: UITableViewDataSource)
         -> Cancellable {
-        RxTableViewDataSourceProxy.installForwardDelegate(dataSource, retainDelegate: false, onProxyForObject: self.base)
+        CombineTableViewDataSourceProxy.installForwardDelegate(dataSource, retainDelegate: false, onProxyForObject: self.base)
     }
     
     // events
@@ -369,7 +369,7 @@ extension Reactive where Base: UITableView {
     ///
     /// For more information take a look at `DelegateProxyType` protocol documentation.
     public var prefetchDataSource: DelegateProxy<UITableView, UITableViewDataSourcePrefetching> {
-        RxTableViewDataSourcePrefetchingProxy.proxy(for: base)
+        CombineTableViewDataSourcePrefetchingProxy.proxy(for: base)
     }
 
     /**
@@ -383,12 +383,12 @@ extension Reactive where Base: UITableView {
      */
     public func setPrefetchDataSource(_ prefetchDataSource: UITableViewDataSourcePrefetching)
         -> Cancellable {
-            return RxTableViewDataSourcePrefetchingProxy.installForwardDelegate(prefetchDataSource, retainDelegate: false, onProxyForObject: self.base)
+            return CombineTableViewDataSourcePrefetchingProxy.installForwardDelegate(prefetchDataSource, retainDelegate: false, onProxyForObject: self.base)
     }
 
     /// Reactive wrapper for `prefetchDataSource` message `tableView(_:prefetchRowsAt:)`.
     public var prefetchRows: ControlEvent<[IndexPath]> {
-        let source = RxTableViewDataSourcePrefetchingProxy.proxy(for: base).prefetchRowsPublishSubject
+        let source = CombineTableViewDataSourcePrefetchingProxy.proxy(for: base).prefetchRowsPublishSubject
         return ControlEvent(events: source)
     }
 

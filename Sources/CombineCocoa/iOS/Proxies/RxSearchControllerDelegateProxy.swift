@@ -1,6 +1,6 @@
 //
-//  RxSearchControllerDelegateProxy.swift
-//  RxCocoa
+//  CombineSearchControllerDelegateProxy.swift
+//  CombineCocoa
 //
 //  Created by Segii Shulga on 3/17/16.
 //  Copyright © 2016 Krunoslav Zaher. All rights reserved.
@@ -18,7 +18,7 @@ extension UISearchController: HasDelegate {
 
 /// For more information take a look at `DelegateProxyType`.
 @available(iOS 13.0, macOS 10.15, *)
-open class RxSearchControllerDelegateProxy
+open class CombineSearchControllerDelegateProxy
     : DelegateProxy<UISearchController, UISearchControllerDelegate>
     , DelegateProxyType 
     , UISearchControllerDelegate {
@@ -29,12 +29,12 @@ open class RxSearchControllerDelegateProxy
     /// - parameter searchController: Parent object for delegate proxy.
     public init(searchController: UISearchController) {
         self.searchController = searchController
-        super.init(parentObject: searchController, delegateProxy: RxSearchControllerDelegateProxy.self)
+        super.init(parentObject: searchController, delegateProxy: CombineSearchControllerDelegateProxy.self)
     }
     
     // Register known implementations
     public static func registerKnownImplementations() {
-        self.register { RxSearchControllerDelegateProxy(searchController: $0) }
+        self.register { CombineSearchControllerDelegateProxy(searchController: $0) }
     }
 }
    

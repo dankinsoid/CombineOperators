@@ -1,6 +1,6 @@
 //
-//  UIButton+Rx.swift
-//  RxCocoa
+//  UIButton+Combine.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 3/28/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

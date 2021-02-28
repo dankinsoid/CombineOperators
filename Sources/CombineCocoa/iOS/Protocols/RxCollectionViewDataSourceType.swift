@@ -1,6 +1,6 @@
 //
-//  RxCollectionViewDataSourceType.swift
-//  RxCocoa
+//  CombineCollectionViewDataSourceType.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/29/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -13,7 +13,7 @@ import Combine
 
 /// Marks data source as `UICollectionView` reactive data source enabling it to be used with one of the `bindTo` methods.
 @available(iOS 13.0, macOS 10.15, *)
-public protocol RxCollectionViewDataSourceType /*: UICollectionViewDataSource*/ {
+public protocol CombineCollectionViewDataSourceType /*: UICollectionViewDataSource*/ {
     
     /// Type of elements that can be bound to collection view.
     associatedtype Element

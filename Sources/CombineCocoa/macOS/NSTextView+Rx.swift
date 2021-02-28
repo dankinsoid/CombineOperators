@@ -1,6 +1,6 @@
 //
-//  NSTextView+Rx.swift
-//  RxCocoa
+//  NSTextView+Combine.swift
+//  CombineCocoa
 //
 //  Created by Cee on 8/5/18.
 //  Copyright © 2018 Krunoslav Zaher. All rights reserved.
@@ -15,7 +15,7 @@ import Combine
 ///
 /// For more information take a look at `DelegateProxyType`.
 @available(iOS 13.0, macOS 10.15, *)
-open class RxTextViewDelegateProxy: DelegateProxy<NSTextView, NSTextViewDelegate>, DelegateProxyType, NSTextViewDelegate {
+open class CombineTextViewDelegateProxy: DelegateProxy<NSTextView, NSTextViewDelegate>, DelegateProxyType, NSTextViewDelegate {
 
     #if compiler(>=5.2)
     /// Typed parent object.
@@ -29,16 +29,16 @@ open class RxTextViewDelegateProxy: DelegateProxy<NSTextView, NSTextViewDelegate
     public weak private(set) var textView: NSTextView?
     #endif
 
-    /// Initializes `RxTextViewDelegateProxy`
+    /// Initializes `CombineTextViewDelegateProxy`
     ///
     /// - parameter textView: Parent object for delegate proxy.
     init(textView: NSTextView) {
         self.textView = textView
-        super.init(parentObject: textView, delegateProxy: RxTextViewDelegateProxy.self)
+        super.init(parentObject: textView, delegateProxy: CombineTextViewDelegateProxy.self)
     }
 
     public static func registerKnownImplementations() {
-        self.register { RxTextViewDelegateProxy(textView: $0) }
+        self.register { CombineTextViewDelegateProxy(textView: $0) }
     }
 
     fileprivate let textSubject = PassthroughSubject<String, Error>()
@@ -72,12 +72,12 @@ extension Reactive where Base: NSTextView {
     ///
     /// For more information take a look at `DelegateProxyType` protocol documentation.
     public var delegate: DelegateProxy<NSTextView, NSTextViewDelegate> {
-        RxTextViewDelegateProxy.proxy(for: self.base)
+        CombineTextViewDelegateProxy.proxy(for: self.base)
     }
 
     /// Reactive wrapper for `string` property.
     public var string: ControlProperty<String> {
-        let delegate = RxTextViewDelegateProxy.proxy(for: self.base)
+        let delegate = CombineTextViewDelegateProxy.proxy(for: self.base)
 
         let source = Deferred { [weak textView = self.base] in
             delegate.textSubject.prepend(textView?.string ?? "")

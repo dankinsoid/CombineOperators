@@ -1,6 +1,6 @@
 //
-//  UISlider+Rx.swift
-//  RxCocoa
+//  UISlider+Combine.swift
+//  CombineCocoa
 //
 //  Created by Alexander van der Werff on 28/05/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

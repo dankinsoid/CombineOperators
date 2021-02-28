@@ -1,6 +1,6 @@
 //
-//  RxCocoa.swift
-//  RxCocoa
+//  CombineCocoa.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 2/21/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -12,9 +12,9 @@ import Combine
     import UIKit
 #endif
 
-/// RxCocoa errors.
+/// CombineCocoa errors.
 @available(iOS 13.0, macOS 10.15, *)
-public enum RxCocoaError
+public enum CombineCocoaError
     : Swift.Error
     , CustomDebugStringConvertible {
     /// Unknown error has occurred.
@@ -37,7 +37,7 @@ public enum RxCocoaError
 // MARK: Debug descriptions
 
 @available(iOS 13.0, macOS 10.15, *)
-extension RxCocoaError {
+extension CombineCocoaError {
     /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
         switch self {
@@ -105,7 +105,7 @@ func castOptionalOrFatalError<T>(_ value: Any?) -> T? {
 @available(iOS 13.0, macOS 10.15, *)
 func castOrThrow<T>(_ resultType: T.Type, _ object: Any) throws -> T {
     guard let returnValue = object as? T else {
-        throw RxCocoaError.castingError(object: object, targetType: resultType)
+        throw CombineCocoaError.castingError(object: object, targetType: resultType)
     }
 
     return returnValue
@@ -118,7 +118,7 @@ func castOptionalOrThrow<T>(_ resultType: T.Type, _ object: AnyObject) throws ->
     }
 
     guard let returnValue = object as? T else {
-        throw RxCocoaError.castingError(object: object, targetType: resultType)
+        throw CombineCocoaError.castingError(object: object, targetType: resultType)
     }
 
     return returnValue
@@ -151,7 +151,7 @@ let dataSourceNotSet = "DataSource not set"
 @available(iOS 13.0, macOS 10.15, *)
 let delegateNotSet = "Delegate not set"
 
-// MARK: Shared with RxSwift
+// MARK: Shared with CombineSwift
 
 func rxFatalError(_ lastMessage: String) -> Never  {
     // The temptation to comment this line is great, but please don't, it's for your own good. The choice is yours.

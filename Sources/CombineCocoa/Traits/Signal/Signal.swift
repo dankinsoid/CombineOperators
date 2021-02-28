@@ -1,6 +1,6 @@
 //
 //  Signal.swift
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 9/26/16.
 //  Copyright © 2016 Krunoslav Zaher. All rights reserved.
@@ -33,7 +33,7 @@ import Combine
 //public struct SignalSharingStrategy: SharingStrategyProtocol {
 //    public static var scheduler: SchedulerType { SharingScheduler.make() }
 //    
-//    public static func share<Element>(_ source: AnyPublisher<Element>) -> Observable<Element, Error> {
+//    public static func share<Element>(_ source: AnyPublisher<Element>) -> Publisher<Element, Error> {
 //        source.share(scope: .whileConnected)
 //    }
 //}

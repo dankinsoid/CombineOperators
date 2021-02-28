@@ -1,6 +1,6 @@
 //
-//  RxCollectionViewDelegateProxy.swift
-//  RxCocoa
+//  CombineCollectionViewDelegateProxy.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/29/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -13,15 +13,15 @@ import Combine
 
 /// For more information take a look at `DelegateProxyType`.
 @available(iOS 13.0, macOS 10.15, *)
-open class RxCollectionViewDelegateProxy
-    : RxScrollViewDelegateProxy
+open class CombineCollectionViewDelegateProxy
+    : CombineScrollViewDelegateProxy
     , UICollectionViewDelegate
     , UICollectionViewDelegateFlowLayout {
 
     /// Typed parent object.
     public weak private(set) var collectionView: UICollectionView?
 
-    /// Initializes `RxCollectionViewDelegateProxy`
+    /// Initializes `CombineCollectionViewDelegateProxy`
     ///
     /// - parameter collectionView: Parent object for delegate proxy.
     public init(collectionView: UICollectionView) {

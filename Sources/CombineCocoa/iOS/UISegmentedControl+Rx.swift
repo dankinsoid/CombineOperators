@@ -1,6 +1,6 @@
 //
-//  UISegmentedControl+Rx.swift
-//  RxCocoa
+//  UISegmentedControl+Combine.swift
+//  CombineCocoa
 //
 //  Created by Carlos García on 8/7/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

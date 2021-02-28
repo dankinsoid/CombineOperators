@@ -1,6 +1,6 @@
 //
 //  _RXDelegateProxy.m
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 7/4/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

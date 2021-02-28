@@ -1,6 +1,6 @@
 //
 //  ItemEvents.swift
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/20/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

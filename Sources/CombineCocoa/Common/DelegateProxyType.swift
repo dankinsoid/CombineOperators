@@ -1,6 +1,6 @@
 //
 //  DelegateProxyType.swift
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/15/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -12,7 +12,7 @@
     import Combine
 
 /**
-`DelegateProxyType` protocol enables using both normal delegates and Rx observable sequences with
+`DelegateProxyType` protocol enables using both normal delegates and Combine observable sequences with
 views that can have only one delegate/datasource registered.
 
 `Proxies` store information about observers, subscriptions and delegates
@@ -54,7 +54,7 @@ This is more or less how it works.
       +-------------------------------------------+                           
 
 
-Since RxCocoa needs to automagically create those Proxys and because views that have delegates can be hierarchical
+Since CombineCocoa needs to automagically create those Proxys and because views that have delegates can be hierarchical
 
      UITableView : UIScrollView : UIView
 
@@ -65,7 +65,7 @@ Since RxCocoa needs to automagically create those Proxys and because views that 
 ... this mechanism can be extended by using the following snippet in `registerKnownImplementations` or in some other
      part of your app that executes before using `rx.*` (e.g. appDidFinishLaunching).
 
-    RxScrollViewDelegateProxy.register { RxTableViewDelegateProxy(parentObject: $0) }
+    CombineScrollViewDelegateProxy.register { CombineTableViewDelegateProxy(parentObject: $0) }
 
 */
 @available(iOS 13.0, macOS 10.15, *)
@@ -152,8 +152,8 @@ extension DelegateProxyType {
 extension DelegateProxyType {
 
     /// Store DelegateProxy subclass to factory.
-    /// When make 'Rx*DelegateProxy' subclass, call 'Rx*DelegateProxySubclass.register(for:_)' 1 time, or use it in DelegateProxyFactory
-    /// 'Rx*DelegateProxy' can have one subclass implementation per concrete ParentObject type.
+    /// When make 'Combine*DelegateProxy' subclass, call 'Combine*DelegateProxySubclass.register(for:_)' 1 time, or use it in DelegateProxyFactory
+    /// 'Combine*DelegateProxy' can have one subclass implementation per concrete ParentObject type.
     /// Should call it from concrete DelegateProxy type, not generic.
     public static func register<Parent>(make: @escaping (Parent) -> Self) {
         self.factory.extend(make: make)
@@ -174,7 +174,7 @@ extension DelegateProxyType {
     ///     extension Reactive where Base: UISearchBar {
     ///
     ///         public var delegate: DelegateProxy<UISearchBar, UISearchBarDelegate> {
-    ///            return RxSearchBarDelegateProxy.proxy(for: base)
+    ///            return CombineSearchBarDelegateProxy.proxy(for: base)
     ///         }
     ///
     ///         public var text: ControlProperty<String> {
@@ -337,7 +337,7 @@ extension DelegateProxyType where ParentObject: HasPrefetchDataSource, Self.Dele
 
                 // Do not perform layoutIfNeeded if the object is still not in the view heirarchy
                 if object.window != nil {
-                    // this is needed to flush any delayed old state (https://github.com/RxSwiftCommunity/RxDataSources/pull/75)
+                    // this is needed to flush any delayed old state (https://github.com/CombineSwiftCommunity/CombineDataSources/pull/75)
                     object.layoutIfNeeded()
                 }
 
@@ -391,9 +391,9 @@ extension DelegateProxyType where ParentObject: HasPrefetchDataSource, Self.Dele
      To add delegate proxy subclasses call `DelegateProxySubclass.register()` in `registerKnownImplementations` or in some other
      part of your app that executes before using `rx.*` (e.g. appDidFinishLaunching).
 
-         class RxScrollViewDelegateProxy: DelegateProxy {
+         class CombineScrollViewDelegateProxy: DelegateProxy {
              public static func registerKnownImplementations() {
-                 self.register { RxTableViewDelegateProxy(parentObject: $0) }
+                 self.register { CombineTableViewDelegateProxy(parentObject: $0) }
          }
          ...
 

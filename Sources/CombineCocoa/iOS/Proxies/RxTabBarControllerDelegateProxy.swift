@@ -1,6 +1,6 @@
 //
-//  RxTabBarControllerDelegateProxy.swift
-//  RxCocoa
+//  CombineTabBarControllerDelegateProxy.swift
+//  CombineCocoa
 //
 //  Created by Yusuke Kita on 2016/12/07.
 //  Copyright © 2016 Krunoslav Zaher. All rights reserved.
@@ -18,7 +18,7 @@ extension UITabBarController: HasDelegate {
 
 /// For more information take a look at `DelegateProxyType`.
 @available(iOS 13.0, macOS 10.15, *)
-open class RxTabBarControllerDelegateProxy
+open class CombineTabBarControllerDelegateProxy
     : DelegateProxy<UITabBarController, UITabBarControllerDelegate>
     , DelegateProxyType 
     , UITabBarControllerDelegate {
@@ -29,12 +29,12 @@ open class RxTabBarControllerDelegateProxy
     /// - parameter tabBar: Parent object for delegate proxy.
     public init(tabBar: ParentObject) {
         self.tabBar = tabBar
-        super.init(parentObject: tabBar, delegateProxy: RxTabBarControllerDelegateProxy.self)
+        super.init(parentObject: tabBar, delegateProxy: CombineTabBarControllerDelegateProxy.self)
     }
 
     // Register known implementations
     public static func registerKnownImplementations() {
-        self.register { RxTabBarControllerDelegateProxy(tabBar: $0) }
+        self.register { CombineTabBarControllerDelegateProxy(tabBar: $0) }
     }
 }
 

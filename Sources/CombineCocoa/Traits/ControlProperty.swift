@@ -1,6 +1,6 @@
 //
 //  ControlProperty.swift
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 8/28/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -19,7 +19,7 @@ public protocol ControlPropertyType: Publisher, Subscriber where Output == Input
 }
 
 /**
-    Trait for `Observable`/`Publisher` that represents property of UI element.
+    Trait for `Publisher`/`Publisher` that represents property of UI element.
  
     Sequence of values only represents initial control value and user initiated value changes.
     Programmatic value changes won't be reported.
@@ -54,7 +54,7 @@ public struct ControlProperty<PropertyType>: ControlPropertyType {
     /// Initializes control property with a observable sequence that represents property values and observer that enables
     /// binding values to property.
     ///
-    /// - parameter values: Observable sequence that represents property values.
+    /// - parameter values: Publisher sequence that represents property values.
     /// - parameter valueSink: Observer that enables binding values to control property.
     /// - returns: Control property created with a observable sequence of values and an observer that enables binding values
     /// to property.

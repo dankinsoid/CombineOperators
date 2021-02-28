@@ -57,17 +57,17 @@ public extension Reactive where Base: UIViewController {
 		return ControlEvent(events: source)
 	}
 	
-	/// Rx observable, triggered when the ViewController appearance state changes (true if the View is being displayed, false otherwise)
+	/// Combine observable, triggered when the ViewController appearance state changes (true if the View is being displayed, false otherwise)
 	var isVisible: AnyPublisher<Bool, Never> {
-		let viewDidAppearObservable = viewDidAppear.map { _ in true }
-		let viewWillDisappearObservable = viewDidDisappear.map { _ in false }
-		return viewDidAppearObservable
-			.merge(with: viewWillDisappearObservable)
+		let viewDidAppearPublisher = viewDidAppear.map { _ in true }
+		let viewWillDisappearPublisher = viewDidDisappear.map { _ in false }
+		return viewDidAppearPublisher
+			.merge(with: viewWillDisappearPublisher)
 			.prepend(base.viewIfLoaded?.window != nil)
 			.eraseToAnyPublisher()
 	}
 	
-	/// Rx observable, triggered when the ViewController is being dismissed
+	/// Combine observable, triggered when the ViewController is being dismissed
 	var isDismissing: ControlEvent<Bool> {
 		let source = self.sentMessage(#selector(Base.dismiss)).map { $0.first as? Bool ?? false }
 		return ControlEvent(events: source)

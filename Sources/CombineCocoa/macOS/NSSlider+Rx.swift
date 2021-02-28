@@ -1,6 +1,6 @@
 //
-//  NSSlider+Rx.swift
-//  RxCocoa
+//  NSSlider+Combine.swift
+//  CombineCocoa
 //
 //  Created by Junior B. on 24/05/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

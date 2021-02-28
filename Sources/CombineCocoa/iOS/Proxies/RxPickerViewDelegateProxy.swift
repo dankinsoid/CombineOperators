@@ -1,6 +1,6 @@
 //
-//  RxPickerViewDelegateProxy.swift
-//  RxCocoa
+//  CombinePickerViewDelegateProxy.swift
+//  CombineCocoa
 //
 //  Created by Segii Shulga on 5/12/16.
 //  Copyright © 2016 Krunoslav Zaher. All rights reserved.
@@ -17,7 +17,7 @@ extension UIPickerView: HasDelegate {
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-open class RxPickerViewDelegateProxy
+open class CombinePickerViewDelegateProxy
 : DelegateProxy<UIPickerView, UIPickerViewDelegate>
 	, DelegateProxyType
 	, UIPickerViewDelegate {
@@ -28,12 +28,12 @@ open class RxPickerViewDelegateProxy
 	/// - parameter pickerView: Parent object for delegate proxy.
 	public init(pickerView: ParentObject) {
 		self.pickerView = pickerView
-		super.init(parentObject: pickerView, delegateProxy: RxPickerViewDelegateProxy.self)
+		super.init(parentObject: pickerView, delegateProxy: CombinePickerViewDelegateProxy.self)
 	}
 	
 	// Register known implementationss
 	public static func registerKnownImplementations() {
-		self.register { RxPickerViewDelegateProxy(pickerView: $0) }
+		self.register { CombinePickerViewDelegateProxy(pickerView: $0) }
 	}
 }
 #endif

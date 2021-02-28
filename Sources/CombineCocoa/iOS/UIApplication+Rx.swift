@@ -1,6 +1,6 @@
 //
-//  UIApplication+Rx.swift
-//  RxCocoa
+//  UIApplication+Combine.swift
+//  CombineCocoa
 //
 //  Created by Mads Bøgeskov on 18/01/16.
 //  Copyright © 2016 Krunoslav Zaher. All rights reserved.

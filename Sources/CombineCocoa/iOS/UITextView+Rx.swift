@@ -1,6 +1,6 @@
 //
-//  UITextView+Rx.swift
-//  RxCocoa
+//  UITextView+Combine.swift
+//  CombineCocoa
 //
 //  Created by Yuta ToKoRo on 7/19/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

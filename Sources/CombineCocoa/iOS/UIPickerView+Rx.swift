@@ -1,6 +1,6 @@
 //
-//  UIPickerView+Rx.swift
-//  RxCocoa
+//  UIPickerView+Combine.swift
+//  CombineCocoa
 //
 //  Created by Segii Shulga on 5/12/16.
 //  Copyright © 2016 Krunoslav Zaher. All rights reserved.
@@ -17,7 +17,7 @@ extension Reactive where Base: UIPickerView {
         /// Reactive wrapper for `delegate`.
         /// For more information take a look at `DelegateProxyType` protocol documentation.
         public var delegate: DelegateProxy<UIPickerView, UIPickerViewDelegate> {
-            return RxPickerViewDelegateProxy.proxy(for: base)
+            return CombinePickerViewDelegateProxy.proxy(for: base)
         }
         
         /// Installs delegate as forwarding delegate on `delegate`.
@@ -28,7 +28,7 @@ extension Reactive where Base: UIPickerView {
         /// - parameter delegate: Delegate object.
         /// - returns: Cancellable object that can be used to unbind the delegate.
         public func setDelegate(_ delegate: UIPickerViewDelegate) -> Cancellable {
-						RxPickerViewDelegateProxy.installForwardDelegate(delegate, retainDelegate: false, onProxyForObject: self.base)
+						CombinePickerViewDelegateProxy.installForwardDelegate(delegate, retainDelegate: false, onProxyForObject: self.base)
         }
         
         /**
@@ -37,7 +37,7 @@ extension Reactive where Base: UIPickerView {
          For more information take a look at `DelegateProxyType` protocol documentation.
          */
         public var dataSource: DelegateProxy<UIPickerView, UIPickerViewDataSource> {
-            return RxPickerViewDataSourceProxy.proxy(for: base)
+            return CombinePickerViewDataSourceProxy.proxy(for: base)
         }
         
         /**
@@ -84,13 +84,13 @@ extension Reactive where Base: UIPickerView {
         /**
          Binds sequences of elements to picker view rows.
          
-         - parameter source: Observable sequence of items.
+         - parameter source: Publisher sequence of items.
          - parameter titleForRow: Transform between sequence elements and row titles.
          - returns: Cancellable object that can be used to unbind.
          
          Example:
          
-            let items = Observable.just([
+            let items = Publisher.just([
                     "First Item",
                     "Second Item",
                     "Third Item"
@@ -109,7 +109,7 @@ extension Reactive where Base: UIPickerView {
             -> (_ titleForRow: @escaping (Int, Sequence.Element) -> String?)
             -> Cancellable where Source.Output == Sequence {
                 return { titleForRow in
-                    let adapter = RxStringPickerViewAdapter<Sequence>(titleForRow: titleForRow)
+                    let adapter = CombineStringPickerViewAdapter<Sequence>(titleForRow: titleForRow)
                     return self.items(adapter: adapter)(source)
                 }
         }
@@ -117,13 +117,13 @@ extension Reactive where Base: UIPickerView {
         /**
          Binds sequences of elements to picker view rows.
          
-         - parameter source: Observable sequence of items.
+         - parameter source: Publisher sequence of items.
          - parameter attributedTitleForRow: Transform between sequence elements and row attributed titles.
          - returns: Cancellable object that can be used to unbind.
          
          Example:
          
-         let items = Observable.just([
+         let items = Publisher.just([
                 "First Item",
                 "Second Item",
                 "Third Item"
@@ -142,7 +142,7 @@ extension Reactive where Base: UIPickerView {
             -> (_ attributedTitleForRow: @escaping (Int, Sequence.Element) -> NSAttributedString?)
             -> Cancellable where Source.Output == Sequence {
                 return { attributedTitleForRow in
-                    let adapter = RxAttributedStringPickerViewAdapter<Sequence>(attributedTitleForRow: attributedTitleForRow)
+                    let adapter = CombineAttributedStringPickerViewAdapter<Sequence>(attributedTitleForRow: attributedTitleForRow)
                     return self.items(adapter: adapter)(source)
                 }
         }
@@ -150,13 +150,13 @@ extension Reactive where Base: UIPickerView {
         /**
          Binds sequences of elements to picker view rows.
          
-         - parameter source: Observable sequence of items.
+         - parameter source: Publisher sequence of items.
          - parameter viewForRow: Transform between sequence elements and row views.
          - returns: Cancellable object that can be used to unbind.
          
          Example:
          
-         let items = Observable.just([
+         let items = Publisher.just([
                 "First Item",
                 "Second Item",
                 "Third Item"
@@ -181,7 +181,7 @@ extension Reactive where Base: UIPickerView {
             -> (_ viewForRow: @escaping (Int, Sequence.Element, UIView?) -> UIView)
             -> Cancellable where Source.Output == Sequence {
                 return { viewForRow in
-                    let adapter = RxPickerViewAdapter<Sequence>(viewForRow: viewForRow)
+                    let adapter = CombinePickerViewAdapter<Sequence>(viewForRow: viewForRow)
                     return self.items(adapter: adapter)(source)
                 }
         }
@@ -194,16 +194,16 @@ extension Reactive where Base: UIPickerView {
          until the subscription isn't disposed.
          
          - parameter adapter: Adapter used to transform elements to picker components.
-         - parameter source: Observable sequence of items.
+         - parameter source: Publisher sequence of items.
          - returns: Cancellable object that can be used to unbind.
          */
         public func items<Source: Publisher,
-                          Adapter: RxPickerViewDataSourceType & UIPickerViewDataSource & UIPickerViewDelegate>(adapter: Adapter)
+                          Adapter: CombinePickerViewDataSourceType & UIPickerViewDataSource & UIPickerViewDelegate>(adapter: Adapter)
             -> (_ source: Source)
             -> Cancellable where Source.Output == Adapter.Element {
                 return { source in
                     let delegateSubscription = self.setDelegate(adapter)
-                    let dataSourceSubscription = source.subscribeProxyDataSource(ofObject: self.base, dataSource: adapter, retainDataSource: true, binding: { [weak pickerView = self.base] (_: RxPickerViewDataSourceProxy, event) in
+                    let dataSourceSubscription = source.subscribeProxyDataSource(ofObject: self.base, dataSource: adapter, retainDataSource: true, binding: { [weak pickerView = self.base] (_: CombinePickerViewDataSourceProxy, event) in
                         guard let pickerView = pickerView else { return }
                         adapter.pickerView(pickerView, observed: event)
 										}, completion: {_, _ in })

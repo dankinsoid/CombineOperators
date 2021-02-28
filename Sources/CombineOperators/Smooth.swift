@@ -40,7 +40,7 @@ extension Publisher {
 	
 	public func smooth(rule: @escaping (Output, Output, Int) -> [Output], interval: TimeInterval, count: Int, runLoop: RunLoop = .main, condition: @escaping (Output, Output) -> Bool = { _, _ in true }) -> some Publisher {
 		scan([]) { $0.suffix(1) + [$1] }
-			.flat { list -> AnyPublisher<Output, Never> in
+			.flat { (list: [Output]) -> AnyPublisher<Output, Never> in
 				guard list.count == 2 else { return Just(list[0]).eraseToAnyPublisher() }
 				guard condition(list[0], list[1]) else { return Just(list[1]).eraseToAnyPublisher() }
 				let array = rule(list[0], list[1], count)

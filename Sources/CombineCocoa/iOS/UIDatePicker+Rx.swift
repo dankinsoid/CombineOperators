@@ -1,6 +1,6 @@
 //
-//  UIDatePicker+Rx.swift
-//  RxCocoa
+//  UIDatePicker+Combine.swift
+//  CombineCocoa
 //
 //  Created by Daniel Tartaglia on 5/31/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

@@ -1,6 +1,6 @@
 //
-//  RxPickerViewAdapter.swift
-//  RxCocoa
+//  CombinePickerViewAdapter.swift
+//  CombineCocoa
 //
 //  Created by Sergey Shulga on 12/07/2017.
 //  Copyright © 2017 Krunoslav Zaher. All rights reserved.
@@ -12,12 +12,12 @@ import UIKit
 import Combine
 
 @available(iOS 13.0, macOS 10.15, *)
-class RxPickerViewArrayDataSource<T>: NSObject, UIPickerViewDataSource, SectionedViewDataSourceType {
+class CombinePickerViewArrayDataSource<T>: NSObject, UIPickerViewDataSource, SectionedViewDataSourceType {
     fileprivate var items: [T] = []
     
     func model(at indexPath: IndexPath) throws -> Any {
         guard items.indices ~= indexPath.row else {
-            throw RxCocoaError.itemsNotYetBound(object: self)
+            throw CombineCocoaError.itemsNotYetBound(object: self)
         }
         return items[indexPath.row]
     }
@@ -32,9 +32,9 @@ class RxPickerViewArrayDataSource<T>: NSObject, UIPickerViewDataSource, Sectione
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-class RxPickerViewSequenceDataSource<Sequence: Swift.Sequence>
-    : RxPickerViewArrayDataSource<Sequence.Element>
-    , RxPickerViewDataSourceType {
+class CombinePickerViewSequenceDataSource<Sequence: Swift.Sequence>
+    : CombinePickerViewArrayDataSource<Sequence.Element>
+    , CombinePickerViewDataSourceType {
     typealias Element = Sequence
 
     func pickerView(_ pickerView: UIPickerView, observed: Sequence) {
@@ -47,8 +47,8 @@ class RxPickerViewSequenceDataSource<Sequence: Swift.Sequence>
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-final class RxStringPickerViewAdapter<Sequence: Swift.Sequence>
-    : RxPickerViewSequenceDataSource<Sequence>
+final class CombineStringPickerViewAdapter<Sequence: Swift.Sequence>
+    : CombinePickerViewSequenceDataSource<Sequence>
     , UIPickerViewDelegate {
     
     typealias TitleForRow = (Int, Sequence.Element) -> String?
@@ -65,7 +65,7 @@ final class RxStringPickerViewAdapter<Sequence: Swift.Sequence>
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-final class RxAttributedStringPickerViewAdapter<Sequence: Swift.Sequence>: RxPickerViewSequenceDataSource<Sequence>, UIPickerViewDelegate {
+final class CombineAttributedStringPickerViewAdapter<Sequence: Swift.Sequence>: CombinePickerViewSequenceDataSource<Sequence>, UIPickerViewDelegate {
     typealias AttributedTitleForRow = (Int, Sequence.Element) -> NSAttributedString?
     private let attributedTitleForRow: AttributedTitleForRow
     
@@ -80,7 +80,7 @@ final class RxAttributedStringPickerViewAdapter<Sequence: Swift.Sequence>: RxPic
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-final class RxPickerViewAdapter<Sequence: Swift.Sequence>: RxPickerViewSequenceDataSource<Sequence>, UIPickerViewDelegate {
+final class CombinePickerViewAdapter<Sequence: Swift.Sequence>: CombinePickerViewSequenceDataSource<Sequence>, UIPickerViewDelegate {
     typealias ViewForRow = (Int, Sequence.Element, UIView?) -> UIView
     private let viewForRow: ViewForRow
     

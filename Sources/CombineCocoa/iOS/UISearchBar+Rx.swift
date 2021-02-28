@@ -1,6 +1,6 @@
 //
-//  UISearchBar+Rx.swift
-//  RxCocoa
+//  UISearchBar+Combine.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 3/28/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -18,7 +18,7 @@ extension Reactive where Base: UISearchBar {
     ///
     /// For more information take a look at `DelegateProxyType` protocol documentation.
     public var delegate: DelegateProxy<UISearchBar, UISearchBarDelegate> {
-        RxSearchBarDelegateProxy.proxy(for: base)
+        CombineSearchBarDelegateProxy.proxy(for: base)
     }
 
     /// Reactive wrapper for `text` property.
@@ -134,7 +134,7 @@ extension Reactive where Base: UISearchBar {
     /// - returns: Cancellable object that can be used to unbind the delegate.
     public func setDelegate(_ delegate: UISearchBarDelegate)
         -> Cancellable {
-        RxSearchBarDelegateProxy.installForwardDelegate(delegate, retainDelegate: false, onProxyForObject: self.base)
+        CombineSearchBarDelegateProxy.installForwardDelegate(delegate, retainDelegate: false, onProxyForObject: self.base)
     }
 	
 	public var changes: ControlEvent<String> {

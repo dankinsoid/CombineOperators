@@ -1,6 +1,6 @@
 //
-//  UIActivityIndicatorView+Rx.swift
-//  RxCocoa
+//  UIActivityIndicatorView+Combine.swift
+//  CombineCocoa
 //
 //  Created by Ivan Persidskiy on 02/12/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

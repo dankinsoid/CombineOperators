@@ -1,6 +1,6 @@
 //
-//  UIGestureRecognizer+Rx.swift
-//  RxCocoa
+//  UIGestureRecognizer+Combine.swift
+//  CombineCocoa
 //
 //  Created by Carlos García on 10/6/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -13,7 +13,7 @@ import Combine
 
 // This should be only used from `MainScheduler`
 @available(iOS 13.0, macOS 10.15, *)
-final class GestureTarget<Recognizer: UIGestureRecognizer>: RxTarget {
+final class GestureTarget<Recognizer: UIGestureRecognizer>: CombineTarget {
     typealias Callback = (Recognizer) -> Void
     
     let selector = #selector(ControlTarget.eventHandler(_:))

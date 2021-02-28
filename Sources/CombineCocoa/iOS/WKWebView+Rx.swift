@@ -1,6 +1,6 @@
 //
-//  WKWebView+Rx.swift
-//  RxCocoa
+//  WKWebView+Combine.swift
+//  CombineCocoa
 //
 //  Created by Giuseppe Lanza on 14/02/2020.
 //  Copyright © 2020 Krunoslav Zaher. All rights reserved.
@@ -17,7 +17,7 @@ extension Reactive where Base: WKWebView {
     /// Reactive wrapper for `navigationDelegate`.
     /// For more information take a look at `DelegateProxyType` protocol documentation.
     public var navigationDelegate: DelegateProxy<WKWebView, WKNavigationDelegate> {
-        RxWKNavigationDelegateProxy.proxy(for: base)
+        CombineWKNavigationDelegateProxy.proxy(for: base)
     }
     
     /// Reactive wrapper for `navigationDelegate` message.

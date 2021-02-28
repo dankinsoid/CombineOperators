@@ -1,6 +1,6 @@
 //
-//  RxCollectionViewDataSourceProxy.swift
-//  RxCocoa
+//  CombineCollectionViewDataSourceProxy.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/29/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -37,7 +37,7 @@ private final class CollectionViewDataSourceNotSet
 
 /// For more information take a look at `DelegateProxyType`.
 @available(iOS 13.0, macOS 10.15, *)
-open class RxCollectionViewDataSourceProxy
+open class CombineCollectionViewDataSourceProxy
     : DelegateProxy<UICollectionView, UICollectionViewDataSource>
     , DelegateProxyType 
     , UICollectionViewDataSource {
@@ -48,12 +48,12 @@ open class RxCollectionViewDataSourceProxy
     /// - parameter collectionView: Parent object for delegate proxy.
     public init(collectionView: ParentObject) {
         self.collectionView = collectionView
-        super.init(parentObject: collectionView, delegateProxy: RxCollectionViewDataSourceProxy.self)
+        super.init(parentObject: collectionView, delegateProxy: CombineCollectionViewDataSourceProxy.self)
     }
 
     // Register known implementations
     public static func registerKnownImplementations() {
-        self.register { RxCollectionViewDataSourceProxy(collectionView: $0) }
+        self.register { CombineCollectionViewDataSourceProxy(collectionView: $0) }
     }
 
     private weak var _requiredMethodsDataSource: UICollectionViewDataSource? = collectionViewDataSourceNotSet

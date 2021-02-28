@@ -1,6 +1,6 @@
 //
-//  RxTarget.swift
-//  RxCocoa
+//  CombineTarget.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 7/12/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -11,7 +11,7 @@ import Foundation
 import Combine
 
 @available(iOS 13.0, macOS 10.15, *)
-class RxTarget: NSObject, Cancellable {
+class CombineTarget: NSObject, Cancellable {
     
     override init() {
         super.init()

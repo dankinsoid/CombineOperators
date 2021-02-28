@@ -1,6 +1,6 @@
 //
 //  ControlTarget.swift
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 2/21/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -22,7 +22,7 @@ import Combine
 
 // This should be only used from `MainScheduler`
 @available(iOS 13.0, macOS 10.15, *)
-final class ControlTarget: RxTarget {
+final class ControlTarget: CombineTarget {
     typealias Callback = (Control) -> Void
 
     let selector: Selector = #selector(ControlTarget.eventHandler(_:))

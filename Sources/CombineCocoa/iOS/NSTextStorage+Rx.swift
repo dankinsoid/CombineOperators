@@ -1,6 +1,6 @@
 //
-//  NSTextStorage+Rx.swift
-//  RxCocoa
+//  NSTextStorage+Combine.swift
+//  CombineCocoa
 //
 //  Created by Segii Shulga on 12/30/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -17,7 +17,7 @@ extension Reactive where Base: NSTextStorage {
         ///
         /// For more information take a look at `DelegateProxyType` protocol documentation.
         public var delegate: DelegateProxy<NSTextStorage, NSTextStorageDelegate> {
-            return RxTextStorageDelegateProxy.proxy(for: base)
+            return CombineTextStorageDelegateProxy.proxy(for: base)
         }
 
         /// Reactive wrapper for `delegate` message.

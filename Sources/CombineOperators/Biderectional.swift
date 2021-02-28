@@ -12,7 +12,7 @@ import Combine
 //infix operator <==> : CombinePrecedence
 
 //@available(iOS 13.0, macOS 10.15, *)
-//fileprivate func bind<Output: Equatable>(_ lO: Observable<Output>, _ rO: Observable<Output>, _ lOb: AnySubscriber<Output>, _ rOb: AnySubscriber<Output>) -> Cancellable {
+//fileprivate func bind<Output: Equatable>(_ lO: Publisher<Output>, _ rO: Publisher<Output>, _ lOb: AnySubscriber<Output>, _ rOb: AnySubscriber<Output>) -> Cancellable {
 //	let subject = Publishers<Output>()
 //	let d1 = lO.subscribe(subject)
 //	let d2 = rO.subscribe(subject)
@@ -24,14 +24,14 @@ import Combine
 //@available(iOS 13.0, macOS 10.15, *)
 //public func <=><T: Publisher & Subscriber, O: Publisher & Subscriber>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output, T.Output: Equatable {
 //	guard let l = lhs, let r = rhs else { return Cancellables.create() }
-//	return bind(l.asObservable(), r.asObservable(), l.asObserver(), r.asObserver())
+//	return bind(l.asPublisher(), r.asPublisher(), l.asObserver(), r.asObserver())
 //}
 //
 //@available(iOS 13.0, macOS 10.15, *)
 //@discardableResult
 //public func <=><T: Publisher & CancellableSubscriber, O: Publisher & Subscriber>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output, T.Output: Equatable {
 //	guard let l = lhs, let r = rhs else { return Cancellables.create() }
-//	let result = bind(l.asObservable(), r.asObservable(), l.asObserver(), r.asObserver())
+//	let result = bind(l.asPublisher(), r.asPublisher(), l.asObserver(), r.asObserver())
 //	l.insert(Cancellable: result)
 //	return result
 //}
@@ -40,7 +40,7 @@ import Combine
 //@discardableResult
 //public func <=><T: Publisher & Subscriber, O: Publisher & CancellableSubscriber>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output, T.Output: Equatable {
 //	guard let l = lhs, let r = rhs else { return Cancellables.create() }
-//	let result = bind(l.asObservable(), r.asObservable(), l.asObserver(), r.asObserver())
+//	let result = bind(l.asPublisher(), r.asPublisher(), l.asObserver(), r.asObserver())
 //	r.insert(Cancellable: result)
 //	return result
 //}
@@ -49,14 +49,14 @@ import Combine
 //@discardableResult
 //public func <=><T: Publisher & CancellableSubscriber, O: Publisher & CancellableSubscriber>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output, T.Output: Equatable {
 //	guard let l = lhs, let r = rhs else { return Cancellables.create() }
-//	let result = bind(l.asObservable(), r.asObservable(), l.asObserver(), r.asObserver())
+//	let result = bind(l.asPublisher(), r.asPublisher(), l.asObserver(), r.asObserver())
 //	r.insert(Cancellable: result)
 //	l.insert(Cancellable: result)
 //	return result
 //}
 //
 //@available(iOS 13.0, macOS 10.15, *)
-//fileprivate func drive<Output: Equatable>(_ lO: Observable<Output>, _ rO: Observable<Output>, _ lOb: AnySubscriber<Output>, _ rOb: AnySubscriber<Output>) -> Cancellable {
+//fileprivate func drive<Output: Equatable>(_ lO: Publisher<Output>, _ rO: Publisher<Output>, _ lOb: AnySubscriber<Output>, _ rOb: AnySubscriber<Output>) -> Cancellable {
 //	let subject = PublishSubject<Output>()
 //	let d1 = lO.subscribe(subject)
 //	let d2 = rO.subscribe(subject)
@@ -68,14 +68,14 @@ import Combine
 //@available(iOS 13.0, macOS 10.15, *)
 //public func <==><T: Publisher & Subscriber, O: Publisher & Subscriber>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output, T.Output: Equatable {
 //	guard let l = lhs, let r = rhs else { return Cancellables.create() }
-//	return drive(l.asObservable(), r.asObservable(), l.asObserver(), r.asObserver())
+//	return drive(l.asPublisher(), r.asPublisher(), l.asObserver(), r.asObserver())
 //}
 //
 //@available(iOS 13.0, macOS 10.15, *)
 //@discardableResult
 //public func <==><T: Publisher & CancellableSubscriber, O: Publisher & Subscriber>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output, T.Output: Equatable {
 //	guard let l = lhs, let r = rhs else { return Cancellables.create() }
-//	let result = drive(l.asObservable(), r.asObservable(), l.asObserver(), r.asObserver())
+//	let result = drive(l.asPublisher(), r.asPublisher(), l.asObserver(), r.asObserver())
 //	l.insert(Cancellable: result)
 //	return result
 //}
@@ -84,7 +84,7 @@ import Combine
 //@discardableResult
 //public func <==><T: Publisher & Subscriber, O: Publisher & CancellableSubscriber>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output, T.Output: Equatable {
 //	guard let l = lhs, let r = rhs else { return Cancellables.create() }
-//	let result = drive(l.asObservable(), r.asObservable(), l.asObserver(), r.asObserver())
+//	let result = drive(l.asPublisher(), r.asPublisher(), l.asObserver(), r.asObserver())
 //	r.insert(Cancellable: result)
 //	return result
 //}
@@ -93,7 +93,7 @@ import Combine
 //@discardableResult
 //public func <==><T: Publisher & CancellableSubscriber, O: Publisher & CancellableSubscriber>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output, T.Output: Equatable {
 //	guard let l = lhs, let r = rhs else { return Cancellables.create() }
-//	let result = drive(l.asObservable(), r.asObservable(), l.asObserver(), r.asObserver())
+//	let result = drive(l.asPublisher(), r.asPublisher(), l.asObserver(), r.asObserver())
 //	r.insert(Cancellable: result)
 //	l.insert(Cancellable: result)
 //	return result

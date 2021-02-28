@@ -1,6 +1,6 @@
 //
 //  _RX.m
-//  RxCocoa
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 7/12/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

@@ -1,6 +1,6 @@
 //
-//  RxTableViewDataSourceProxy.swift
-//  RxCocoa
+//  CombineTableViewDataSourceProxy.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/15/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -35,7 +35,7 @@ private final class TableViewDataSourceNotSet
 
 /// For more information take a look at `DelegateProxyType`.
 @available(iOS 13.0, macOS 10.15, *)
-open class RxTableViewDataSourceProxy
+open class CombineTableViewDataSourceProxy
     : DelegateProxy<UITableView, UITableViewDataSource>
     , DelegateProxyType 
     , UITableViewDataSource {
@@ -46,12 +46,12 @@ open class RxTableViewDataSourceProxy
     /// - parameter tableView: Parent object for delegate proxy.
     public init(tableView: UITableView) {
         self.tableView = tableView
-        super.init(parentObject: tableView, delegateProxy: RxTableViewDataSourceProxy.self)
+        super.init(parentObject: tableView, delegateProxy: CombineTableViewDataSourceProxy.self)
     }
 
     // Register known implementations
     public static func registerKnownImplementations() {
-        self.register { RxTableViewDataSourceProxy(tableView: $0) }
+        self.register { CombineTableViewDataSourceProxy(tableView: $0) }
     }
 
     private weak var _requiredMethodsDataSource: UITableViewDataSource? = tableViewDataSourceNotSet

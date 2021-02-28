@@ -25,5 +25,5 @@ TODO: Add long description of the pod here.
   s.source_files = 'Sources/RxOperators/**/*'
   s.dependency 'RxSwift', '~> 6.0'
   s.dependency 'RxCocoa', '~> 6.0'
-  s.dependency 'VD', '~> 1.10.0'
+  s.dependency 'VD', '~> 1.11.0'
 end

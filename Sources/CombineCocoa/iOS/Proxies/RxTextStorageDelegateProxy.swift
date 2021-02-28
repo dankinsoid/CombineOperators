@@ -1,6 +1,6 @@
 //
-//  RxTextStorageDelegateProxy.swift
-//  RxCocoa
+//  CombineTextStorageDelegateProxy.swift
+//  CombineCocoa
 //
 //  Created by Segii Shulga on 12/30/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -17,7 +17,7 @@ extension NSTextStorage: HasDelegate {
     }
 
 @available(iOS 13.0, macOS 10.15, *)
-    open class RxTextStorageDelegateProxy
+    open class CombineTextStorageDelegateProxy
         : DelegateProxy<NSTextStorage, NSTextStorageDelegate>
         , DelegateProxyType 
         , NSTextStorageDelegate {
@@ -28,12 +28,12 @@ extension NSTextStorage: HasDelegate {
         /// - parameter textStorage: Parent object for delegate proxy.
         public init(textStorage: NSTextStorage) {
             self.textStorage = textStorage
-            super.init(parentObject: textStorage, delegateProxy: RxTextStorageDelegateProxy.self)
+            super.init(parentObject: textStorage, delegateProxy: CombineTextStorageDelegateProxy.self)
         }
 
         // Register known implementations
         public static func registerKnownImplementations() {
-            self.register { RxTextStorageDelegateProxy(textStorage: $0) }
+            self.register { CombineTextStorageDelegateProxy(textStorage: $0) }
         }
     }
 #endif

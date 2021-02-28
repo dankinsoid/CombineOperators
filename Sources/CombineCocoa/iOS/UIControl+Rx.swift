@@ -1,6 +1,6 @@
 //
-//  UIControl+Rx.swift
-//  RxCocoa
+//  UIControl+Combine.swift
+//  CombineCocoa
 //
 //  Created by Daniel Tartaglia on 5/23/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.

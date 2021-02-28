@@ -1,6 +1,6 @@
 //
-//  RxScrollViewDelegateProxy.swift
-//  RxCocoa
+//  CombineScrollViewDelegateProxy.swift
+//  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 6/19/15.
 //  Copyright © 2015 Krunoslav Zaher. All rights reserved.
@@ -18,7 +18,7 @@ extension UIScrollView: HasDelegate {
 
 /// For more information take a look at `DelegateProxyType`.
 @available(iOS 13.0, macOS 10.15, *)
-open class RxScrollViewDelegateProxy
+open class CombineScrollViewDelegateProxy
     : DelegateProxy<UIScrollView, UIScrollViewDelegate>
     , DelegateProxyType 
     , UIScrollViewDelegate {
@@ -29,15 +29,15 @@ open class RxScrollViewDelegateProxy
     /// - parameter scrollView: Parent object for delegate proxy.
     public init(scrollView: ParentObject) {
         self.scrollView = scrollView
-        super.init(parentObject: scrollView, delegateProxy: RxScrollViewDelegateProxy.self)
+        super.init(parentObject: scrollView, delegateProxy: CombineScrollViewDelegateProxy.self)
     }
 
     // Register known implementations
     public static func registerKnownImplementations() {
-        self.register { RxScrollViewDelegateProxy(scrollView: $0) }
-        self.register { RxTableViewDelegateProxy(tableView: $0) }
-        self.register { RxCollectionViewDelegateProxy(collectionView: $0) }
-        self.register { RxTextViewDelegateProxy(textView: $0) }
+        self.register { CombineScrollViewDelegateProxy(scrollView: $0) }
+        self.register { CombineTableViewDelegateProxy(tableView: $0) }
+        self.register { CombineCollectionViewDelegateProxy(collectionView: $0) }
+        self.register { CombineTextViewDelegateProxy(textView: $0) }
     }
 
     private var _contentOffsetBehaviorSubject: CurrentValueSubject<CGPoint, Never>?
