@@ -62,7 +62,7 @@ public struct Driver<Output>: Publisher {
 	private let publisher: AnyPublisher<Output, Failure>
 	
 	public init<P: Publisher, C: Publisher>(_ source: P, catch handler: @escaping (Error) -> C) where C.Output == P.Output, C.Output == Output {
-		publisher = source.share(replay: 1).catch(handler).receive(on: DispatchQueue.main).skipFailure().eraseToAnyPublisher()
+		self = Driver(source.catch(handler).skipFailure())
 	}
 	
 	public init<P: Publisher>(_ source: P) where Never == P.Failure, P.Output == Output {
