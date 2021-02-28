@@ -47,6 +47,7 @@ extension Subscriptions {
 		private var subscriber: SubscriberType?
 		private var cancellable: Cancellable?
 		private var disassociate: (CombineIdentifier) -> Void
+		private let lock = NSRecursiveLock()
 		
 		init(subscriber: SubscriberType, disassociate: @escaping (CombineIdentifier) -> Void) {
 			self.subscriber = subscriber
@@ -54,9 +55,11 @@ extension Subscriptions {
 		}
 		
 		func start(_ closure: @escaping (AnySubscriber<Output, Failure>) -> Cancellable) {
+			lock.lock()
 			if let subscriber = subscriber {
 				cancellable = closure(AnySubscriber(subscriber))
 			}
+			lock.unlock()
 		}
 		
 		func request(_ demand: Subscribers.Demand) {
@@ -64,10 +67,12 @@ extension Subscriptions {
 		}
 		
 		func cancel() {
+			lock.lock()
 			cancellable?.cancel()
 			cancellable = nil
 			self.subscriber = nil
 			disassociate(combineIdentifier)
+			lock.unlock()
 		}
 		
 		deinit {
