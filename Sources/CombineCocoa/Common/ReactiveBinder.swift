@@ -15,10 +15,6 @@ public final class ReactiveBinder<Target: AnyObject, Input, KP: KeyPath<Target, 
 	fileprivate weak var target: Target?
 	fileprivate let keyPath: KP
 	
-	/// Initializes `Binder`
-	///
-	/// - parameter target: Target object.
-	/// - parameter keyPath
 	public init(_ target: Target?, keyPath: KP) {
 		self.target = target
 		self.keyPath = keyPath
