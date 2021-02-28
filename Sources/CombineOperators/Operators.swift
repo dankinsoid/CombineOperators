@@ -104,13 +104,13 @@ public func =><O: Publisher>(_ lhs: O?, _ rhs: [(O.Output) -> ()]) {
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func ==><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input == T.Output {
-	rhs.map { lhs?.skipFailure().subscribe(on: DispatchQueue.main).subscribe(Subscribers.Garantie($0)) }
+	rhs.map { lhs?.skipFailure().receive(on: DispatchQueue.main).subscribe(Subscribers.Garantie($0)) }
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func ==><O: Publisher>(_ lhs: O?, _ rhs: @escaping (O.Output) -> Void) {
-	lhs?.skipFailure().subscribe(on: DispatchQueue.main).subscribe(AnySubscriber.create(rhs))
+	lhs?.skipFailure().receive(on: DispatchQueue.main).subscribe(AnySubscriber.create(rhs))
 }
 
 @available(iOS 13.0, macOS 10.15, *)
@@ -180,7 +180,11 @@ public func &<T1: Publisher, T2: Publisher>(_ lhs: T1, _ rhs: T2) -> Publishers.
 extension AnySubscriber {
 	@inlinable
 	static func create(_ receive: @escaping (Input) -> Void) -> AnySubscriber {
-		AnySubscriber(receiveValue: {
+		AnySubscriber(
+			receiveSubscription: {
+				$0.request(.unlimited)
+		},
+		receiveValue: {
 			receive($0)
 			return .unlimited
 		})

@@ -98,11 +98,11 @@ public func =>><O: Publisher>(_ lhs: O?, _ rhs: [(O.Output) -> ()]) where O.Outp
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func ==>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input == T.Output, O.Input: Equatable {
-	rhs.map { lhs?.skipFailure().removeDuplicates().subscribe(on: DispatchQueue.main).subscribe(Subscribers.Garantie($0)) }
+	rhs.map { lhs?.skipFailure().removeDuplicates().receive(on: DispatchQueue.main).subscribe(Subscribers.Garantie($0)) }
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func ==>><O: Publisher>(_ lhs: O?, _ rhs: @escaping (O.Output) -> Void) -> Cancellable where O.Output: Equatable {
-	lhs?.removeDuplicates().skipFailure().subscribe(on: DispatchQueue.main).sink(receiveValue: rhs) ?? AnyCancellable()
+	lhs?.removeDuplicates().skipFailure().receive(on: DispatchQueue.main).sink(receiveValue: rhs) ?? AnyCancellable()
 }

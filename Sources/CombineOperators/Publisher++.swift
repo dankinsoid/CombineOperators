@@ -231,50 +231,7 @@ extension Publishers {
 		public func receive<S: Subscriber>(subscriber: S) where P.Failure == S.Failure, P.Output.Wrapped == S.Input {
 			source.map { $0.asOptional() }.receive(subscriber: subscriber.ignoreNil())
 		}
-
-		public struct From<Output>: Publisher {
-			public typealias Failure = Never
-			private let array: [Output]
-
-			public init(_ elements: Output...) {
-				array = elements
-			}
-
-			public init<C: Collection>(_ collection: C) where C.Element == Output {
-				array = Array(collection)
-			}
-
-			public func receive<S: Subscriber>(subscriber: S) where Never == S.Failure, Output == S.Input {
-				subscriber.receive(subscription: ArraySubscription(subscriber, array: array))
-			}
-
-			private final class ArraySubscription<S: Subscriber>: Subscription where S.Input == Output {
-				var subscriber: S?
-				let array: [Output]
-
-				init(_ subscriber: S?, array: [Output]) {
-					self.subscriber = subscriber
-					self.array = array
-				}
-
-				func request(_ demand: Subscribers.Demand) {
-					guard let subscriber = subscriber, demand > .none else {
-						subscriber?.receive(completion: .finished)
-						return
-					}
-					for element in array.prefix(demand.max ?? array.count) {
-						guard subscriber.receive(element) > .none else { break }
-					}
-					subscriber.receive(completion: .finished)
-				}
-
-				func cancel() {
-					subscriber = nil
-				}
-			}
-
-		}
-
+		
 	}
 
 }

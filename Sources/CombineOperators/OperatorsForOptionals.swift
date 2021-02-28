@@ -83,7 +83,7 @@ public func =><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable wh
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func ==><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input == T.Output? {
-	rhs.map { lhs?.map { $0 }.skipFailure().subscribe(on: DispatchQueue.main).subscribe(Subscribers.Garantie($0)) }
+	rhs.map { lhs?.map { $0 }.skipFailure().receive(on: DispatchQueue.main).subscribe(Subscribers.Garantie($0)) }
 }
 
 
@@ -162,5 +162,5 @@ public func =><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable wh
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func ==><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input? == T.Output {
-	rhs.map { lhs?.skipNil().skipFailure().subscribe(on: DispatchQueue.main).subscribe(Subscribers.Garantie($0)) }
+	rhs.map { lhs?.skipNil().skipFailure().receive(on: DispatchQueue.main).subscribe(Subscribers.Garantie($0)) }
 }

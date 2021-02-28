@@ -21,11 +21,10 @@ extension Publishers {
 		}
 		
 		public func receive<S>(subscriber: S) where S : Subscriber, Create.Failure == S.Failure, Create.Output == S.Input {
-			let subscription = Subscriptions.Anonymous(subscriber: subscriber) {[weak self] in
+			let subscription = Subscriptions.Anonymous(subscriber: subscriber, closure: closure) {[weak self] in
 				self?.disassociate($0)
 			}
 			subscriber.receive(subscription: subscription)
-			subscription.start(closure)
 			lock.lock()
 			subscriptions[subscription.combineIdentifier] = subscription
 			lock.unlock()
@@ -48,22 +47,21 @@ extension Subscriptions {
 		private var cancellable: Cancellable?
 		private var disassociate: (CombineIdentifier) -> Void
 		private let lock = NSRecursiveLock()
+		private var closure: (AnySubscriber<Output, Failure>) -> Cancellable
 		
-		init(subscriber: SubscriberType, disassociate: @escaping (CombineIdentifier) -> Void) {
+		init(subscriber: SubscriberType, closure: @escaping (AnySubscriber<Output, Failure>) -> Cancellable, disassociate: @escaping (CombineIdentifier) -> Void) {
 			self.subscriber = subscriber
+			self.closure = closure
 			self.disassociate = disassociate
 		}
 		
-		func start(_ closure: @escaping (AnySubscriber<Output, Failure>) -> Cancellable) {
+		func request(_ demand: Subscribers.Demand) {
+			guard demand > 0, cancellable == nil else { return }
 			lock.lock()
 			if let subscriber = subscriber {
 				cancellable = closure(AnySubscriber(subscriber))
 			}
 			lock.unlock()
-		}
-		
-		func request(_ demand: Subscribers.Demand) {
-			// Ignore demand for now
 		}
 		
 		func cancel() {
