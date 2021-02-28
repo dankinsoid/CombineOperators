@@ -7,23 +7,21 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'RxOperators'
-  s.version          = '2.8.0'
-  s.summary          = 'A short description of RxOperators.'
+  s.name             = 'CombineOperators'
+  s.version          = '1.17.0'
+  s.summary          = 'A short description of CombineOperators.'
   s.description      = <<-DESC
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/dankinsoid/RxOperators'
+  s.homepage         = 'https://github.com/dankinsoid/CombineOperators'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Voidilov' => 'voidilov@gmail.com' }
-  s.source           = { :git => 'https://github.com/dankinsoid/RxOperators.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/dankinsoid/CombineOperators.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '11.0'
   s.swift_versions = '5.1'
-  s.source_files = 'Sources/RxOperators/**/*'
-  s.dependency 'RxSwift', '~> 6.0'
-  s.dependency 'RxCocoa', '~> 6.0'
-  s.dependency 'VD', '~> 1.16.0'
+  s.source_files = 'Sources/CombineOperators/**/*'
+  s.dependency 'VD', '~> 1.13.0'
 end
