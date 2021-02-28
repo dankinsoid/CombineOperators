@@ -91,6 +91,12 @@ public func =>><O: Publisher>(_ lhs: O?, _ rhs: @escaping (O.Output) -> Void) wh
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
+public func =>><O: Publisher>(_ lhs: O?, _ rhs: @escaping @autoclosure () -> Void) where O.Output: Equatable {
+	lhs?.removeDuplicates().map({ _ in rhs() }).subscribe(AnySubscriber.create(rhs))
+}
+
+@available(iOS 13.0, macOS 10.15, *)
+@inlinable
 public func =>><O: Publisher>(_ lhs: O?, _ rhs: [(O.Output) -> ()]) where O.Output: Equatable {
 	rhs.forEach { lhs?.removeDuplicates().subscribe(AnySubscriber.create($0)) }
 }

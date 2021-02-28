@@ -97,6 +97,12 @@ public func =><O: Publisher>(_ lhs: O?, _ rhs: @escaping (O.Output) -> Void) {
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
+public func =><O: Publisher>(_ lhs: O?, _ rhs: @escaping @autoclosure () -> Void) {
+	lhs?.map({ _ in rhs() }).subscribe(AnySubscriber.create(rhs))
+}
+
+@available(iOS 13.0, macOS 10.15, *)
+@inlinable
 public func =><O: Publisher>(_ lhs: O?, _ rhs: [(O.Output) -> ()]) {
 	rhs.forEach { lhs?.subscribe(AnySubscriber.create($0)) }
 }
