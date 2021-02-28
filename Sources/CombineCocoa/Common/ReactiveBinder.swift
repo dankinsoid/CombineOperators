@@ -52,12 +52,24 @@ extension ReactiveBinder: Subscriber where KP: ReferenceWritableKeyPath<Target, 
 	
 	public func receive(completion: Subscribers.Completion<Never>) {}
 	
+	public subscript<T>(dynamicMember keyPath: WritableKeyPath<Input, T>) -> ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>> {
+		ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>>(target, keyPath: self.keyPath.append(writable: keyPath))
+	}
+	
 }
 
 extension KeyPath {
 	
 	func append<T>(reference: ReferenceWritableKeyPath<Value, T>) -> ReferenceWritableKeyPath<Root, T> {
 		appending(path: reference)
+	}
+	
+}
+
+extension ReferenceWritableKeyPath {
+	
+	func append<T>(writable: WritableKeyPath<Value, T>) -> ReferenceWritableKeyPath<Root, T> {
+		appending(path: writable)
 	}
 	
 }
