@@ -342,7 +342,7 @@ extension DelegateProxyType where ParentObject: HasPrefetchDataSource, Self.Dele
                 }
 
                 let subscription = self
-										.receive(on: DispatchQueue.main)
+									.receive(on: DispatchQueue.main)
 									.catch { error -> Empty<Output, Failure> in
                         bindingError(error)
                         return Empty(completeImmediately: true)
