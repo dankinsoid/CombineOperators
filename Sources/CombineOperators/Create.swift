@@ -11,20 +11,32 @@ import Combine
 @available(iOS 13.0, macOS 10.15, *)
 extension Publishers {
 	
-	public struct Create<Output, Failure: Swift.Error>: Publisher {
+	public final class Create<Output, Failure: Swift.Error>: Publisher {
 		private var closure: (AnySubscriber<Output, Failure>) -> Cancellable
+		private let lock = NSRecursiveLock()
+		private var subscriptions: [CombineIdentifier: Any] = [:]
 		
 		public init(_ closure: @escaping (AnySubscriber<Output, Failure>) -> Cancellable) {
 			self.closure = closure
 		}
 		
 		public func receive<S>(subscriber: S) where S : Subscriber, Create.Failure == S.Failure, Create.Output == S.Input {
-			let subscription = Subscriptions.Anonymous(subscriber: subscriber)
+			let subscription = Subscriptions.Anonymous(subscriber: subscriber) {[weak self] in
+				self?.disassociate($0)
+			}
 			subscriber.receive(subscription: subscription)
 			subscription.start(closure)
+			lock.lock()
+			subscriptions[subscription.combineIdentifier] = subscription
+			lock.unlock()
+		}
+		
+		private func disassociate(_ id: CombineIdentifier) {
+			lock.lock()
+			subscriptions[id] = nil
+			lock.unlock()
 		}
 	}
-	
 }
 
 @available(iOS 13.0, macOS 10.15, *)
@@ -34,9 +46,11 @@ extension Subscriptions {
 		
 		private var subscriber: SubscriberType?
 		private var cancellable: Cancellable?
+		private var disassociate: (CombineIdentifier) -> Void
 		
-		init(subscriber: SubscriberType) {
+		init(subscriber: SubscriberType, disassociate: @escaping (CombineIdentifier) -> Void) {
 			self.subscriber = subscriber
+			self.disassociate = disassociate
 		}
 		
 		func start(_ closure: @escaping (AnySubscriber<Output, Failure>) -> Cancellable) {
@@ -53,11 +67,11 @@ extension Subscriptions {
 			cancellable?.cancel()
 			cancellable = nil
 			self.subscriber = nil
+			disassociate(combineIdentifier)
 		}
 		
 		deinit {
 			cancellable?.cancel()
-			print("deinit")
 		}
 		
 	}

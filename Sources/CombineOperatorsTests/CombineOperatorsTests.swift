@@ -20,6 +20,11 @@ final class CombineOperatorsTests: XCTestCase {
 		button.cb.tap => { exp.fulfill() }
 		button.sendActions(for: .touchUpInside)
 		waitForExpectations(timeout: 2, handler: nil)
+		
+		let subject = CurrentValueSubject<String, Error>("")
+		let label = UILabel()
+		subject => label.cb.text
+		
 		print("wait")
 	}
 	
