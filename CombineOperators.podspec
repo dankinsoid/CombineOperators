@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CombineOperators'
-  s.version          = '1.24.0'
+  s.version          = '1.25.0'
   s.summary          = 'A short description of CombineOperators.'
   s.description      = <<-DESC
 TODO: Add long description of the pod here.
@@ -22,6 +22,6 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '11.0'
   s.swift_versions = '5.1'
-  s.source_files = 'Sources/CombineOperators/**/*'
+  s.source_files = 'Sources/**/*'
   s.dependency 'VD', '~> 1.13.0'
 end
