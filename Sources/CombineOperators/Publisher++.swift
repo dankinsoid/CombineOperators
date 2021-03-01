@@ -22,7 +22,7 @@ public enum PublishersMerger<Output>: PublishersMergerType {
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-public typealias PublisherBuilder<Output> = ComposeBuilder<PublishersMerger<Output>>
+public typealias MergeBuilder<Output> = ComposeBuilder<PublishersMerger<Output>>
 
 @available(iOS 13.0, macOS 10.15, *)
 extension ComposeBuilder where C: PublishersMergerType, C.Item == AnyPublisher<C.Output, Error> {
@@ -35,7 +35,7 @@ extension ComposeBuilder where C: PublishersMergerType, C.Item == AnyPublisher<C
 
 @available(iOS 13.0, macOS 10.15, *)
 extension Publishers {
-	public static func merge<Output>(@PublisherBuilder<Output> _ build: () -> AnyPublisher<Output, Error>) -> AnyPublisher<Output, Error> {
+	public static func merge<Output>(@MergeBuilder<Output> _ build: () -> AnyPublisher<Output, Error>) -> AnyPublisher<Output, Error> {
 		build()
 	}
 }

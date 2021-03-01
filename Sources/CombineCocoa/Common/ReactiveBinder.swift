@@ -34,7 +34,9 @@ public final class ReactiveBinder<Target: AnyObject, Input, KP: KeyPath<Target, 
 extension ReactiveBinder: Subscriber where KP: ReferenceWritableKeyPath<Target, Input> {
 	public typealias Failure = Never
 	
-	public func receive(subscription: Subscription) {}
+	public func receive(subscription: Subscription) {
+		subscription.request(.unlimited)
+	}
 	
 	public func receive(_ input: Input) -> Subscribers.Demand {
 		DispatchQueue.main.schedule {

@@ -23,6 +23,8 @@
  `Binder`s are also automatically synthesized using `@dynamicMemberLookup` for writable reference properties of the reactive base.
  */
 
+import CombineOperators
+
 @available(iOS 13.0, macOS 10.15, *)
 @dynamicMemberLookup
 public struct Reactive<Base> {
@@ -50,6 +52,17 @@ extension Reactive where Base: AnyObject {
 		ReactiveBinder<Base, T, ReferenceWritableKeyPath<Base, T>>(base, keyPath: keyPath)
 	}
 	
+	public func weak<I>(_ method: @escaping (Base) -> (I) -> Void) -> WeakMethod<Base, I> {
+		WeakMethod(method, on: base)
+	}
+	
+	
+	public func weak(_ method: @escaping (Base) -> () -> Void) -> WeakMethod<Base, Void> {
+		WeakMethod({ base in { _ in method(base)() } }, on: base)
+	}
+//	public subscript<T: ReactiveCompatible>(dynamicMember keyPath: KeyPath<Base, T>) -> Reactive<T> {
+//		base[keyPath: keyPath].cb
+//	}
 }
 
 /// A type that has reactive extensions.
@@ -67,6 +80,8 @@ public protocol ReactiveCompatible {
 
 @available(iOS 13.0, macOS 10.15, *)
 extension ReactiveCompatible {
+	public typealias It = Self
+	
     /// Reactive extensions.
     public static var cb: Reactive<Self>.Type {
         get { Reactive<Self>.self }

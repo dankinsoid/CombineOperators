@@ -25,8 +25,11 @@ final class CombineOperatorsTests: XCTestCase {
 		let label = UILabel()
 		subject => label.cb.text
 		
+		_ = cb.weak(It.test)
+		
 		print("wait")
 	}
+	
 	
 }
 

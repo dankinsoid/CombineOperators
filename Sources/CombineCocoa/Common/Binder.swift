@@ -44,7 +44,9 @@ public final class Binder<Input>: Subscriber {
 		self.init(target, scheduler: DispatchQueue.main, binding: binding)
 	}
 	
-	public func receive(subscription: Subscription) {}
+	public func receive(subscription: Subscription) {
+		subscription.request(.unlimited)
+	}
 	
 	public func receive(_ input: Input) -> Subscribers.Demand {
 		binding(input)
