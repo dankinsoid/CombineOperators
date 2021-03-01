@@ -38,13 +38,13 @@ public struct CombineLatestBuilder {
 	}
 	
 	@_alwaysEmitIntoClient
-	public static func buildEither<P: Publisher>(first component: P) -> P {
-		component
+	public static func buildEither<P: Publisher>(first component: P) -> AnyPublisher<P.Output, P.Failure> {
+		component.eraseToAnyPublisher()
 	}
 	
 	@_alwaysEmitIntoClient
-	public static func buildEither<P: Publisher>(second component: P) -> P {
-		component
+	public static func buildEither<P: Publisher>(second component: P) -> AnyPublisher<P.Output, P.Failure> {
+		component.eraseToAnyPublisher()
 	}
 	
 	public static func buildOptional<P: Publisher>(_ component: P?) -> AnyPublisher<P.Output, P.Failure> {
