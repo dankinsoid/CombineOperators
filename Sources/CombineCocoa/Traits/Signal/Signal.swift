@@ -32,7 +32,7 @@ import Combine
 @available(iOS 13.0, macOS 10.15, *)
 extension Publisher {
 	
-	public func asSignal() -> Driver<Output> {
+	public func asSignal() -> Signal<Output> {
 		Signal(self.skipFailure())
 	}
 	
