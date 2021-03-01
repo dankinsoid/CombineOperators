@@ -6,6 +6,7 @@
 //  Copyright © 2016 Krunoslav Zaher. All rights reserved.
 //
 
+import Foundation
 import Combine
 
 /**
@@ -27,21 +28,39 @@ import Combine
  
  To find out more about units and how to use them, please visit `Documentation/Traits.md`.
  */
-//public typealias Signal<Element> = SharedSequence<SignalSharingStrategy, Element>
-//
-//@available(iOS 13.0, macOS 10.15, *)
-//public struct SignalSharingStrategy: SharingStrategyProtocol {
-//    public static var scheduler: SchedulerType { SharingScheduler.make() }
-//    
-//    public static func share<Element>(_ source: AnyPublisher<Element>) -> Publisher<Element, Error> {
-//        source.share(scope: .whileConnected)
-//    }
-//}
-//
-//@available(iOS 13.0, macOS 10.15, *)
-//extension SharedSequenceConvertibleType where SharingStrategy == SignalSharingStrategy {
-//    /// Adds `asPublisher` to `SharingSequence` with `PublishSharingStrategy`.
-//    public func asSignal() -> Signal<Element> {
-//        self.asSharedSequence()
-//    }
-//}
+
+@available(iOS 13.0, macOS 10.15, *)
+extension Publisher {
+	
+	public func asSignal() -> Driver<Output> {
+		Signal(self.skipFailure())
+	}
+	
+	public func asSignal(replaceError: Output) -> Signal<Output> {
+		Signal(self) { _ in Just(replaceError) }
+	}
+	
+	public func asSignal<C: Publisher>(catch handler: @escaping (Error) -> C) -> Signal<Output> where C.Output == Output {
+		Signal(self, catch: handler)
+	}
+	
+}
+
+@available(iOS 13.0, macOS 10.15, *)
+public struct Signal<Output>: Publisher {
+	public typealias Failure = Never
+	private let publisher: AnyPublisher<Output, Failure>
+	
+	public init<P: Publisher, C: Publisher>(_ source: P, catch handler: @escaping (Error) -> C) where C.Output == P.Output, C.Output == Output {
+		self = Signal(source.catch(handler).skipFailure())
+	}
+	
+	public init<P: Publisher>(_ source: P) where Never == P.Failure, P.Output == Output {
+		publisher = source.share().receive(on: DispatchQueue.main).eraseToAnyPublisher()
+	}
+	
+	public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, Output == S.Input {
+		publisher.receive(subscriber: subscriber)
+	}
+	
+}

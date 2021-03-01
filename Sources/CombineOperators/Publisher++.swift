@@ -81,6 +81,7 @@ extension Publisher {
 		map { _ in value }
 	}
 	
+	@inlinable
 	public func any() -> AnyPublisher<Output, Failure> {
 		eraseToAnyPublisher()
 	}
