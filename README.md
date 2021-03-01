@@ -99,10 +99,10 @@ intPublisher ==> intSubscriber => cancellableSet
 
 3. Operators `=>>` and `==>>` replaces `.removeDublicates()`
 
-4. `CancellableBuilder` and `PublisherBuilder` - result builders
+4. `CancellableBuilder` and `MergeBuilder`, `CombineLatestBuilder` - result builders
 
 5. Some features:
-
+- `UIView.cb` operators: `isVisible`, `willAppear`, `isOnScreen`, `didAppear`, `movedToWindow`, `frame`, `frameOnWindow`, etc. 
 - `skipNil()` operator
 - `or(Bool), .toggle(), !` operators for boolean sequences
 - use `+` and `+=` operator for merging publishers, creating Cancellables, etc
@@ -143,7 +143,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.31.0")
+    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.32.0")
     ],
   targets: [
     .target(name: "SomeProject", dependencies: ["CombineOperators"])
