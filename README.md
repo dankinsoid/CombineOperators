@@ -109,7 +109,7 @@ intPublisher ==> intSubscriber => cancellableSet
 - `interval(...)` 
 - `withLast() -> AnyPublisher<(previous: Output?, current: Output), Failure>`
 - `.mp` - `@dynamicMemberLookup` mapper
-- `asResult() -> AnyPublisher<Result<Output, Error>, Never>`
+- `asResult() -> AnyPublisher<Result<Output, Failure>, Never>`
 - `nilIfEmpty`
 - `isEmpty`
 - `isNil`
@@ -143,7 +143,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.32.0")
+    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.33.0")
     ],
   targets: [
     .target(name: "SomeProject", dependencies: ["CombineOperators"])

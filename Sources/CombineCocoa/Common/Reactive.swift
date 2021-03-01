@@ -56,10 +56,10 @@ extension Reactive where Base: AnyObject {
 		WeakMethod(method, on: base)
 	}
 	
-	
 	public func weak(_ method: @escaping (Base) -> () -> Void) -> WeakMethod<Base, Void> {
 		WeakMethod({ base in { _ in method(base)() } }, on: base)
 	}
+	
 //	public subscript<T: ReactiveCompatible>(dynamicMember keyPath: KeyPath<Base, T>) -> Reactive<T> {
 //		base[keyPath: keyPath].cb
 //	}

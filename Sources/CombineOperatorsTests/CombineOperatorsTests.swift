@@ -15,21 +15,15 @@ final class CombineOperatorsTests: XCTestCase {
 	
 	@available(iOS 13.0, *)
 	func test() {
-		let button = Button()
-		let exp = expectation(description: "")
-		button.cb.tap => { exp.fulfill() }
-		button.sendActions(for: .touchUpInside)
+		let exp = [expectation(description: "0"), expectation(description: "1")]
+		let date = Date()
+		[0, 1].publisher.interval(0.5) => { exp[$0].fulfill(); print(Date().timeIntervalSince(date)) }
 		waitForExpectations(timeout: 2, handler: nil)
-		
-		let subject = CurrentValueSubject<String, Error>("")
-		let label = UILabel()
-		subject => label.cb.text
-		
-		_ = cb.weak(It.test)
-		
-		print("wait")
 	}
 	
+	private func get(text: String) {
+		
+	}
 	
 }
 

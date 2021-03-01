@@ -62,10 +62,11 @@ extension Publisher {
 		}
 	}
 
-	public func interval(_ period: TimeInterval, runLoop: RunLoop = .main) -> Publishers.WithInterval<Self> {
+	public func interval(_ period: TimeInterval, runLoop: RunLoop = .main) -> AnyPublisher<Output, Never> {
 		skipFailure().zip(
-			Timer.TimerPublisher(interval: period, runLoop: runLoop, mode: .default).prepend(Date())
+			Timer.TimerPublisher(interval: period, runLoop: runLoop, mode: .default).autoconnect().prepend(Date())
 		).map { $0.0 }
+		.eraseToAnyPublisher()
 	}
 
 	public func withLast(initial value: Output) -> Publishers.Scan<Self, (previous: Output, current: Output)> {
@@ -223,7 +224,6 @@ extension Publisher where Output: Equatable {
 
 @available(iOS 13.0, macOS 10.15, *)
 extension Publishers {
-	public typealias WithInterval<P: Publisher> = Map<Zip<Catch<P, Empty<P.Output, Never>>, Concatenate<Sequence<[Timer.TimerPublisher.Output], Timer.TimerPublisher.Failure>, Timer.TimerPublisher>>, Catch<P, Empty<P.Output, Never>>.Output>
 
 	public typealias WithLast<P: Publisher> = Map<Scan<P, (P.Output?, P.Output?)>, (P.Output?, P.Output)>
 

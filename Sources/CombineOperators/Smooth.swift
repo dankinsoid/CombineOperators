@@ -44,7 +44,7 @@ extension Publisher {
 				guard list.count == 2 else { return Just(list[0]).eraseToAnyPublisher() }
 				guard condition(list[0], list[1]) else { return Just(list[1]).eraseToAnyPublisher() }
 				let array = rule(list[0], list[1], count)
-				return Timer.TimerPublisher(interval: interval, runLoop: runLoop, mode: .common)
+				return Timer.TimerPublisher(interval: interval, runLoop: runLoop, mode: .default).autoconnect()
 					.zip(Publishers.Sequence(sequence: array))
 					.map { $0.1 }
 					.eraseToAnyPublisher()
@@ -167,6 +167,15 @@ extension ClosedRange where Bound: FloatingPoint {
 		}
 		result.append(upperBound)
 		return result
+	}
+	
+}
+
+@available(iOS 13.0, macOS 10.15, *)
+extension Timer.TimerPublisher {
+	
+	public convenience init(_ interval: TimeInterval, tolerance: TimeInterval? = nil, runLoop: RunLoop = .current, mode: RunLoop.Mode = .default, options: RunLoop.SchedulerOptions? = nil) {
+		self.init(interval: interval, tolerance: tolerance, runLoop: runLoop, mode: mode, options: options)
 	}
 	
 }
