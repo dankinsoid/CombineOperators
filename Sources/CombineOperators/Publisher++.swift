@@ -248,3 +248,31 @@ extension Publishers {
 	}
 
 }
+
+extension AnyPublisher {
+	
+	public static func just(_ value: Output) -> AnyPublisher {
+		Just(value).setFailureType(to: Failure.self).eraseToAnyPublisher()
+	}
+	
+	public static func never() -> AnyPublisher {
+		Empty(completeImmediately: false).eraseToAnyPublisher()
+	}
+	
+	public static func from(_ values: Output...) -> AnyPublisher {
+		from(values)
+	}
+	
+	public static func from(_ values: [Output]) -> AnyPublisher {
+		Publishers.Sequence(sequence: values).eraseToAnyPublisher()
+	}
+	
+	public static func error(_ error: Failure) -> AnyPublisher {
+		Result<Output, Failure>.Publisher(.failure(error)).eraseToAnyPublisher()
+	}
+	
+	public static func empty() -> AnyPublisher {
+		Empty(completeImmediately: true).eraseToAnyPublisher()
+	}
+	
+}
