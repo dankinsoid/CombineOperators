@@ -13,37 +13,59 @@ import VDKit
 @available(iOS 13.0, macOS 10.15, *)
 public protocol PublishersMergerType: ArrayInitable {
 	associatedtype Output
+	associatedtype Failure: Error
 }
 @available(iOS 13.0, macOS 10.15, *)
-public enum PublishersMerger<Output>: PublishersMergerType {
-	public static func create(from: [AnyPublisher<Output, Error>]) -> AnyPublisher<Output, Error> {
+public enum PublishersMerger<Output, Failure: Error>: PublishersMergerType {
+	public static func create(from: [AnyPublisher<Output, Failure>]) -> AnyPublisher<Output, Failure> {
 		Publishers.MergeMany(from).eraseToAnyPublisher()
 	}
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-public typealias MergeBuilder<Output> = ComposeBuilder<PublishersMerger<Output>>
+public typealias MergeBuilder<Output, Failure: Error> = ComposeBuilder<PublishersMerger<Output, Failure>>
 
 @available(iOS 13.0, macOS 10.15, *)
-extension ComposeBuilder where C: PublishersMergerType, C.Item == AnyPublisher<C.Output, Error> {
+extension ComposeBuilder where C: PublishersMergerType, C.Item == AnyPublisher<C.Output, C.Failure> {
 	
-	public static func buildExpression(_ expression: C.Output) -> AnyPublisher<C.Output, Error> {
-		Just(expression).simpleError().eraseToAnyPublisher()
+	public static func buildExpression(_ expression: C.Output) -> AnyPublisher<C.Output, C.Failure> {
+		Just(expression).setFailureType(to: C.Failure.self).eraseToAnyPublisher()
 	}
 	
-	public static func buildExpression(_ expression: [C.Output]) -> AnyPublisher<C.Output, Error> {
-		expression.publisher.simpleError().eraseToAnyPublisher()
+	public static func buildExpression(_ expression: [C.Output]) -> AnyPublisher<C.Output, C.Failure> {
+		Publishers.Sequence(sequence: expression).eraseToAnyPublisher()
 	}
 	
-	public static func buildExpression<P: Publisher>(_ expression: P) -> AnyPublisher<C.Output, Error> where P.Output == C.Output {
-		expression.simpleError().eraseToAnyPublisher()
+	public static func buildExpression<P: Publisher>(_ expression: P) -> AnyPublisher<C.Output, C.Failure> where P.Output == C.Output, P.Failure == C.Failure {
+		expression.eraseToAnyPublisher()
 	}
 	
 }
 
+extension ComposeBuilder where C: PublishersMergerType, C.Item == AnyPublisher<C.Output, C.Failure>, C.Failure == Error {
+	public static func buildExpression<P: Publisher>(_ expression: P) -> AnyPublisher<C.Output, C.Failure> where P.Output == C.Output {
+		expression.simpleError().eraseToAnyPublisher()
+	}
+	
+	public static func buildExpression<P: Publisher>(_ expression: P) -> AnyPublisher<C.Output, C.Failure> where P.Output == C.Output, P.Failure == Error {
+		expression.eraseToAnyPublisher()
+	}
+}
+
+extension ComposeBuilder where C: PublishersMergerType, C.Item == AnyPublisher<C.Output, C.Failure>, C.Failure == Never {
+	
+	public static func buildExpression<P: Publisher>(_ expression: P) -> AnyPublisher<C.Output, C.Failure> where P.Output == C.Output {
+		expression.skipFailure().eraseToAnyPublisher()
+	}
+	
+	public static func buildExpression<P: Publisher>(_ expression: P) -> AnyPublisher<C.Output, C.Failure> where P.Output == C.Output, P.Failure == Never {
+		expression.eraseToAnyPublisher()
+	}
+}
+
 @available(iOS 13.0, macOS 10.15, *)
 extension Publishers {
-	public static func merge<Output>(@MergeBuilder<Output> _ build: () -> AnyPublisher<Output, Error>) -> AnyPublisher<Output, Error> {
+	public static func merge<Output, Failure: Error>(@MergeBuilder<Output, Failure> _ build: () -> AnyPublisher<Output, Failure>) -> AnyPublisher<Output, Failure> {
 		build()
 	}
 }
