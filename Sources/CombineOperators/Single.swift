@@ -11,13 +11,13 @@ import Combine
 public struct Single<Output, Failure: Error>: Publisher {
 	fileprivate let future: AnyPublisher<Output, Failure>
 	
-	public init(_ attemptToFulFill: @escaping (Future<Output, Failure>.Promise) -> Void, onCancel: @escaping () -> Void) {
+	public init(_ attemptToFulFill: @escaping (@escaping Future<Output, Failure>.Promise) -> Void, onCancel: @escaping () -> Void) {
 		future = Deferred {
 			Future(attemptToFulFill).onCancel(onCancel)
 		}.any()
 	}
 	
-	public init(_ attemptToFulFill: @escaping (Future<Output, Failure>.Promise) -> Void) {
+	public init(_ attemptToFulFill: @escaping (@escaping Future<Output, Failure>.Promise) -> Void) {
 		future = Deferred {
 			Future(attemptToFulFill)
 		}.any()
