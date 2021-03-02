@@ -2,15 +2,6 @@
   "object": {
     "pins": [
       {
-        "package": "VDCodable",
-        "repositoryURL": "https://github.com/dankinsoid/VDCodable.git",
-        "state": {
-          "branch": null,
-          "revision": "a5a26be25b1678f410412ec352889dc52607c5a8",
-          "version": "1.0.13"
-        }
-      },
-      {
         "package": "VDKit",
         "repositoryURL": "https://github.com/dankinsoid/VDKit.git",
         "state": {
