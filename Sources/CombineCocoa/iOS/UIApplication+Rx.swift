@@ -13,12 +13,6 @@ import Combine
 
 @available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIApplication {
-    /// Bindable sink for `isNetworkActivityIndicatorVisible`.
-    public var isNetworkActivityIndicatorVisible: Binder<Bool> {
-        return Binder(self.base) { application, active in
-            application.isNetworkActivityIndicatorVisible = active
-        }
-    }
     
     /// Reactive wrapper for `UIApplication.didEnterBackgroundNotification`
     public static var didEnterBackground: ControlEvent<Void> {

@@ -20,7 +20,7 @@ extension Publishers {
 			self.closure = closure
 		}
 		
-		public func receive<S>(subscriber: S) where S : Subscriber, Create.Failure == S.Failure, Create.Output == S.Input {
+		public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
 			let subscription = Subscriptions.Anonymous(subscriber: subscriber, closure: closure) {[weak self] in
 				self?.disassociate($0)
 			}
@@ -59,7 +59,7 @@ extension Subscriptions {
 			guard demand > 0, cancellable == nil else { return }
 			lock.lock()
 			if let subscriber = subscriber {
-				cancellable = closure(AnySubscriber(subscriber))
+				cancellable = closure(AnySubscriber(AnonymousSubscriber(subscriber: subscriber)))
 			}
 			lock.unlock()
 		}
@@ -77,6 +77,21 @@ extension Subscriptions {
 			cancellable?.cancel()
 		}
 		
+		private struct AnonymousSubscriber: Subscriber {
+			var combineIdentifier: CombineIdentifier { subscriber.combineIdentifier }
+			var subscriber: SubscriberType
+			
+			func receive(subscription: Subscription) {}
+			
+			func receive(_ input: SubscriberType.Input) -> Subscribers.Demand {
+				subscriber.receive(input)
+			}
+			
+			func receive(completion: Subscribers.Completion<SubscriberType.Failure>) {
+				subscriber.receive(completion: completion)
+			}
+			
+		}
 	}
 	
 }
