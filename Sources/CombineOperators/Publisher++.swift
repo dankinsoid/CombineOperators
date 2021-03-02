@@ -27,6 +27,14 @@ public typealias MergeBuilder<Output> = ComposeBuilder<PublishersMerger<Output>>
 @available(iOS 13.0, macOS 10.15, *)
 extension ComposeBuilder where C: PublishersMergerType, C.Item == AnyPublisher<C.Output, Error> {
 	
+	public static func buildExpression(_ expression: C.Output) -> AnyPublisher<C.Output, Error> {
+		Just(expression).simpleError().eraseToAnyPublisher()
+	}
+	
+	public static func buildExpression(_ expression: [C.Output]) -> AnyPublisher<C.Output, Error> {
+		expression.publisher.simpleError().eraseToAnyPublisher()
+	}
+	
 	public static func buildExpression<P: Publisher>(_ expression: P) -> AnyPublisher<C.Output, Error> where P.Output == C.Output {
 		expression.simpleError().eraseToAnyPublisher()
 	}
