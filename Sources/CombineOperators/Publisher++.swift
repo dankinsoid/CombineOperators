@@ -285,12 +285,12 @@ extension AnyPublisher {
 		from(values)
 	}
 	
-	public static func from(_ values: [Output]) -> AnyPublisher {
+	public static func from<S: Sequence>(_ values: S) -> AnyPublisher where S.Element == Output {
 		Publishers.Sequence(sequence: values).eraseToAnyPublisher()
 	}
 	
 	public static func error(_ error: Failure) -> AnyPublisher {
-		Result<Output, Failure>.Publisher(.failure(error)).eraseToAnyPublisher()
+		Result.Publisher(.failure(error)).eraseToAnyPublisher()
 	}
 	
 	public static func empty() -> AnyPublisher {
