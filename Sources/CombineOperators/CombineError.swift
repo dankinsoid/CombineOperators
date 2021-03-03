@@ -7,6 +7,6 @@
 
 import Foundation
 
-enum CombineError: Error {
+public enum CombineError: Error {
 	case condition, noElements, unknown
 }
