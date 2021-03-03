@@ -61,12 +61,17 @@ extension Reactive where Base: AnyObject {
 	}
 	
 	public var asBag: CancellableBag {
-		if let result = objc_getAssociatedObject(base, &cancellableBagKey) as? CancellableBag {
+		get {
+			if let result = objc_getAssociatedObject(base, &cancellableBagKey) as? CancellableBag {
+			return result
+			}
+			let result = CancellableBag()
+			objc_setAssociatedObject(base, &cancellableBagKey, result, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
 			return result
 		}
-		let result = CancellableBag()
-		objc_setAssociatedObject(base, cancellableBagKey, result, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-		return result
+		nonmutating set {
+			objc_setAssociatedObject(base, &cancellableBagKey, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+		}
 	}
 }
 
