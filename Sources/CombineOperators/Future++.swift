@@ -8,9 +8,7 @@
 import Foundation
 import Combine
 
-@available(iOS 13.0, macOS 10.15, *)
-extension Future {
-	
+extension Single {
 	public func await() throws -> Output {
 		var e: Output?
 		var err: Failure?
@@ -40,6 +38,42 @@ extension Future {
 			throw CombineError.condition
 		}
 		return e!
+	}
+}
+
+extension Single where Failure == Never {
+	
+	public func await() -> Output {
+		var e: Output?
+		let semaphore = DispatchSemaphore(value: 0)
+		var d: Cancellable?
+		DispatchQueue.global().async {
+			d = self.sink(
+				receiveCompletion: {
+					switch $0 {
+					case .failure:
+						semaphore.signal()
+					case .finished:
+						semaphore.signal()
+					}
+				},
+				receiveValue: { element in
+					e = element
+				}
+			)
+		}
+		semaphore.wait()
+		d?.cancel()
+		return e!
+	}
+	
+}
+
+@available(iOS 13.0, macOS 10.15, *)
+extension Future {
+	
+	public func await() throws -> Output {
+		try asSingle().await()
 	}
 	
 	//	public static func wrap(_ function: @escaping (@escaping (Result<Output, Failure>) -> Void) -> Void) -> Future {
