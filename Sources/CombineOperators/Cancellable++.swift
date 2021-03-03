@@ -89,6 +89,9 @@ public struct CancellablePublisher: Cancellable, Publisher {
 	public typealias Output = Void
 	public typealias Failure = Never
 	private let subject = CurrentValueSubject<Void?, Never>(nil)
+	public var isCancelled: Bool {
+		subject.value != nil
+	}
 	
 	public init() {}
 	
