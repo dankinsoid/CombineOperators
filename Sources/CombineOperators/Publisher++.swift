@@ -116,29 +116,10 @@ extension Publisher {
 		eraseToAnyPublisher()
 	}
 
-	public func asResult() -> Publishers.Create<Result<Output, Failure>, Never> {
-		Publishers.Create { subscriber in
-			self.subscribe(
-				AnySubscriber(
-					receiveSubscription: {
-						subscriber.receive(subscription: $0)
-					},
-					receiveValue: {
-						subscriber.receive(.success($0))
-					},
-					receiveCompletion: {
-						switch $0 {
-						case .finished:
-							subscriber.receive(completion: .finished)
-						case .failure(let error):
-							_ = subscriber.receive(.failure(error))
-							subscriber.receive(completion: .finished)
-						}
-					}
-				)
-			)
-			return AnyCancellable()
-		}
+	public func asResult() -> AnyPublisher<Result<Output, Failure>, Never> {
+		map { .success($0) }
+			.catch { Just(.failure($0)) }
+			.eraseToAnyPublisher()
 	}
 
 	public func append(_ values: Output...) -> Publishers.Concatenate<Self, Publishers.Sequence<[Output], Failure>> {
