@@ -43,7 +43,7 @@ public struct Single<Output, Failure: Error>: Publisher {
 		}.any()
 	}
 	
-	public init<P: Publisher>(_ publisher: P, ifEmpty: P.Failure) where P.Output == Output, P.Failure == Failure {
+	public init<P: Publisher>(_ publisher: P, ifEmpty: Result<Output, P.Failure>) where P.Output == Output, P.Failure == Failure {
 		future = publisher
 			.prefix(1)
 			.collect(1)
@@ -51,10 +51,18 @@ public struct Single<Output, Failure: Error>: Publisher {
 				if list.count == 1 {
 					return Result.Publisher(.success(list[0]))
 				} else {
-					return Result.Publisher(.failure(ifEmpty))
+					return Result.Publisher(ifEmpty)
 				}
 			}
 			.any()
+	}
+	
+	public init<P: Publisher>(_ publisher: P, ifEmpty: P.Failure) where P.Output == Output, P.Failure == Failure {
+		self = Single(publisher, ifEmpty: .failure(ifEmpty))
+	}
+	
+	public init<P: Publisher>(_ publisher: P, ifEmpty: P.Output) where P.Output == Output, P.Failure == Failure {
+		self = Single(publisher, ifEmpty: .success(ifEmpty))
 	}
 	
 	public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
@@ -122,6 +130,18 @@ extension Publisher {
 	public func asSingle(ifEmpty: Failure) -> Single<Output, Failure> {
 		Single(self, ifEmpty: ifEmpty)
 	}
+	
+	public func asSingle(ifEmpty: Output) -> Single<Output, Failure> {
+		Single(self, ifEmpty: ifEmpty)
+	}
+}
+
+extension Publisher where Output == Void {
+	
+	public func asSingle() -> Single<Output, Failure> {
+		asSingle(ifEmpty: ())
+	}
+	
 }
 
 private final class Owner {
