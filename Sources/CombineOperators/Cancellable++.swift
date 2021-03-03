@@ -62,3 +62,25 @@ extension Array: Cancellable where Element == Cancellable {
 		forEach { $0.cancel() }
 	}
 }
+
+public final class CancellableBag: Cancellable, RangeReplaceableCollection {
+	public typealias Element = AnyCancellable
+	private var bag = Set<AnyCancellable>()
+	public var startIndex: Set<AnyCancellable>.Index { bag.startIndex }
+	public var endIndex: Set<AnyCancellable>.Index { bag.endIndex }
+	
+	public init() {}
+	
+	public subscript(position: Set<AnyCancellable>.Index) -> AnyCancellable {
+		bag[position]
+	}
+	
+	public func index(after i: Set<AnyCancellable>.Index) -> Set<AnyCancellable>.Index {
+		bag.index(after: i)
+	}
+	
+	public func cancel() {
+		bag.removeAll()
+	}
+	
+}

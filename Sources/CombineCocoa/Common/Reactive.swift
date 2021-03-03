@@ -60,10 +60,17 @@ extension Reactive where Base: AnyObject {
 		WeakMethod({ base in { _ in method(base)() } }, on: base)
 	}
 	
-//	public subscript<T: ReactiveCompatible>(dynamicMember keyPath: KeyPath<Base, T>) -> Reactive<T> {
-//		base[keyPath: keyPath].cb
-//	}
+	public var asBag: CancellableBag {
+		if let result = objc_getAssociatedObject(base, &cancellableBagKey) as? CancellableBag {
+			return result
+		}
+		let result = CancellableBag()
+		objc_setAssociatedObject(base, cancellableBagKey, result, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+		return result
+	}
 }
+
+private var cancellableBagKey = "CancellableBagKey"
 
 /// A type that has reactive extensions.
 @available(iOS 13.0, macOS 10.15, *)
