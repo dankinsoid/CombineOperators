@@ -105,3 +105,16 @@ extension Subscribers.Completion {
 		}
 	}
 }
+
+extension Subject {
+	public func asSubscriber() -> AnySubscriber<Output, Failure> {
+		AnySubscriber {
+			self.send(subscription: $0)
+		} receiveValue: {
+			self.send($0)
+			return .unlimited
+		} receiveCompletion: {
+			self.send(completion: $0)
+		}
+	}
+}

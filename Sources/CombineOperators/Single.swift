@@ -23,6 +23,18 @@ public struct Single<Output, Failure: Error>: Publisher {
 		}.any()
 	}
 	
+	public init(_ attemptToFulFill: @escaping (@escaping Future<Output, Failure>.Promise) -> Cancellable) {
+		let owner = Owner()
+		future = Deferred {
+			Future({
+				owner.cancellation = attemptToFulFill($0)
+			}).onCancel {
+				owner.cancellation?.cancel()
+				owner.cancellation = nil
+			}
+		}.any()
+	}
+	
 	public init(_ action: @escaping () -> Result<Output, Failure>) {
 		future = Deferred {
 			Future { promise in
@@ -110,4 +122,8 @@ extension Publisher {
 	public func asSingle(ifEmpty: Failure) -> Single<Output, Failure> {
 		Single(self, ifEmpty: ifEmpty)
 	}
+}
+
+private final class Owner {
+	var cancellation: Cancellable?
 }

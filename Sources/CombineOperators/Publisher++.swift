@@ -298,3 +298,123 @@ extension AnyPublisher {
 	}
 	
 }
+
+extension Publisher {
+	
+	@discardableResult
+	public func bind<S: Subscriber>(_ subscriber: S) -> Cancellable where S.Input == Output, S.Failure == Failure {
+		let cancels = Cancels()
+		subscribe(
+			CancellableSubscriber<S>(subscriber: subscriber) {[weak cancels] cancel in
+				cancels?.list.append(cancel)
+			} remove: {[weak cancels] in
+				cancels?.removeAll()
+			} isCancel: {[weak cancels] in
+				cancels?.isCancelled ?? false
+			}
+		)
+		return cancels
+	}
+	
+	@discardableResult
+	public func bind(receiveValue: ((Output) -> Subscribers.Demand)? = nil, receiveCompletion: ((Subscribers.Completion<Failure>) -> Void)? = nil) -> Cancellable {
+		bind(
+			AnySubscriber(
+				receiveSubscription: {
+					$0.request(.unlimited)
+				},
+				receiveValue: receiveValue,
+				receiveCompletion: receiveCompletion
+			)
+		)
+	}
+	
+	@discardableResult
+	public func bind(receiveValue: @escaping (Output) -> Void) -> Cancellable {
+		bind(
+			AnySubscriber(
+				receiveSubscription: {
+					$0.request(.unlimited)
+				},
+				receiveValue: {
+					receiveValue($0)
+					return .unlimited
+				},
+				receiveCompletion: nil
+			)
+		)
+	}
+	
+	public func subscribe(receiveValue: ((Output) -> Subscribers.Demand)? = nil, receiveCompletion: ((Subscribers.Completion<Failure>) -> Void)? = nil) {
+		subscribe(
+			AnySubscriber(
+				receiveSubscription: {
+					$0.request(.unlimited)
+				},
+				receiveValue: receiveValue,
+				receiveCompletion: receiveCompletion
+			)
+		)
+	}
+	
+	public func subscribe(receiveValue: @escaping (Output) -> Void) {
+		subscribe(
+			AnySubscriber(
+				receiveSubscription: {
+					$0.request(.unlimited)
+				},
+				receiveValue: {
+					receiveValue($0)
+					return .unlimited
+				},
+				receiveCompletion: nil
+			)
+		)
+	}
+	
+	public func sink<S: Subscriber>(_ subscriber: S) -> AnyCancellable where S.Failure == Failure, S.Input == Output {
+		AnyCancellable(bind(subscriber))
+	}
+}
+
+private struct CancellableSubscriber<S: Subscriber>: Subscriber {
+	typealias Input = S.Input
+	typealias Failure = S.Failure
+	var combineIdentifier: CombineIdentifier { subscriber.combineIdentifier }
+	let subscriber: S
+	let insertCancel: (@escaping () -> Void) -> Void
+	let remove: () -> Void
+	let isCancel: () -> Bool
+	
+	func receive(subscription: Subscription) {
+		guard !isCancel() else { return }
+		insertCancel(subscription.cancel)
+		subscriber.receive(subscription: subscription)
+	}
+	
+	func receive(_ input: S.Input) -> Subscribers.Demand {
+		guard !isCancel() else { return .none }
+		return subscriber.receive(input)
+	}
+	
+	func receive(completion: Subscribers.Completion<Failure>) {
+		guard !isCancel() else { return }
+		subscriber.receive(completion: completion)
+		remove()
+	}
+}
+
+private final class Cancels: Cancellable {
+	var list: [() -> Void] = []
+	var isCancelled = false
+	
+	func cancel() {
+		isCancelled = true
+		list.forEach { $0() }
+		list = []
+	}
+	
+	func removeAll() {
+		list = []
+	}
+}

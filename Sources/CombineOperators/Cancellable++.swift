@@ -56,3 +56,9 @@ extension AnyCancellable {
 	}
 	
 }
+
+extension Array: Cancellable where Element == Cancellable {
+	public func cancel() {
+		forEach { $0.cancel() }
+	}
+}
