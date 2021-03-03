@@ -15,9 +15,11 @@ final class CombineOperatorsTests: XCTestCase {
 	
 	@available(iOS 13.0, *)
 	func test() {
-		let exp = [expectation(description: "0"), expectation(description: "1")]
-		let date = Date()
-		[0, 1].publisher.interval(0.5) => { exp[$0].fulfill(); print(Date().timeIntervalSince(date)) }
+		let exp = expectation(description: "0")
+		let single = Array<Int>().publisher.prefix(1).reduce([], { $0 + [$1] }).print()
+		single.subscribe { _ in
+			exp.fulfill()
+		}
 		waitForExpectations(timeout: 2, handler: nil)
 	}
 	

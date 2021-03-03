@@ -46,7 +46,7 @@ public struct Single<Output, Failure: Error>: Publisher {
 	public init<P: Publisher>(_ publisher: P, ifEmpty: Result<Output, P.Failure>) where P.Output == Output, P.Failure == Failure {
 		future = publisher
 			.prefix(1)
-			.collect(1)
+			.reduce([], { $0 + [$1] })
 			.flatMap { list -> Result<Output, Failure>.Publisher in
 				if list.count == 1 {
 					return Result.Publisher(.success(list[0]))
