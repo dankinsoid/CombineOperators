@@ -84,3 +84,19 @@ public final class CancellableBag: Cancellable, RangeReplaceableCollection {
 	}
 	
 }
+
+public struct CancellablePublisher: Cancellable, Publisher {
+	public typealias Output = Void
+	public typealias Failure = Never
+	private let subject = CurrentValueSubject<Void?, Never>(nil)
+	
+	public init() {}
+	
+	public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
+		subject.skipNil().prefix(1).receive(subscriber: subscriber)
+	}
+	
+	public func cancel() {
+		subject.send(())
+	}
+}
