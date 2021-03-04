@@ -18,7 +18,7 @@ extension Publisher {
 		value: @escaping (F, Output) -> Output,
 		runLoop: RunLoop = .main,
 		condition: @escaping (Output, Output) -> Bool = { _, _ in true }
-	) -> some Publisher {
+	) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 20.0 / 1000
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop, float: float, value: value, condition: condition)
 	}
@@ -87,7 +87,7 @@ extension Publisher where Output: FloatingPoint {
 @available(iOS 13.0, macOS 10.15, *)
 extension Publisher where Output == String {
 	
-	public func smooth(_ duration: TimeInterval = 0.3, runLoop: RunLoop = .main) -> some Publisher {
+	public func smooth(_ duration: TimeInterval = 0.3, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 30 / 1000
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop)
 	}
