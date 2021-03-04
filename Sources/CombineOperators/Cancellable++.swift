@@ -68,7 +68,7 @@ public protocol CancellableBagType: Cancellable {
 }
 
 extension Cancellable {
-	func store(in bag: CancellableBagType) {
+	public func store(in bag: CancellableBagType) {
 		bag.insert(AnyCancellable(self))
 	}
 }
