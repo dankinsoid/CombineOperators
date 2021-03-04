@@ -23,7 +23,7 @@ extension Publisher {
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop, float: float, value: value, condition: condition)
 	}
 	
-	public func smooth<F: FloatingPoint>(interval: TimeInterval, count: Int, runLoop: RunLoop = .main, float: @escaping (Output) -> F, value: @escaping (F, Output) -> Output, condition: @escaping (Output, Output) -> Bool = { _, _ in true }) -> some Publisher {
+	public func smooth<F: FloatingPoint>(interval: TimeInterval, count: Int, runLoop: RunLoop = .main, float: @escaping (Output) -> F, value: @escaping (F, Output) -> Output, condition: @escaping (Output, Output) -> Bool = { _, _ in true }) -> AnyPublisher<Output, Failure> {
 		smooth(
 			rule: { f, s, count in
 				let (first, second) = (float(f), float(s))
@@ -38,20 +38,22 @@ extension Publisher {
 		)
 	}
 	
-	public func smooth(rule: @escaping (Output, Output, Int) -> [Output], interval: TimeInterval, count: Int, runLoop: RunLoop = .main, condition: @escaping (Output, Output) -> Bool = { _, _ in true }) -> some Publisher {
+	public func smooth(rule: @escaping (Output, Output, Int) -> [Output], interval: TimeInterval, count: Int, runLoop: RunLoop = .main, condition: @escaping (Output, Output) -> Bool = { _, _ in true }) -> AnyPublisher<Output, Failure> {
 		scan([]) { $0.suffix(1) + [$1] }
-			.flat { (list: [Output]) -> AnyPublisher<Output, Never> in
-				guard list.count == 2 else { return Just(list[0]).eraseToAnyPublisher() }
-				guard condition(list[0], list[1]) else { return Just(list[1]).eraseToAnyPublisher() }
+			.flatMap { (list: [Output]) -> AnyPublisher<Output, Failure> in
+				guard list.count == 2 else { return Just(list[0]).setFailureType(to: Failure.self).eraseToAnyPublisher() }
+				guard condition(list[0], list[1]) else { return Just(list[1]).setFailureType(to: Failure.self).eraseToAnyPublisher() }
 				let array = rule(list[0], list[1], count)
 				return Timer.TimerPublisher(interval: interval, runLoop: runLoop, mode: .default).autoconnect()
 					.zip(Publishers.Sequence(sequence: array))
 					.map { $0.1 }
+					.setFailureType(to: Failure.self)
 					.eraseToAnyPublisher()
 			}
+			.any()
 	}
 	
-	public func smooth(rule: @escaping (Output, Output, Int) -> [Output], duration: TimeInterval = 1, runLoop: RunLoop = .main, condition: @escaping (Output, Output) -> Bool = { _, _ in true }) -> some Publisher {
+	public func smooth(rule: @escaping (Output, Output, Int) -> [Output], duration: TimeInterval = 1, runLoop: RunLoop = .main, condition: @escaping (Output, Output) -> Bool = { _, _ in true }) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 20.0 / 1000
 		return smooth(rule: rule, interval: interval, count: Int(duration / interval), runLoop: runLoop, condition: condition)
 	}
@@ -61,12 +63,12 @@ extension Publisher {
 @available(iOS 13.0, macOS 10.15, *)
 extension Publisher where Output: FloatingPoint {
 	
-	public func smooth(_ duration: TimeInterval = 1, runLoop: RunLoop = .main) -> some Publisher {
+	public func smooth(_ duration: TimeInterval = 1, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 20 / 1000
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop)
 	}
 	
-	public func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> some Publisher {
+	public func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		removeDuplicates()
 			.smooth(
 				rule: {
@@ -90,7 +92,7 @@ extension Publisher where Output == String {
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop)
 	}
 	
-	public func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> some Publisher {
+	public func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		removeDuplicates()
 			.smooth(
 				rule: {

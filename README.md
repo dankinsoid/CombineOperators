@@ -143,7 +143,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.56.0")
+    .package(url: "https://github.com/dankinsoid/CombineOperators.git", from: "1.57.0")
     ],
   targets: [
     .target(name: "SomeProject", dependencies: ["CombineOperators"])
