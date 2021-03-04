@@ -63,7 +63,17 @@ extension Array: Cancellable where Element == Cancellable {
 	}
 }
 
-public final class CancellableBag: Cancellable, RangeReplaceableCollection {
+public protocol CancellableBagType: Cancellable {
+	func insert(_ cancellable: AnyCancellable)
+}
+
+extension Cancellable {
+	func store(in bag: CancellableBagType) {
+		bag.insert(AnyCancellable(self))
+	}
+}
+
+public final class CancellableBag: CancellableBagType, Collection {
 	public typealias Element = AnyCancellable
 	private var bag = Set<AnyCancellable>()
 	public var startIndex: Set<AnyCancellable>.Index { bag.startIndex }
@@ -79,10 +89,13 @@ public final class CancellableBag: Cancellable, RangeReplaceableCollection {
 		bag.index(after: i)
 	}
 	
+	public func insert(_ cancellable: AnyCancellable) {
+		bag.insert(cancellable)
+	}
+	
 	public func cancel() {
 		bag.removeAll()
 	}
-	
 }
 
 public struct CancellablePublisher: Cancellable, Publisher {

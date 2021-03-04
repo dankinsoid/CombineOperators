@@ -138,6 +138,11 @@ public func =><R: RangeReplaceableCollection>(_ lhs: Cancellable?, _ rhs: inout 
 }
 
 @available(iOS 13.0, macOS 10.15, *)
+public func =>(_ lhs: Cancellable?, _ rhs: CancellableBagType) {
+	lhs?.store(in: rhs)
+}
+
+@available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func =><T: Publisher, S: Scheduler>(_ lhs: T?, _ rhs: S) -> Publishers.SubscribeOn<T, S>? {
 	lhs?.subscribe(on: rhs)
