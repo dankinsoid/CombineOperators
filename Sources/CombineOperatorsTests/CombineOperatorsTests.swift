@@ -16,15 +16,13 @@ final class CombineOperatorsTests: XCTestCase {
 	@available(iOS 13.0, *)
 	func test() {
 		let exp = expectation(description: "0")
-		let single = Array<Int>().publisher.prefix(1).reduce([], { $0 + [$1] }).print()
-		single.subscribe { _ in
+		var count = 0
+		DispatchSource.Timer(1, count: 1) => { _ in
+			count += 1
 			exp.fulfill()
 		}
 		waitForExpectations(timeout: 2, handler: nil)
-	}
-	
-	private func get(text: String) {
-		
+		XCTAssert(count == 1, "\(count)")
 	}
 	
 }
