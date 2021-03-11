@@ -45,7 +45,6 @@ extension Publishers {
 			
 			func receive(subscription: Subscription) {
 				subscriber.receive(subscription: subscription)
-				lock.protect { index = 0 }
 			}
 			
 			func receive(completion: Subscribers.Completion<Source.Failure>) {

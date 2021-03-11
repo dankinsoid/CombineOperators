@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CombineOperators'
-  s.version          = '1.62.0'
+  s.version          = '1.63.0'
   s.summary          = 'A short description of CombineOperators.'
   s.description      = <<-DESC
 TODO: Add long description of the pod here.
