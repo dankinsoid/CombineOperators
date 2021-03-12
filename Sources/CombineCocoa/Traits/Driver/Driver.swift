@@ -74,36 +74,48 @@ public struct Driver<Output>: Publisher {
 	}
 }
 
-struct MainQueueSubscriber<S: Subscriber>: Subscriber {
+final class MainQueueSubscriber<S: Subscriber>: Subscriber {
 	typealias Input = S.Input
 	typealias Failure = S.Failure
 	let subscriber: S
 	var combineIdentifier: CombineIdentifier { subscriber.combineIdentifier }
+	private var demand: Subscribers.Demand = .unlimited
+	
+	init(subscriber: S) {
+		self.subscriber = subscriber
+	}
 	
 	func receive(subscription: Subscription) {
 		onMain {
-			subscriber.receive(subscription: subscription)
+			self.subscriber.receive(subscription: subscription)
 		}
 	}
 	
 	func receive(_ input: S.Input) -> Subscribers.Demand {
-		onMain {
-			subscriber.receive(input)
+		if Thread.isMainThread {
+			let _demand = subscriber.receive(input)
+			demand = _demand - 1
+			return _demand
+		} else {
+			DispatchQueue.main.async {
+				self.demand = self.subscriber.receive(input) - 1
+			}
+			return demand
 		}
 	}
 	
 	func receive(completion: Subscribers.Completion<S.Failure>) {
 		onMain {
-			subscriber.receive(completion: completion)
+			self.subscriber.receive(completion: completion)
 		}
 	}
 	
 	@inlinable
-	func onMain<T>(_ action: () -> T) -> T {
+	func onMain(_ action: @escaping () -> Void) -> Void {
 		if Thread.isMainThread {
-			return action()
+			action()
 		} else {
-			return DispatchQueue.main.sync(execute: action)
+			DispatchQueue.main.async(execute: action)
 		}
 	}
 }
