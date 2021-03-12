@@ -66,11 +66,44 @@ public struct Driver<Output>: Publisher {
 	}
 	
 	public init<P: Publisher>(_ source: P) where Never == P.Failure, P.Output == Output {
-		publisher = source.share(replay: 1).receive(on: DispatchQueue.main).eraseToAnyPublisher()
+		publisher = source.share(replay: 1).receive(on: MainSyncScheduler()).eraseToAnyPublisher()
 	}
 	
 	public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, Output == S.Input {
 		publisher.receive(subscriber: subscriber)
 	}
+}
+
+struct MainQueueSubscriber<S: Subscriber>: Subscriber {
+	typealias Input = S.Input
+	typealias Failure = S.Failure
+	let subscriber: S
+	var combineIdentifier: CombineIdentifier { subscriber.combineIdentifier }
 	
+	func receive(subscription: Subscription) {
+		onMain {
+			subscriber.receive(subscription: subscription)
+		}
+	}
+	
+	func receive(_ input: S.Input) -> Subscribers.Demand {
+		onMain {
+			subscriber.receive(input)
+		}
+	}
+	
+	func receive(completion: Subscribers.Completion<S.Failure>) {
+		onMain {
+			subscriber.receive(completion: completion)
+		}
+	}
+	
+	@inlinable
+	func onMain<T>(_ action: () -> T) -> T {
+		if Thread.isMainThread {
+			return action()
+		} else {
+			return DispatchQueue.main.sync(execute: action)
+		}
+	}
 }

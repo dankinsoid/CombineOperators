@@ -8,6 +8,7 @@
 
 import Foundation
 import Combine
+import CombineOperators
 
 /**
  Trait that represents observable sequence with following properties:
@@ -56,11 +57,10 @@ public struct Signal<Output>: Publisher {
 	}
 	
 	public init<P: Publisher>(_ source: P) where Never == P.Failure, P.Output == Output {
-		publisher = source.share().receive(on: DispatchQueue.main).eraseToAnyPublisher()
+		publisher = source.share().receive(on: MainSyncScheduler()).eraseToAnyPublisher()
 	}
 	
 	public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, Output == S.Input {
 		publisher.receive(subscriber: subscriber)
 	}
-	
 }

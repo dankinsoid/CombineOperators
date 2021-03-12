@@ -16,15 +16,13 @@ final class CombineOperatorsTests: XCTestCase {
 	@available(iOS 13.0, *)
 	func test() {
 		let exp = expectation(description: "0")
-		var count = 0
-		DispatchSource.Timer(1, count: 1) => { _ in
-			count += 1
-			exp.fulfill()
+		DispatchQueue.global().async {
+			Just(4).receive(on: MainSyncScheduler()).subscribe { _ in
+				exp.fulfill()
+			}
 		}
 		waitForExpectations(timeout: 2, handler: nil)
-		XCTAssert(count == 1, "\(count)")
 	}
-	
 }
 
 final class Button: UIButton {
