@@ -66,11 +66,11 @@ public struct Driver<Output>: Publisher {
 	}
 	
 	public init<P: Publisher>(_ source: P) where Never == P.Failure, P.Output == Output {
-		publisher = source.share(replay: 1).receive(on: MainSyncScheduler()).eraseToAnyPublisher()
+		publisher = source.share(replay: 1).eraseToAnyPublisher()
 	}
 	
 	public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, Output == S.Input {
-		publisher.receive(subscriber: subscriber)
+		publisher.receive(subscriber: MainQueueSubscriber(subscriber: subscriber))
 	}
 }
 
