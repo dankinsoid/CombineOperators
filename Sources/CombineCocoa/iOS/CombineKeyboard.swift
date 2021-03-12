@@ -123,11 +123,15 @@ public class CombineKeyboard: NSObject, CombineKeyboardType {
 		// gesture recognizer
 		self.panRecognizer.delegate = self
 		
-		UIApplication.cb.didFinishLaunching // when RxKeyboard is initialized before UIApplication.window is created
-			.sink(receiveValue: { _ in
-				UIApplication.shared.windows.first?.addGestureRecognizer(self.panRecognizer)
-			})
-			.store(in: &disposeBag)
+		if let window = UIApplication.shared.windows.first {
+			window.addGestureRecognizer(panRecognizer)
+		} else {
+			UIApplication.cb.didFinishLaunching // when RxKeyboard is initialized before UIApplication.window is created
+				.sink(receiveValue: { _ in
+					UIApplication.shared.windows.first?.addGestureRecognizer(self.panRecognizer)
+				})
+				.store(in: &disposeBag)
+		}
 	}
 	
 }
