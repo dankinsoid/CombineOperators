@@ -101,7 +101,7 @@ final class MainQueueSubscriber<S: Subscriber>: Subscriber {
 			return _demand
 		} else {
 			DispatchQueue.main.async {
-				lock.protect {
+				self.lock.protect {
 					self.demand = self.subscriber.receive(input) - 1
 				}
 			}
