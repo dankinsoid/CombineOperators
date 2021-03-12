@@ -106,7 +106,7 @@ final class MainQueueSubscriber<S: Subscriber>: Subscriber {
 				}
 			}
 			let _demand = lock.protect {
-				demand - 1
+				demand
 			}
 			return _demand
 		}
