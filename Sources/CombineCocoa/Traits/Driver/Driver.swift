@@ -80,6 +80,7 @@ final class MainQueueSubscriber<S: Subscriber>: Subscriber {
 	let subscriber: S
 	var combineIdentifier: CombineIdentifier { subscriber.combineIdentifier }
 	private var demand: Subscribers.Demand = .unlimited
+	private let lock = NSRecursiveLock()
 	
 	init(subscriber: S) {
 		self.subscriber = subscriber
@@ -94,11 +95,15 @@ final class MainQueueSubscriber<S: Subscriber>: Subscriber {
 	func receive(_ input: S.Input) -> Subscribers.Demand {
 		if Thread.isMainThread {
 			let _demand = subscriber.receive(input)
-			demand = _demand - 1
+			lock.protect {
+				demand = _demand - 1
+			}
 			return _demand
 		} else {
 			DispatchQueue.main.async {
-				self.demand = self.subscriber.receive(input) - 1
+				lock.protect {
+					self.demand = self.subscriber.receive(input) - 1
+				}
 			}
 			return demand
 		}
