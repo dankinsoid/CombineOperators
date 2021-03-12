@@ -96,16 +96,19 @@ final class MainQueueSubscriber<S: Subscriber>: Subscriber {
 		if Thread.isMainThread {
 			let _demand = subscriber.receive(input)
 			lock.protect {
-				demand = _demand - 1
+				demand = _demand
 			}
 			return _demand
 		} else {
 			DispatchQueue.main.async {
 				self.lock.protect {
-					self.demand = self.subscriber.receive(input) - 1
+					self.demand = self.subscriber.receive(input)
 				}
 			}
-			return demand
+			let _demand = lock.protect {
+				demand - 1
+			}
+			return _demand
 		}
 	}
 	
