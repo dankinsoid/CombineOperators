@@ -10,9 +10,9 @@ import Combine
 
 @available(iOS 13.0, macOS 10.15, *)
 public final class ReplaySubject<Output, Failure: Error>: Subject {
-	private var buffer = [Output]()
+	private var buffer: [Output] = []
 	private let bufferSize: Int
-	private var subscriptions = [ReplaySubjectSubscription<Output, Failure>]()
+	private var subscriptions = [UUID: ReplaySubjectSubscription<Output, Failure>]()
 	private var completion: Subscribers.Completion<Failure>?
 	private let lock = NSRecursiveLock()
 	
@@ -31,23 +31,34 @@ public final class ReplaySubject<Output, Failure: Error>: Subject {
 		lock.lock(); defer { lock.unlock() }
 		buffer.append(value)
 		buffer = buffer.suffix(bufferSize)
-		subscriptions.forEach { $0.receive(value) }
+		subscriptions.forEach { $0.value.receive(value) }
 	}
 	
 	/// Sends a completion signal to the subscriber.
 	public func send(completion: Subscribers.Completion<Failure>) {
 		lock.lock(); defer { lock.unlock() }
 		self.completion = completion
-		subscriptions.forEach { subscription in subscription.receive(completion: completion) }
+		subscriptions.forEach { subscription in subscription.value.receive(completion: completion) }
+		subscriptions = [:]
 	}
 	
 	/// This function is called to attach the specified `Subscriber` to the`Publisher
 	public func receive<Downstream: Subscriber>(subscriber: Downstream) where Downstream.Failure == Failure, Downstream.Input == Output {
 		lock.lock(); defer { lock.unlock() }
-		let subscription = ReplaySubjectSubscription<Output, Failure>(downstream: AnySubscriber(subscriber))
+		let id = UUID()
+		let subscription = ReplaySubjectSubscription<Output, Failure>(AnySubscriber(subscriber)) {[weak self] in
+			self?.cancel(id: id)
+		}
 		subscriber.receive(subscription: subscription)
-		subscriptions.append(subscription)
+		if completion == nil {
+			subscriptions[id] = subscription
+		}
 		subscription.replay(buffer, completion: completion)
+	}
+	
+	private func cancel(id: UUID) {
+		lock.lock(); defer { lock.unlock() }
+		subscriptions[id] = nil
 	}
 }
 
@@ -55,9 +66,11 @@ public final class ReplaySubjectSubscription<Output, Failure: Error>: Subscripti
 	private let downstream: AnySubscriber<Output, Failure>
 	private var isCompleted = false
 	private var demand: Subscribers.Demand = .none
+	private let finish: () -> Void
 	
-	public init(downstream: AnySubscriber<Output, Failure>) {
+	public init(_ downstream: AnySubscriber<Output, Failure>, cancel: @escaping () -> Void) {
 		self.downstream = downstream
+		finish = cancel
 	}
 	
 	// Tells a publisher that it may send more values to the subscriber.
@@ -67,6 +80,7 @@ public final class ReplaySubjectSubscription<Output, Failure: Error>: Subscripti
 	
 	public func cancel() {
 		isCompleted = true
+		finish()
 	}
 	
 	public func receive(_ value: Output) {

@@ -61,10 +61,6 @@ public struct Single<Output, Failure: Error>: Publisher {
 		self = Single(publisher, ifEmpty: .failure(ifEmpty))
 	}
 	
-	public init<P: Publisher>(_ publisher: P, ifEmpty: P.Output) where P.Output == Output, P.Failure == Failure {
-		self = Single(publisher, ifEmpty: .success(ifEmpty))
-	}
-	
 	public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
 		future.receive(subscriber: subscriber)
 	}
@@ -111,6 +107,20 @@ extension Single where Failure == Never {
 		}.any()
 	}
 	
+	public init<P: Publisher>(_ publisher: P, ifEmpty: P.Output) where P.Output == Output {
+		future = publisher
+			.prefix(1)
+			.reduce([], { $0 + [$1] })
+			.map { list -> Output in
+				if list.count == 1 {
+					return list[0]
+				} else {
+					return ifEmpty
+				}
+			}
+			.catch(ifEmpty)
+			.any()
+	}
 }
 
 extension Single where Output == Void {
@@ -131,17 +141,16 @@ extension Publisher {
 		Single(self, ifEmpty: ifEmpty)
 	}
 	
-	public func asSingle(ifEmpty: Output) -> Single<Output, Failure> {
+	public func asSingle(ifEmpty: Output) -> Single<Output, Never> {
 		Single(self, ifEmpty: ifEmpty)
 	}
 }
 
 extension Publisher where Output == Void {
 	
-	public func asSingle() -> Single<Output, Failure> {
+	public func asSingle() -> Single<Output, Never> {
 		asSingle(ifEmpty: ())
 	}
-	
 }
 
 private final class Owner {
