@@ -15,18 +15,21 @@ final class CombineOperatorsTests: XCTestCase {
 	
 	@available(iOS 13.0, *)
 	func test() {
-		let exp = expectation(description: "0")
+		let exp1 = expectation(description: "0")
+		let exp2 = expectation(description: "0")
+		var date1 = Date()
+		var date2 = Date()
 		DispatchQueue.global().async {
+			Just(4).receive(on: DispatchQueue.main).subscribe { _ in
+				exp2.fulfill()
+				date1 = Date()
+			}
 			Just(4).receive(on: MainSyncScheduler()).subscribe { _ in
-				exp.fulfill()
+				exp1.fulfill()
+				date2 = Date()
 			}
 		}
 		waitForExpectations(timeout: 2, handler: nil)
-	}
-}
-
-final class Button: UIButton {
-	deinit {
-		print("button deinit")
+		print(date2 > date1)
 	}
 }

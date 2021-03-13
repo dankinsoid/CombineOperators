@@ -18,7 +18,7 @@ public struct MainSyncScheduler: Scheduler {
 		if Thread.isMainThread {
 			action()
 		} else {
-			DispatchQueue.main.sync(execute: action)
+			DispatchQueue.main.async(execute: action)
 		}
 	}
 	
