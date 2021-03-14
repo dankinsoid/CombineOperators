@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 @available(iOS 13.0, macOS 10.15, *)
-@resultBuilder
+@_functionBuilder
 public struct CombineLatestBuilder {
 	
 	@_alwaysEmitIntoClient

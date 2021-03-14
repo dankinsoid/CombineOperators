@@ -23,7 +23,136 @@ public enum PublishersMerger<Output, Failure: Error>: PublishersMergerType {
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-public typealias MergeBuilder<Output, Failure: Error> = ComposeBuilder<PublishersMerger<Output, Failure>>
+@_functionBuilder
+public struct MergeBuilder<Output, Failure: Error> {
+	
+	@inline(__always)
+	public static func buildArray(_ components: [AnyPublisher<Output, Failure>]) -> AnyPublisher<Output, Failure> {
+		Publishers.MergeMany(components).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildEither<P: Publisher>(first component: P) -> AnyPublisher<Output, Failure> where P.Output == Output, P.Failure == Failure {
+		component.eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildEither<P: Publisher>(second component: P) -> AnyPublisher<Output, Failure> where P.Output == Output, P.Failure == Failure {
+		component.eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildEither<P: Publisher>(_ component: P?) -> AnyPublisher<Output, Failure> where P.Output == Output, P.Failure == Failure {
+		component?.eraseToAnyPublisher() ?? Empty(completeImmediately: true).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildLimitedAvailability<P: Publisher>(second component: P) -> AnyPublisher<Output, Failure> where P.Output == Output, P.Failure == Failure {
+		component.eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock() -> AnyPublisher<Output, Failure> {
+		Empty(completeImmediately: false).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher>(_ c1: C1) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher>(_ c1: C1, _ c2: C2) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher, C10: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9, _ c10: C10) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure, C10.Output == Output, C10.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher(), c10.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher, C10: Publisher, C11: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9, _ c10: C10, _ c11: C11) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure, C10.Output == Output, C10.Failure == Failure, C11.Output == Output, C11.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher(), c10.eraseToAnyPublisher(), c11.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher, C10: Publisher, C11: Publisher, C12: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9, _ c10: C10, _ c11: C11, _ c12: C12) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure, C10.Output == Output, C10.Failure == Failure, C11.Output == Output, C11.Failure == Failure, C12.Output == Output, C12.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher(), c10.eraseToAnyPublisher(), c11.eraseToAnyPublisher(), c12.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher, C10: Publisher, C11: Publisher, C12: Publisher, C13: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9, _ c10: C10, _ c11: C11, _ c12: C12, _ c13: C13) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure, C10.Output == Output, C10.Failure == Failure, C11.Output == Output, C11.Failure == Failure, C12.Output == Output, C12.Failure == Failure, C13.Output == Output, C13.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher(), c10.eraseToAnyPublisher(), c11.eraseToAnyPublisher(), c12.eraseToAnyPublisher(), c13.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher, C10: Publisher, C11: Publisher, C12: Publisher, C13: Publisher, C14: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9, _ c10: C10, _ c11: C11, _ c12: C12, _ c13: C13, _ c14: C14) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure, C10.Output == Output, C10.Failure == Failure, C11.Output == Output, C11.Failure == Failure, C12.Output == Output, C12.Failure == Failure, C13.Output == Output, C13.Failure == Failure, C14.Output == Output, C14.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher(), c10.eraseToAnyPublisher(), c11.eraseToAnyPublisher(), c12.eraseToAnyPublisher(), c13.eraseToAnyPublisher(), c14.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher, C10: Publisher, C11: Publisher, C12: Publisher, C13: Publisher, C14: Publisher, C15: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9, _ c10: C10, _ c11: C11, _ c12: C12, _ c13: C13, _ c14: C14, _ c15: C15) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure, C10.Output == Output, C10.Failure == Failure, C11.Output == Output, C11.Failure == Failure, C12.Output == Output, C12.Failure == Failure, C13.Output == Output, C13.Failure == Failure, C14.Output == Output, C14.Failure == Failure, C15.Output == Output, C15.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher(), c10.eraseToAnyPublisher(), c11.eraseToAnyPublisher(), c12.eraseToAnyPublisher(), c13.eraseToAnyPublisher(), c14.eraseToAnyPublisher(), c15.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher, C10: Publisher, C11: Publisher, C12: Publisher, C13: Publisher, C14: Publisher, C15: Publisher, C16: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9, _ c10: C10, _ c11: C11, _ c12: C12, _ c13: C13, _ c14: C14, _ c15: C15, _ c16: C16) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure, C10.Output == Output, C10.Failure == Failure, C11.Output == Output, C11.Failure == Failure, C12.Output == Output, C12.Failure == Failure, C13.Output == Output, C13.Failure == Failure, C14.Output == Output, C14.Failure == Failure, C15.Output == Output, C15.Failure == Failure, C16.Output == Output, C16.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher(), c10.eraseToAnyPublisher(), c11.eraseToAnyPublisher(), c12.eraseToAnyPublisher(), c13.eraseToAnyPublisher(), c14.eraseToAnyPublisher(), c15.eraseToAnyPublisher(), c16.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher, C10: Publisher, C11: Publisher, C12: Publisher, C13: Publisher, C14: Publisher, C15: Publisher, C16: Publisher, C17: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9, _ c10: C10, _ c11: C11, _ c12: C12, _ c13: C13, _ c14: C14, _ c15: C15, _ c16: C16, _ c17: C17) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure, C10.Output == Output, C10.Failure == Failure, C11.Output == Output, C11.Failure == Failure, C12.Output == Output, C12.Failure == Failure, C13.Output == Output, C13.Failure == Failure, C14.Output == Output, C14.Failure == Failure, C15.Output == Output, C15.Failure == Failure, C16.Output == Output, C16.Failure == Failure, C17.Output == Output, C17.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher(), c10.eraseToAnyPublisher(), c11.eraseToAnyPublisher(), c12.eraseToAnyPublisher(), c13.eraseToAnyPublisher(), c14.eraseToAnyPublisher(), c15.eraseToAnyPublisher(), c16.eraseToAnyPublisher(), c17.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher, C10: Publisher, C11: Publisher, C12: Publisher, C13: Publisher, C14: Publisher, C15: Publisher, C16: Publisher, C17: Publisher, C18: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9, _ c10: C10, _ c11: C11, _ c12: C12, _ c13: C13, _ c14: C14, _ c15: C15, _ c16: C16, _ c17: C17, _ c18: C18) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure, C10.Output == Output, C10.Failure == Failure, C11.Output == Output, C11.Failure == Failure, C12.Output == Output, C12.Failure == Failure, C13.Output == Output, C13.Failure == Failure, C14.Output == Output, C14.Failure == Failure, C15.Output == Output, C15.Failure == Failure, C16.Output == Output, C16.Failure == Failure, C17.Output == Output, C17.Failure == Failure, C18.Output == Output, C18.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher(), c10.eraseToAnyPublisher(), c11.eraseToAnyPublisher(), c12.eraseToAnyPublisher(), c13.eraseToAnyPublisher(), c14.eraseToAnyPublisher(), c15.eraseToAnyPublisher(), c16.eraseToAnyPublisher(), c17.eraseToAnyPublisher(), c18.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+	@inline(__always)
+	public static func buildBlock<C1: Publisher, C2: Publisher, C3: Publisher, C4: Publisher, C5: Publisher, C6: Publisher, C7: Publisher, C8: Publisher, C9: Publisher, C10: Publisher, C11: Publisher, C12: Publisher, C13: Publisher, C14: Publisher, C15: Publisher, C16: Publisher, C17: Publisher, C18: Publisher, C19: Publisher>(_ c1: C1, _ c2: C2, _ c3: C3, _ c4: C4, _ c5: C5, _ c6: C6, _ c7: C7, _ c8: C8, _ c9: C9, _ c10: C10, _ c11: C11, _ c12: C12, _ c13: C13, _ c14: C14, _ c15: C15, _ c16: C16, _ c17: C17, _ c18: C18, _ c19: C19) -> AnyPublisher<Output, Failure> where C1.Output == Output, C1.Failure == Failure, C2.Output == Output, C2.Failure == Failure, C3.Output == Output, C3.Failure == Failure, C4.Output == Output, C4.Failure == Failure, C5.Output == Output, C5.Failure == Failure, C6.Output == Output, C6.Failure == Failure, C7.Output == Output, C7.Failure == Failure, C8.Output == Output, C8.Failure == Failure, C9.Output == Output, C9.Failure == Failure, C10.Output == Output, C10.Failure == Failure, C11.Output == Output, C11.Failure == Failure, C12.Output == Output, C12.Failure == Failure, C13.Output == Output, C13.Failure == Failure, C14.Output == Output, C14.Failure == Failure, C15.Output == Output, C15.Failure == Failure, C16.Output == Output, C16.Failure == Failure, C17.Output == Output, C17.Failure == Failure, C18.Output == Output, C18.Failure == Failure, C19.Output == Output, C19.Failure == Failure {
+		Publishers.MergeMany(c1.eraseToAnyPublisher(), c2.eraseToAnyPublisher(), c3.eraseToAnyPublisher(), c4.eraseToAnyPublisher(), c5.eraseToAnyPublisher(), c6.eraseToAnyPublisher(), c7.eraseToAnyPublisher(), c8.eraseToAnyPublisher(), c9.eraseToAnyPublisher(), c10.eraseToAnyPublisher(), c11.eraseToAnyPublisher(), c12.eraseToAnyPublisher(), c13.eraseToAnyPublisher(), c14.eraseToAnyPublisher(), c15.eraseToAnyPublisher(), c16.eraseToAnyPublisher(), c17.eraseToAnyPublisher(), c18.eraseToAnyPublisher(), c19.eraseToAnyPublisher()).eraseToAnyPublisher()
+	}
+	
+
+}
 
 @available(iOS 13.0, macOS 10.15, *)
 extension ComposeBuilder where C: PublishersMergerType, C.Item == AnyPublisher<C.Output, C.Failure> {
