@@ -51,44 +51,52 @@ extension Reactive where Base: UITextField {
 	////// Reactive wrapper for `delegate`.
 	///
 	/// For more information take a look at `DelegateProxyType` protocol documentation.
-	public var delegate: DelegateProxy<UITextField, UITextFieldDelegate> {
+	public var delegate: CombineTextFieldDelegateProxy {
 		return CombineTextFieldDelegateProxy.proxy(for: base)
+	}
+	
+	private func invoked(_ selector: Selector) -> AnyPublisher<[Any], Never> {
+		base.publisher(for: \.delegate).or(delegate).map {
+			Reactive<UITextFieldDelegate>($0).methodInvoked(selector).skipFailure()
+		}
+		.switchToLatest()
+		.any()
 	}
 
 	public var mayBeginEditing: ControlEvent<Void> {
 		ControlEvent<()>(
-			events: self.delegate.methodInvoked(#selector(UITextFieldDelegate.textFieldShouldBeginEditing(_:))).map { _ in () }
+			events: invoked(#selector(UITextFieldDelegate.textFieldShouldBeginEditing(_:))).map { _ in () }
 		)
 	}
 	
 	public var didBeginEditing: ControlEvent<Void> {
 		ControlEvent<()>(
-			events: self.delegate.methodInvoked(#selector(UITextFieldDelegate.textFieldDidBeginEditing(_:))).map { _ in () }
+			events: invoked(#selector(UITextFieldDelegate.textFieldDidBeginEditing(_:))).map { _ in () }
 		)
 	}
 	
 	public var mayEndEditing: ControlEvent<Void> {
 		ControlEvent<()>(
-			events: self.delegate.methodInvoked(#selector(UITextFieldDelegate.textFieldShouldEndEditing(_:))).map { _ in () }
+			events: invoked(#selector(UITextFieldDelegate.textFieldShouldEndEditing(_:))).map { _ in () }
 		)
 	}
 	
 	public var didEndEditing: ControlEvent<Void> {
 		ControlEvent<()>(
-			events: self.delegate.methodInvoked(#selector(UITextFieldDelegate.textFieldDidEndEditing(_:))).map { _ in () }
+			events: invoked(#selector(UITextFieldDelegate.textFieldDidEndEditing(_:))).map { _ in () }
 		)
 	}
 	
 	public var reasonEndEditing: ControlEvent<UITextField.DidEndEditingReason> {
 		ControlEvent<UITextField.DidEndEditingReason>(
-			events: self.delegate.methodInvoked(#selector(UITextFieldDelegate.textFieldDidEndEditing(_:reason:)))
+			events: invoked(#selector(UITextFieldDelegate.textFieldDidEndEditing(_:reason:)))
 				.compactMap { $0.last as? UITextField.DidEndEditingReason }
 		)
 	}
 	
 	public var mayChange: ControlEvent<(NSRange, String)> {
 		ControlEvent(
-			events: self.delegate.methodInvoked(#selector(UITextFieldDelegate.textField(_:shouldChangeCharactersIn:replacementString:)))
+			events: invoked(#selector(UITextFieldDelegate.textField(_:shouldChangeCharactersIn:replacementString:)))
 				.compactMap { args in
 					(args[safe: 1] as? NSRange).flatMap { range in
 						(args.last as? String).map { (range, $0) }
@@ -99,19 +107,19 @@ extension Reactive where Base: UITextField {
 	
 	public var didChangeSelection: ControlEvent<Void> {
 		ControlEvent<Void>(
-			events: self.delegate.methodInvoked(#selector(UITextFieldDelegate.textFieldDidChangeSelection(_:))).map { _ in () }
+			events: invoked(#selector(UITextFieldDelegate.textFieldDidChangeSelection(_:))).map { _ in () }
 		)
 	}
 	
 	public var mayClear: ControlEvent<Void> {
 		ControlEvent<Void>(
-			events: self.delegate.methodInvoked(#selector(UITextFieldDelegate.textFieldShouldClear(_:))).map { _ in () }
+			events: invoked(#selector(UITextFieldDelegate.textFieldShouldClear(_:))).map { _ in () }
 		)
 	}
 	
 	public var mayReturn: ControlEvent<Void> {
 		ControlEvent<Void>(
-			events: self.delegate.methodInvoked(#selector(UITextFieldDelegate.textFieldShouldReturn(_:))).map { _ in () }
+			events: invoked(#selector(UITextFieldDelegate.textFieldShouldReturn(_:))).map { _ in () }
 		)
 	}
 }
