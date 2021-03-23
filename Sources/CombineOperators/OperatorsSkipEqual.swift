@@ -115,6 +115,6 @@ public func ==>><O: Publisher>(_ lhs: O?, _ rhs: @escaping @autoclosure () -> Vo
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func ==>><O: Publisher>(_ lhs: O?, _ rhs: @escaping (O.Output) -> Void) -> Cancellable where O.Output: Equatable {
-	lhs?.removeDuplicates().skipFailure().receive(on: DispatchQueue.main).sink(receiveValue: rhs) ?? AnyCancellable()
+public func ==>><O: Publisher>(_ lhs: O?, _ rhs: @escaping (O.Output) -> Void) where O.Output: Equatable {
+	lhs?.removeDuplicates().skipFailure().receive(on: DispatchQueue.main).subscribe(receiveValue: rhs)
 }
