@@ -59,7 +59,7 @@ public class CombineKeyboard: NSObject, CombineKeyboardType {
 			height: 0
 		)
 		let frameVariable = CurrentValueSubject<CGRect, Never>(defaultFrame)
-		self.frame = frameVariable.removeDuplicates().asDriver().eraseToAnyPublisher()
+		self.frame = frameVariable.removeDuplicates().eraseToAnyPublisher()
 		self.visibleHeight = self.frame.map { UIScreen.main.bounds.height - $0.origin.y }.eraseToAnyPublisher()
 		self.willShowVisibleHeight = self.visibleHeight
 			.scan((visibleHeight: 0, isShowing: false)) { lastState, newVisibleHeight in
