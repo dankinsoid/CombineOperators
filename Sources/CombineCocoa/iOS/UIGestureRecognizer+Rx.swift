@@ -31,7 +31,9 @@ final class GestureTarget<Recognizer: UIGestureRecognizer>: CombineTarget {
 
         let method = self.method(for: selector)
         if method == nil {
+					#if DEBUG
             fatalError("Can't find method")
+					#endif
         }
     }
     
@@ -66,7 +68,7 @@ extension Reactive where Base: UIGestureRecognizer {
             }
             
             return observer
-        }.prefix(untilOutputFrom: deallocated)
+        }//.prefix(untilOutputFrom: deallocated)
 			)
     }
     
