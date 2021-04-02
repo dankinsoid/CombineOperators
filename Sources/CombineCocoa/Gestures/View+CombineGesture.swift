@@ -102,7 +102,7 @@ extension Reactive where Base: CombineGestureView {
 						control?.removeGestureRecognizer(gesture)
 					}
 				})
-				.prefix(untilOutputFrom: control.cb.deallocated)
+//				.prefix(untilOutputFrom: control.cb.deallocated)
 				.eraseToAnyPublisher()
 		}
 		return ControlEvent(events: source)
