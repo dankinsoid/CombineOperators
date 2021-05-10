@@ -23,7 +23,7 @@ public enum PublishersMerger<Output, Failure: Error>: PublishersMergerType {
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-@_functionBuilder
+@resultBuilder
 public struct MergeBuilder<Output, Failure: Error> {
 	
 	@inline(__always)
@@ -165,10 +165,13 @@ extension ComposeBuilder where C: PublishersMergerType, C.Item == AnyPublisher<C
 		Publishers.Sequence(sequence: expression).eraseToAnyPublisher()
 	}
 	
+	public static func buildExpression<A: Collection>(_ expression: A) -> AnyPublisher<C.Output, C.Failure> where A.Element: Publisher, A.Element.Output == C.Output, A.Element.Failure == C.Failure {
+		Publishers.MergeMany(expression).eraseToAnyPublisher()
+	}
+	
 	public static func buildExpression<P: Publisher>(_ expression: P) -> AnyPublisher<C.Output, C.Failure> where P.Output == C.Output, P.Failure == C.Failure {
 		expression.eraseToAnyPublisher()
 	}
-	
 }
 
 extension ComposeBuilder where C: PublishersMergerType, C.Item == AnyPublisher<C.Output, C.Failure>, C.Failure == Error {
@@ -376,9 +379,7 @@ extension Publishers {
 		public func receive<S: Subscriber>(subscriber: S) where P.Failure == S.Failure, P.Output.Wrapped == S.Input {
 			source.map { $0.asOptional() }.receive(subscriber: subscriber.ignoreNil())
 		}
-		
 	}
-
 }
 
 extension AnyPublisher {
