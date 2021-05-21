@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'CombineOperators'
-  s.version          = '1.77.0'
+  s.version          = '1.78.0'
   s.summary          = 'A short description of CombineOperators.'
   s.description      = <<-DESC
 TODO: Add long description of the pod here.
@@ -21,13 +21,14 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/dankinsoid/CombineOperators.git', :tag => s.version.to_s }
 
   s.ios.deployment_target = '13.0'
-  s.swift_versions = '5.1'
+  s.swift_versions = '5.4'
+  s.ios.public_header_files =  'Sources/**/*.h'
   s.source_files = 'Sources/CombineOperators/**/*'
-  s.dependency 'VD', '~> 1.13.0'
+  s.dependency 'VD', '~> 1.58.0'
   s.frameworks = 'Foundation', 'UIKit', 'Combine'
 
   s.subspec 'CombineCocoa' do |provider|
-    provider.source_files = 'Sources/CombineCocoa/**/*.swift', 'Sources/CombineCocoaRuntime/**/*', 'Sources/CombineOperators/**/*'
+    provider.source_files = 'Sources/CombineCocoa/**/*.swift', 'Sources/VDKit/**/*', 'Sources/CombineOperators/**/*'
   	provider.frameworks = 'Foundation', 'UIKit', 'Combine'
   	provider.dependency 'VD'
   end

@@ -7,10 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "_RX.h"
-#import "_RXDelegateProxy.h"
-#import "_RXKVOObserver.h"
-#import "_RXObjCRuntime.h"
+#import "_VDDelegateProxy.h"
 
 //! Project version number for CombineCocoa.
 FOUNDATION_EXPORT double CombineCocoaVersionNumber;

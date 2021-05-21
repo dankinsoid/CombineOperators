@@ -15,8 +15,7 @@ import FoundationNetworking
 
 /// CombineCocoa URL errors.
 @available(iOS 13.0, macOS 10.15, *)
-public enum CombineCocoaURLError
-    : Swift.Error {
+public enum CombineCocoaURLError: Swift.Error {
     /// Unknown error occurred.
     case unknown
     /// Response is not NSHTTPURLResponse
@@ -28,8 +27,7 @@ public enum CombineCocoaURLError
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-extension CombineCocoaURLError
-    : CustomDebugStringConvertible {
+extension CombineCocoaURLError: CustomDebugStringConvertible {
     /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
         switch self {
@@ -61,7 +59,7 @@ extension Reactive where Base: URLSession {
     */
 	public func response(request: URLRequest) -> URLSession.DataTaskPublisher {
 		base.dataTaskPublisher(for: request)
-    }
+	}
 
     /**
     Publisher sequence of response data for URL request.
@@ -79,15 +77,15 @@ extension Reactive where Base: URLSession {
     - returns: Publisher sequence of response data.
     */
     public func data(request: URLRequest) -> AnyPublisher<Data, Error> {
-				self.response(request: request).tryMap { pair -> Data in
-					if 200 ..< 300 ~= (pair.1._statusCode ?? 201) {
-                return pair.0
-            }
-            else {
-                throw CombineCocoaURLError.httpRequestFailed(response: pair.1, data: pair.0)
-            }
-        }
-				.eraseToAnyPublisher()
+			self.response(request: request).tryMap { pair -> Data in
+				if 200 ..< 300 ~= (pair.1._statusCode ?? 201) {
+					return pair.0
+				}
+				else {
+					throw CombineCocoaURLError.httpRequestFailed(response: pair.1, data: pair.0)
+				}
+			}
+			.eraseToAnyPublisher()
     }
 
     /**
@@ -108,14 +106,14 @@ extension Reactive where Base: URLSession {
     - returns: Publisher sequence of response JSON.
     */
     public func json(request: URLRequest, options: JSONSerialization.ReadingOptions = []) -> AnyPublisher<Any, Error> {
-        return self.data(request: request).tryMap { data -> Any in
-            do {
-                return try JSONSerialization.jsonObject(with: data, options: options)
-            } catch let error {
-                throw CombineCocoaURLError.deserializationError(error: error)
-            }
-        }
-				.eraseToAnyPublisher()
+			self.data(request: request).tryMap { data -> Any in
+				do {
+					return try JSONSerialization.jsonObject(with: data, options: options)
+				} catch let error {
+					throw CombineCocoaURLError.deserializationError(error: error)
+				}
+			}
+			.eraseToAnyPublisher()
     }
 
     /**
@@ -136,18 +134,18 @@ extension Reactive where Base: URLSession {
     - returns: Publisher sequence of response JSON.
     */
     public func json(url: Foundation.URL) -> AnyPublisher<Any, Error> {
-        self.json(request: URLRequest(url: url))
+			self.json(request: URLRequest(url: url))
     }
 }
 @available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base == URLSession {
     /// Log URL requests to standard output in curl format.
     public static var shouldLogRequest: (URLRequest) -> Bool = { _ in
-        #if DEBUG
-            return true
-        #else
-            return false
-        #endif
+			#if DEBUG
+			return true
+			#else
+			return false
+			#endif
     }
 }
 

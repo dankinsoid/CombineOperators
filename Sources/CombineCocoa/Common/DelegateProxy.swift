@@ -10,14 +10,14 @@
 
     import Combine
     #if SWIFT_PACKAGE && !os(Linux)
-        import CombineCocoaRuntime
+        import VDKitRuntime
     #endif
 
     /// Base class for `DelegateProxyType` protocol.
     ///
     /// This implementation is not thread safe and can be used only from one thread (Main thread).
 @available(iOS 13.0, macOS 10.15, *)
-    open class DelegateProxy<P: AnyObject, D>: _RXDelegateProxy {
+    open class DelegateProxy<P: AnyObject, D>: _VDDelegateProxy {
         public typealias ParentObject = P
         public typealias Delegate = D
 

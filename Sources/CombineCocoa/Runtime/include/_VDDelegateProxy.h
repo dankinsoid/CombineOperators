@@ -1,5 +1,5 @@
 //
-//  _RXDelegateProxy.h
+//  _VDDelegateProxy.h
 //  CombineCocoa
 //
 //  Created by Krunoslav Zaher on 7/4/15.
@@ -10,7 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface _RXDelegateProxy : NSObject
+@interface _VDDelegateProxy : NSObject
 
 @property (nonatomic, weak, readonly) id _forwardToDelegate;
 

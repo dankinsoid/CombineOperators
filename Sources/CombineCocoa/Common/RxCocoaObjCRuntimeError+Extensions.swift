@@ -7,7 +7,8 @@
 //
 
 #if SWIFT_PACKAGE && !DISABLE_SWIZZLING && !os(Linux)
-    import CombineCocoaRuntime
+import Foundation
+    import VDKitRuntime
 #endif
 
 #if !DISABLE_SWIZZLING && !os(Linux)
@@ -127,14 +128,14 @@ extension Error {
         func rxCocoaErrorForTarget(_ target: AnyObject) -> CombineCocoaObjCRuntimeError {
             let error = self as NSError
             
-            if error.domain == RXObjCRuntimeErrorDomain {
-                let errorCode = RXObjCRuntimeError(rawValue: error.code) ?? .unknown
+            if error.domain == VDObjCRuntimeErrorDomain {
+                let errorCode = VDObjCRuntimeError(rawValue: error.code) ?? .unknown
                 
                 switch errorCode {
                 case .unknown:
                     return .unknown(target: target)
                 case .objectMessagesAlreadyBeingIntercepted:
-                    let isKVO = (error.userInfo[RXObjCRuntimeErrorIsKVOKey] as? NSNumber)?.boolValue ?? false
+                    let isKVO = (error.userInfo[VDObjCRuntimeErrorIsKVOKey] as? NSNumber)?.boolValue ?? false
                     return .objectMessagesAlreadyBeingIntercepted(target: target, interceptionMechanism: isKVO ? .kvo : .unknown)
                 case .selectorNotImplemented:
                     return .selectorNotImplemented(target: target)
