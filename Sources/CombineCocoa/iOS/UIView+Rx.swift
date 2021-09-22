@@ -108,9 +108,12 @@ extension Reactive where Base: UIView {
 	
 	private func value<T: Equatable>(at keyPath: KeyPath<CALayer, T>) -> AnyPublisher<T, Never> {
 		create {[weak base] sbr in
-			let observer = base?.layer.observe(keyPath, { _ = sbr.receive($0) }) ?? .init()
-			base?.layerObservers.observers.append(observer)
-			return AnyCancellable(observer.invalidate)
+            if let observer = base?.layer.observe(keyPath, { _ = sbr.receive($0) }) {
+                base?.layerObservers.observers.append(observer)
+                return AnyCancellable(observer.invalidate)
+            } else {
+                return AnyCancellable()
+            }
 		}
 		.skipFailure()
 		.eraseToAnyPublisher()

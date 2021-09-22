@@ -12,7 +12,7 @@ let package = Package(
 			.library(name: "CombineCocoa", targets: ["CombineCocoa"])
     ],
     dependencies: [
-			.package(url: "https://github.com/dankinsoid/VDKit.git", from: "1.58.0"),
+			.package(url: "https://github.com/dankinsoid/VDKit.git", from: "1.99.0"),
     ],
     targets: [
 			.target(name: "CombineOperators", dependencies: ["VDKit"]),
