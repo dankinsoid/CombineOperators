@@ -1,4 +1,4 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.5
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 import PackageDescription
 
@@ -12,7 +12,7 @@ let package = Package(
 			.library(name: "CombineCocoa", targets: ["CombineCocoa"])
     ],
     dependencies: [
-			.package(url: "https://github.com/dankinsoid/VDKit.git", from: "1.99.0"),
+			.package(url: "https://github.com/dankinsoid/VDKit.git", from: "1.116.0"),
     ],
     targets: [
 			.target(name: "CombineOperators", dependencies: ["VDKit"]),
