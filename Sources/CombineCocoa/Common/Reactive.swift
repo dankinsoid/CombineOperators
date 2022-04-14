@@ -75,6 +75,8 @@ extension Reactive where Base: AnyObject {
 	}
 }
 
+
+
 private var cancellableBagKey = "CancellableBagKey"
 
 /// A type that has reactive extensions.
@@ -116,3 +118,13 @@ import Foundation
 /// Extend NSObject with `cb` proxy.
 @available(iOS 13.0, macOS 10.15, *)
 extension NSObject: ReactiveCompatible {}
+
+public func bag(_ object: Any) -> CancellableBag {
+		if let result = objc_getAssociatedObject(object, &cancellableBagKey) as? CancellableBag {
+				return result
+		}
+		let result = CancellableBag()
+		objc_setAssociatedObject(object, &cancellableBagKey, result, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+		return result
+}
+

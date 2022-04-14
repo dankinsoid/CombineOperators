@@ -13,38 +13,38 @@ import UIKit
 import VDKit
 @available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UITextField {
-    /// Reactive wrapper for `text` property.
-    public var text: ControlProperty<String?> {
-        return base.cb.controlPropertyWithDefaultEvents(
-            getter: { textField in
-                textField.text
-            },
-            setter: { textField, value in
-                // This check is important because setting text value always clears control state
-                // including marked text selection which is imporant for proper input 
-                // when IME input method is used.
-                if textField.text != value {
-                    textField.text = value
-                }
-            }
-        )
-    }
-    
-    /// Bindable sink for `attributedText` property.
-    public var attributedText: ControlProperty<NSAttributedString?> {
-        return base.cb.controlPropertyWithDefaultEvents(
-            getter: { textField in
-                textField.attributedText
-            },
-            setter: { textField, value in
-                // This check is important because setting text value always clears control state
-                // including marked text selection which is imporant for proper input
-                // when IME input method is used.
-                if textField.attributedText != value {
-                    textField.attributedText = value
-                }
-            }
-        )
+		/// Reactive wrapper for `text` property.
+		public var text: ControlProperty<String?> {
+				return base.cb.controlPropertyWithDefaultEvents(
+						getter: { textField in
+								textField.text
+						},
+						setter: { textField, value in
+								// This check is important because setting text value always clears control state
+								// including marked text selection which is imporant for proper input
+								// when IME input method is used.
+								if textField.text != value {
+										textField.text = value
+								}
+						}
+				)
+		}
+		
+		/// Bindable sink for `attributedText` property.
+		public var attributedText: ControlProperty<NSAttributedString?> {
+				return base.cb.controlPropertyWithDefaultEvents(
+						getter: { textField in
+								textField.attributedText
+						},
+						setter: { textField, value in
+								// This check is important because setting text value always clears control state
+								// including marked text selection which is imporant for proper input
+								// when IME input method is used.
+								if textField.attributedText != value {
+										textField.attributedText = value
+								}
+						}
+				)
 		}
 	
 	///
@@ -81,16 +81,18 @@ extension Reactive where Base: UITextField {
 		)
 	}
 	
-	public var didEndEditing: ControlEvent<Void> {
-		ControlEvent<()>(
-			events: invoked(#selector(UITextFieldDelegate.textFieldDidEndEditing(_:))).map { _ in () }
-		)
-	}
+//	public var didEndEditing: ControlEvent<Void> {
+//		ControlEvent<()>(
+//			events: invoked(#selector(UITextFieldDelegate.textFieldDidEndEditing(_:))).map { _ in () }
+//		)
+//	}
 	
 	public var reasonEndEditing: ControlEvent<UITextField.DidEndEditingReason> {
 		ControlEvent<UITextField.DidEndEditingReason>(
 			events: invoked(#selector(UITextFieldDelegate.textFieldDidEndEditing(_:reason:)))
-				.compactMap { $0.last as? UITextField.DidEndEditingReason }
+								.compactMap { args in
+										(args.last as? Int).flatMap { UITextField.DidEndEditingReason(rawValue: $0) }
+								}
 		)
 	}
 	
