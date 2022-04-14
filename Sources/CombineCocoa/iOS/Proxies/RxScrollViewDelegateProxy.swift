@@ -37,7 +37,6 @@ open class CombineScrollViewDelegateProxy
         self.register { CombineScrollViewDelegateProxy(scrollView: $0) }
         self.register { CombineTableViewDelegateProxy(tableView: $0) }
         self.register { CombineCollectionViewDelegateProxy(collectionView: $0) }
-        self.register { CombineTextViewDelegateProxy(textView: $0) }
     }
 
     private var _contentOffsetBehaviorSubject: CurrentValueSubject<CGPoint, Never>?
