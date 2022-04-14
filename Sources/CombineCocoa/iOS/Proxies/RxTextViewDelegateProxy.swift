@@ -44,7 +44,7 @@ open class CombineTextViewDelegateProxy
 		 We've had some issues with observing text changes. This is here just in case we need the same hack in future and that
 		 we wouldn't need to change the public interface.
 		 */
-		let forwardToDelegate = self.forwardToDelegate() as? UITextViewDelegate
+		let forwardToDelegate = self.forwardToDelegate()
 		return forwardToDelegate?.textView?(textView,
 																				shouldChangeTextIn: range,
 																				replacementText: text) ?? true
