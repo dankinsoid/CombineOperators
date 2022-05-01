@@ -37,9 +37,13 @@ extension Publishers {
 			}
 			
 			func receive(_ input: Source.Output) -> Subscribers.Demand {
-				let offset = lock.protect(code: { index })
+				lock.lock()
+				let offset = index
+				lock.unlock()
 				let result = subscriber.receive((offset: offset, element: input))
-				lock.protect { index += 1 }
+				lock.lock()
+				index += 1
+				lock.unlock()
 				return result
 			}
 			
@@ -49,11 +53,12 @@ extension Publishers {
 			
 			func receive(completion: Subscribers.Completion<Source.Failure>) {
 				subscriber.receive(completion: completion)
-				lock.protect { index = 0 }
+				lock.lock()
+				index = 0
+				lock.unlock()
 			}
 		}
 	}
-	
 }
 
 @available(iOS 13.0, macOS 10.15, *)

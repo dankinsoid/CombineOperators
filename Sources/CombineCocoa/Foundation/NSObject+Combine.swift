@@ -10,7 +10,7 @@
 
 import Foundation
 import Combine
-import VDKit
+import NSMethodsObservation
 
 #if !DISABLE_SWIZZLING && !os(Linux)
 private var deallocatingSubjectTriggerContext: UInt8 = 0
@@ -185,5 +185,7 @@ private final class Wrapper<T> {
 		self.t = t
 	}
 }
+
+extension Cancellation: Cancellable {}
 
 #endif

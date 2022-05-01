@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import VDKit
 import Combine
 
 @available(iOS 13.0, macOS 10.15, *)
@@ -132,6 +131,58 @@ extension UIView {
 		return bag
 	}
 	
+	var superviews: [UIView] {
+		superview.map { [$0] + $0.superviews } ?? []
+	}
+	
+	var isOnScreen: Bool {
+		window?.bounds.intersects(convert(bounds, to: window)) == true
+	}
+	
+	@discardableResult
+	func observeIsOnScreen(_ action: @escaping (Bool) -> Void) -> () -> Void {
+		var prev = isOnScreen
+		action(prev)
+		return observeFrameInWindow {[weak self] in
+			let new = self?.window?.bounds.intersects($0) == true
+			if new != prev {
+				action(new)
+				prev = new
+			}
+		}
+	}
+	
+	@discardableResult
+	func observeFrameInWindow(_ action: @escaping (CGRect) -> Void) -> () -> Void {
+		let list = ([self] + superviews).map {
+			$0.observeFrame {[weak self] in
+				guard let `self` = self, let window = self.window else { return }
+				action($0.convert($0.bounds, to: window))
+			}
+		}
+		return {
+			list.forEach { $0() }
+		}
+	}
+	
+	@discardableResult
+	func observeFrame(_ action: @escaping (UIView) -> Void) -> () -> Void {
+		var observers: [NSKeyValueObservation] = []
+		let block = {[weak self] in
+			guard let it = self else { return }
+			action(it)
+		}
+		observers.append(layer.observeFrame(\.position, block))
+		observers.append(layer.observeFrame(\.bounds, block))
+		observers.append(layer.observeFrame(\.transform, block))
+		layerObservers.observers += observers
+		action(self)
+		return { observers.forEach { $0.invalidate() } }
+	}
+	
+	fileprivate var vc: UIViewController? {
+		(next as? UIViewController) ?? (next as? UIView)?.vc
+	}
 }
 
 private var layerObservrersKey = "layerObservrersKey0000"
@@ -144,7 +195,13 @@ extension CALayer {
 			action(value)
 		}
 	}
-	
+
+	fileprivate func observeFrame<T: Equatable>(_ keyPath: KeyPath<CALayer, T>, _ action: @escaping () -> Void) -> NSKeyValueObservation {
+		observe(keyPath, options: [.new, .old]) { (layer, change) in
+			guard change.newValue != change.oldValue else { return }
+			action()
+		}
+	}
 }
 
 private final class NSKeyValueObservations {
@@ -152,5 +209,14 @@ private final class NSKeyValueObservations {
 	
 	func invalidate() {
 		observers.forEach { $0.invalidate() }
+	}
+}
+
+extension CATransform3D: Equatable {
+	
+	private var ms: [CGFloat] { [m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44] }
+	
+	public static func ==(_ lhs: CATransform3D, _ rhs: CATransform3D) -> Bool {
+		lhs.ms == rhs.ms
 	}
 }

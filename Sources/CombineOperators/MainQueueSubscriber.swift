@@ -29,19 +29,19 @@ public final class MainQueueSubscriber<S: Subscriber>: Subscriber {
 	public func receive(_ input: S.Input) -> Subscribers.Demand {
 		if Thread.isMainThread {
 			let _demand = subscriber.receive(input)
-			lock.protect {
+			lock.lock()
 				demand = _demand
-			}
+			lock.unlock()
 			return _demand
 		} else {
 			DispatchQueue.main.async {
-				self.lock.protect {
+				self.lock.lock()
 					self.demand = self.subscriber.receive(input)
-				}
+				self.lock.unlock()
 			}
-			let _demand = lock.protect {
-				demand
-			}
+			lock.lock()
+			let _demand = demand
+			lock.unlock()
 			return _demand
 		}
 	}

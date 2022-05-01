@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import VDKit
 import Combine
 
 @available(iOS 13.0, macOS 10.15, *)
@@ -122,11 +121,12 @@ extension String {
 		for i in commonPr.count..<(max(self.count, to.count) - commonSfCount) {
 			var last = result[result.count - 1]
 			if i < last.count, i < to.count {
-				last[.first + i] = to[.first + i]
+				let index = last.index(last.startIndex, offsetBy: i)
+				last.replaceSubrange(index..<last.index(after: index), with: [to[to.index(to.startIndex, offsetBy: i)]])
 			} else if i < to.count {
-				last.append(to[.first + i]!)
+				last.append(to[to.index(to.startIndex, offsetBy: i)])
 			} else if i < last.count {
-				_ = last.remove(at: .first + i)
+				_ = last.remove(at: last.index(last.startIndex, offsetBy: i))
 			}
 			result.append(last)
 		}

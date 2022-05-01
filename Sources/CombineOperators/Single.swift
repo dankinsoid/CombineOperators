@@ -126,7 +126,7 @@ extension Single where Failure == Never {
 extension Single where Output == Void {
 	public static func just() -> Single {
 		Single {
-			$0(.success)
+			$0(.success(()))
 		}
 	}
 }

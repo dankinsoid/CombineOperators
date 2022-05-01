@@ -1,16 +1,14 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "VDKit",
-        "repositoryURL": "https://github.com/dankinsoid/VDKit.git",
-        "state": {
-          "branch": null,
-          "revision": "a33938cfed7addc3d8944be0cfe4b0c3980bdb42",
-          "version": "1.188.0"
-        }
+  "pins" : [
+    {
+      "identity" : "nsmethodsobservation",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/dankinsoid/NSMethodsObservation.git",
+      "state" : {
+        "revision" : "c982b0afd077a2d2ba58740b185b15474a08c930",
+        "version" : "1.2.0"
       }
-    ]
-  },
-  "version": 1
+    }
+  ],
+  "version" : 2
 }

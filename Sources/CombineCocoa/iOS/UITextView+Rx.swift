@@ -131,8 +131,9 @@ extension Reactive where Base: UITextView {
 	
 	public var mayChange: ControlEvent<(NSRange, String)> {
 		ControlEvent<(NSRange, String)>(
-			events: invoked(#selector(UITextViewDelegate.textView(_:shouldChangeTextIn:replacementText:))).compactMap { args in
-				(args[safe: 1] as? NSRange).flatMap { range in
+			events: invoked(#selector(UITextViewDelegate.textView(_:shouldChangeTextIn:replacementText:))).compactMap { args -> (NSRange, String)? in
+				guard args.count > 1 else { return nil }
+				return (args[1] as? NSRange).flatMap { range in
 					(args.last as? String).map { (range, $0) }
 				}
 			}

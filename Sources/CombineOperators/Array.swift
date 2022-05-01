@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import VDKit
 import Combine
 
 extension Publishers {
@@ -52,7 +51,11 @@ extension Publishers {
 		public let upstream: Upstream
 		
 		public func receive<S>(subscriber: S) where S : Subscriber, Upstream.Failure == S.Failure, Upstream.Output.Element == S.Input {
-			upstream.compactMap { $0[safe: index] }.receive(subscriber: subscriber)
+			upstream.compactMap { value -> Output? in
+				guard index >= value.startIndex, index < value.endIndex else { return nil }
+				return value[index]
+				
+			}.receive(subscriber: subscriber)
 		}
 	}
 }

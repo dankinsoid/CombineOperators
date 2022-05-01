@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import VDKit
 import Combine
 import CombineOperators
 
@@ -50,13 +49,13 @@ extension Subscriber {
 				self.receive(subscription: subscription)
 			},
 			receiveValue: { value in
-				UIView.animate(duration, options: options, {
+				UIView.animate(withDuration: duration, delay: 0, options: options, animations: {
 					_ = self.receive(value)
 				})
 				return .unlimited
 			},
 			receiveCompletion: { completion in
-				UIView.animate(duration, options: options, {
+				UIView.animate(withDuration: duration, delay: 0, options: options, animations: {
 					self.receive(completion: completion)
 				})
 			})

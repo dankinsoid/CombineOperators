@@ -10,7 +10,7 @@
 
 import Combine
 import UIKit
-import VDKit
+
 @available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UITextField {
 	/// Reactive wrapper for `text` property.
@@ -99,8 +99,9 @@ extension Reactive where Base: UITextField {
 	public var mayChange: ControlEvent<(NSRange, String)> {
 		ControlEvent(
 			events: invoked(#selector(UITextFieldDelegate.textField(_:shouldChangeCharactersIn:replacementString:)))
-				.compactMap { args in
-					(args[safe: 1] as? NSRange).flatMap { range in
+				.compactMap { args -> (NSRange, String)? in
+					guard args.count > 1 else { return nil }
+					return (args[1] as? NSRange).flatMap { range in
 						(args.last as? String).map { (range, $0) }
 					}
 				}

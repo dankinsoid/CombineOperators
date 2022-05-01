@@ -5,7 +5,6 @@
 //
 
 import Foundation
-import VDKit
 import Combine
 
 precedencegroup CombinePrecedence {
@@ -186,8 +185,8 @@ public func +(_ lhs: Cancellable, _ rhs: Cancellable) -> Cancellable {
 }
 
 @available(iOS 13.0, macOS 10.15, *)
-public func ?? <O: Publisher>(_ lhs: O, _ rhs: @escaping @autoclosure () -> O.Output.Wrapped) -> Publishers.Map<O, O.Output.Wrapped> where O.Output: OptionalProtocol {
-	lhs.map { $0.asOptional() ?? rhs() }
+public func ?? <O: Publisher, T>(_ lhs: O, _ rhs: @escaping @autoclosure () -> T) -> Publishers.Map<O, T> where O.Output == T? {
+	lhs.map { $0 ?? rhs() }
 }
 
 @available(iOS 13.0, macOS 10.15, *)
