@@ -50,7 +50,8 @@ extension Publisher {
 @available(iOS 13.0, macOS 10.15, *)
 public struct Driver<Output>: Publisher {
 	public typealias Failure = Never
-	private let publisher: AnyPublisher<Output, Failure>
+    
+    public let publisher: AnyPublisher<Output, Failure>
 	
 	public init<P: Publisher, C: Publisher>(_ source: P, catch handler: @escaping (Error) -> C) where C.Output == P.Output, C.Output == Output {
 		self = Driver(source.catch(handler).skipFailure())
