@@ -1,11 +1,3 @@
-//
-//  ControlEvent.swift
-//  CombineCocoa
-//
-//  Created by Krunoslav Zaher on 8/28/15.
-//  Copyright © 2015 Krunoslav Zaher. All rights reserved.
-//
-
 import Foundation
 import Combine
 
@@ -60,5 +52,4 @@ public struct ControlEvent<PropertyType>: ControlEventType {
 	public func asControlEvent() -> ControlEvent<PropertyType> {
 		self
 	}
-	
 }

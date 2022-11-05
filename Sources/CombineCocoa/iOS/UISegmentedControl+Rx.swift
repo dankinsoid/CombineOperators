@@ -1,11 +1,3 @@
-//
-//  UISegmentedControl+Combine.swift
-//  CombineCocoa
-//
-//  Created by Carlos García on 8/7/15.
-//  Copyright © 2015 Krunoslav Zaher. All rights reserved.
-//
-
 #if os(iOS) || os(tvOS)
 
 import UIKit
@@ -14,12 +6,7 @@ import Combine
 extension Reactive where Base: UISegmentedControl {
     /// Reactive wrapper for `selectedSegmentIndex` property.
     public var selectedSegmentIndex: ControlProperty<Int> {
-        value
-    }
-    
-    /// Reactive wrapper for `selectedSegmentIndex` property.
-    public var value: ControlProperty<Int> {
-        return base.cb.controlPropertyWithDefaultEvents(
+        base.cb.controlPropertyWithDefaultEvents(
             getter: { segmentedControl in
                 segmentedControl.selectedSegmentIndex
             }, setter: { segmentedControl, value in
@@ -30,25 +17,24 @@ extension Reactive where Base: UISegmentedControl {
     
     /// Reactive wrapper for `setEnabled(_:forSegmentAt:)`
     public func enabledForSegment(at index: Int) -> Binder<Bool> {
-        return Binder(self.base) { segmentedControl, segmentEnabled -> Void in
+        Binder(self.base) { segmentedControl, segmentEnabled -> Void in
             segmentedControl.setEnabled(segmentEnabled, forSegmentAt: index)
         }
     }
     
     /// Reactive wrapper for `setTitle(_:forSegmentAt:)`
     public func titleForSegment(at index: Int) -> Binder<String?> {
-        return Binder(self.base) { segmentedControl, title -> Void in
+        Binder(self.base) { segmentedControl, title -> Void in
             segmentedControl.setTitle(title, forSegmentAt: index)
         }
     }
     
     /// Reactive wrapper for `setImage(_:forSegmentAt:)`
     public func imageForSegment(at index: Int) -> Binder<UIImage?> {
-        return Binder(self.base) { segmentedControl, image -> Void in
+        Binder(self.base) { segmentedControl, image -> Void in
             segmentedControl.setImage(image, forSegmentAt: index)
         }
     }
-
 }
 
 #endif

@@ -6,7 +6,7 @@
 
 ## Description
 
-This repo includes operators for Combine, almost complete re-implementation of RxCocoa, RxViewController, RxGestures and RxKeyboard libraries and some additional features.
+This repo includes operators for Combine, almost complete re-implementation of CombineCocoa, RxViewController, RxGestures and RxKeyboard libraries and some additional features.
 
 Example
 

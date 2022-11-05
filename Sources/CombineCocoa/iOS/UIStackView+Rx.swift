@@ -1,10 +1,4 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 27.02.2021.
-//
-
+#if canImport(UIKit)
 import UIKit
 import Combine
 
@@ -41,3 +35,4 @@ extension UIStackView {
 		}
 	}
 }
+#endif

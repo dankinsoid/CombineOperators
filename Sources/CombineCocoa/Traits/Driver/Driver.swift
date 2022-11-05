@@ -1,11 +1,3 @@
-//
-//  Driver.swift
-//  CombineCocoa
-//
-//  Created by Krunoslav Zaher on 9/26/16.
-//  Copyright © 2016 Krunoslav Zaher. All rights reserved.
-//
-
 import Foundation
 import Combine
 import CombineOperators
@@ -53,7 +45,6 @@ extension Publisher {
 	public func asDriver<C: Publisher>(catch handler: @escaping (Error) -> C) -> Driver<Output> where C.Output == Output {
 		Driver(self, catch: handler)
 	}
-	
 }
 
 @available(iOS 13.0, macOS 10.15, *)
@@ -66,10 +57,14 @@ public struct Driver<Output>: Publisher {
 	}
 	
 	public init<P: Publisher>(_ source: P) where Never == P.Failure, P.Output == Output {
-		publisher = source.share(replay: 1).eraseToAnyPublisher()
+        publisher = source.share(replay: 1).receive(on: RunLoop.main).eraseToAnyPublisher()
 	}
 	
 	public func receive<S>(subscriber: S) where S : Subscriber, Never == S.Failure, Output == S.Input {
-		publisher.receive(subscriber: MainQueueSubscriber(subscriber: subscriber))
+        publisher.receive(subscriber: subscriber)
 	}
+    
+    public func asDriver() -> Driver<Output> {
+        self
+    }
 }

@@ -109,13 +109,6 @@ extension Publisher {
 		mapError { $0 }
 	}
 
-	public func map<B: AnyObject, T>(_ method:  @escaping (B) -> (Output) -> T, on object: B) -> Publishers.CompactMap<Self, T> {
-		compactMap {[weak object] in
-			guard let obj = object else { return nil }
-			return method(obj)($0)
-		}
-	}
-
 	public func interval(_ period: TimeInterval, runLoop: RunLoop = .main) -> AnyPublisher<Output, Never> {
 		skipFailure().zip(
 			Timer.TimerPublisher(interval: period, runLoop: runLoop, mode: .default).autoconnect().prepend(Date())
@@ -196,15 +189,6 @@ extension Publisher {
 			return $0
 		}
 	}
-
-	public func flat<P: Publisher>(_ transform: @escaping (Output) -> P) -> AnyPublisher<P.Output, Failure> {
-		if #available(iOS 14.0, *) {
-			return flatMap { transform($0).skipFailure() }.eraseToAnyPublisher()
-		} else {
-			return Publishers.FlatMapiOS13(source: self, map: transform).eraseToAnyPublisher()
-		}
-	}
-
 }
 
 @available(iOS 13.0, macOS 10.15, *)
@@ -277,7 +261,7 @@ extension AnyPublisher {
 		Just(value).setFailureType(to: Failure.self).eraseToAnyPublisher()
 	}
 	
-	public static func never() -> AnyPublisher {
+    public static var never: AnyPublisher {
 		Empty(completeImmediately: false).eraseToAnyPublisher()
 	}
 	
@@ -293,10 +277,9 @@ extension AnyPublisher {
 		Result.Publisher(.failure(error)).eraseToAnyPublisher()
 	}
 	
-	public static func empty() -> AnyPublisher {
+    public static var empty: AnyPublisher {
 		Empty(completeImmediately: true).eraseToAnyPublisher()
 	}
-	
 }
 
 extension Publisher {

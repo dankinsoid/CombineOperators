@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 28.02.2021.
-//
-
 import Foundation
 import Combine
 
@@ -14,6 +7,10 @@ public final class ReactiveBinder<Target: AnyObject, Input, KP: KeyPath<Target, 
 	
 	fileprivate weak var target: Target?
 	fileprivate let keyPath: KP
+    
+    public var combineIdentifier: CombineIdentifier {
+        target.map(CombineIdentifier.init) ?? CombineIdentifier()
+    }
 	
 	public init(_ target: Target?, keyPath: KP) {
 		self.target = target
@@ -27,7 +24,6 @@ public final class ReactiveBinder<Target: AnyObject, Input, KP: KeyPath<Target, 
 	public subscript<T>(dynamicMember keyPath: ReferenceWritableKeyPath<Input, T>) -> ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>> {
 		ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>>(target, keyPath: self.keyPath.append(reference: keyPath))
 	}
-	
 }
 
 @available(iOS 13.0, macOS 10.15, *)

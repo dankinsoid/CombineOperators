@@ -1,11 +1,3 @@
-//
-//  UIStepper+Combine.swift
-//  CombineCocoa
-//
-//  Created by Yuta ToKoRo on 9/1/15.
-//  Copyright © 2015 Krunoslav Zaher. All rights reserved.
-//
-
 #if os(iOS)
 
 import UIKit

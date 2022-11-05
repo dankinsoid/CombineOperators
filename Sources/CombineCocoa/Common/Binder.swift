@@ -1,11 +1,3 @@
-//
-//  Binder.swift
-//  CombineSwift
-//
-//  Created by Krunoslav Zaher on 9/17/17.
-//  Copyright © 2017 Krunoslav Zaher. All rights reserved.
-//
-
 import Foundation
 import Combine
 
@@ -30,13 +22,12 @@ public final class Binder<Input>: Subscriber {
     /// - parameter scheduler: Scheduler used to bind the events.
     /// - parameter binding: Binding logic.
 	public init<Target: AnyObject, S: Scheduler>(_ target: Target, scheduler: S, binding: @escaping (Target, Input) -> Void) {
-			weak var weakTarget = target
-			self.binding = { element in
-				scheduler.schedule {
-					if let target = weakTarget {
-						binding(target, element)
-					}
-				}
+        self.binding = { [weak target] element in
+            scheduler.schedule {
+                if let target = target {
+                    binding(target, element)
+                }
+            }
 		}
 	}
 	

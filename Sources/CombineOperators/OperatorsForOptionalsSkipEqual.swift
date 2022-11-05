@@ -41,13 +41,13 @@ public func =>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func =>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input == T.Output?, T.Failure == Never, T.Output: Equatable {
-	rhs.flatMap { lhs?.removeDuplicates().map { $0 }.subscribe(Subscribers.Garantie($0)) }
+    rhs.flatMap { lhs?.removeDuplicates().map { $0 }.setFailureType(to: O.Failure.self).subscribe($0) }
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func =>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input == T.Output?, T.Failure == Never, O.Failure == Error, T.Output: Equatable {
-	rhs.flatMap { lhs?.removeDuplicates().map { $0 }.subscribe(Subscribers.Garantie($0)) }
+	rhs.flatMap { lhs?.removeDuplicates().map { $0 }.setFailureType(to: O.Failure.self).subscribe($0) }
 }
 
 @available(iOS 13.0, macOS 10.15, *)
@@ -83,7 +83,7 @@ public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable w
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func ==>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input == T.Output?, T.Output: Equatable {
-	rhs.map { lhs?.removeDuplicates().map { $0 }.skipFailure().receive(on: DispatchQueue.main).subscribe(Subscribers.Garantie($0)) }
+	rhs.map { lhs?.removeDuplicates().map { $0 }.skipFailure().setFailureType(to: O.Failure.self).receive(on: RunLoop.main).subscribe($0) }
 }
 
 
@@ -120,13 +120,13 @@ public func =>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func =>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input? == T.Output, T.Failure == Never, O.Input: Equatable {
-	rhs.flatMap { lhs?.removeDuplicates().skipNil().subscribe(Subscribers.Garantie($0)) }
+	rhs.flatMap { lhs?.removeDuplicates().skipNil().setFailureType(to: O.Failure.self).subscribe($0) }
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func =>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input? == T.Output, T.Failure == Never, O.Failure == Error, O.Input: Equatable {
-	rhs.flatMap { lhs?.removeDuplicates().skipNil().subscribe(Subscribers.Garantie($0)) }
+	rhs.flatMap { lhs?.removeDuplicates().skipNil().setFailureType(to: O.Failure.self).subscribe($0) }
 }
 
 @available(iOS 13.0, macOS 10.15, *)
@@ -162,5 +162,5 @@ public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable w
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
 public func ==>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input? == T.Output, O.Input: Equatable {
-	rhs.map { lhs?.removeDuplicates().skipNil().skipFailure().receive(on: DispatchQueue.main).subscribe(Subscribers.Garantie($0)) }
+	rhs.map { lhs?.removeDuplicates().skipNil().skipFailure().receive(on: RunLoop.main).setFailureType(to: O.Failure.self).subscribe($0) }
 }

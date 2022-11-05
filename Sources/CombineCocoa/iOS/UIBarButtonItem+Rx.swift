@@ -17,10 +17,10 @@ extension Reactive where Base: UIBarButtonItem {
     /// Reactive wrapper for target action pattern on `self`.
     public var tap: ControlEvent<()> {
         let source = lazyInstanceAnyPublisher(&rx_tap_key) { () -> AnyPublisher<(), Error> in
-					create { [weak control = self.base] observer in
+            .create { [weak control = self.base] observer in
                 guard let control = control else {
-									observer.receive(completion: .finished)
-									return AnyCancellable {}
+                    observer.receive(completion: .finished)
+                    return AnyCancellable {}
                 }
                 let target = BarButtonItemTarget(barButtonItem: control) {
                     _ = observer.receive()
@@ -29,7 +29,7 @@ extension Reactive where Base: UIBarButtonItem {
             }
             .prefix(untilOutputFrom: self.deallocated)
             .share()
-						.eraseToAnyPublisher()
+            .eraseToAnyPublisher()
         }
         return ControlEvent(events: source)
     }

@@ -1,10 +1,4 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 27.02.2021.
-//
-
+#if canImport(UIKit)
 import UIKit
 import Combine
 
@@ -19,18 +13,23 @@ extension Reactive where Base: UIView {
 		Binder(base, binding: { $0.transform = $1 })
 	}
 	
-	public var movedToWindow: AnyPublisher<Void, Error> {
-		methodInvoked(#selector(UIView.didMoveToWindow))
+	public var movedToWindow: AnyPublisher<Void, Never> {
+        AnyPublisher<Void, Never>.create { [weak base] in
+            let cancellable = base?.observeMoveToWindow(subscriber: $0)
+            return AnyCancellable {
+                cancellable?.cancel()
+            }
+        }
 			.map {[weak base] _ in base?.window != nil }
 			.prepend(base.window != nil)
-			.filter { $0 }
+			.filter { $0 == true }
 			.map { _ in }
 			.prefix(1)
 			.eraseToAnyPublisher()
 	}
 	
 	public var isOnScreen: AnyPublisher<Bool, Never> {
-		create {[weak base] sbr in
+        .create {[weak base] sbr in
 			AnyCancellable(base?.observeIsOnScreen { _ = sbr.receive($0) } ?? {})
 		}
 		.skipFailure()
@@ -38,7 +37,7 @@ extension Reactive where Base: UIView {
 	}
 	
 	public var frame: AnyPublisher<CGRect, Never> {
-		create {[weak base] observer in
+        .create {[weak base] observer in
 			AnyCancellable(base?.observeFrame { _ = observer.receive($0.frame) } ?? {})
 		}
 		.skipFailure()
@@ -47,48 +46,14 @@ extension Reactive where Base: UIView {
 	}
 	
 	public var frameOnWindow: AnyPublisher<CGRect, Never> {
-		create {[weak base] sbr in
+        .create {[weak base] sbr in
 			AnyCancellable(base?.observeFrameInWindow { _ = sbr.receive($0) } ?? {})
 		}
 		.skipFailure()
 		.removeDuplicates()
 		.eraseToAnyPublisher()
 	}
-	
-	public var willAppear: ControlEvent<Bool> {
-		let source = movedToWindow.flatMap {[weak base] in
-			base?.vc?.cb.methodInvoked(#selector(UIViewController.viewWillAppear)).map { $0.first as? Bool ?? false }
-				.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()
-		}
-		return ControlEvent(events: source)
-	}
-	
-	public var didAppear: ControlEvent<Bool> {
-		ControlEvent(events: movedToWindow.flatMap {[weak base] in
-			base?.vc?.cb.methodInvoked(#selector(UIViewController.viewDidAppear)).map { $0.first as? Bool ?? false }
-				.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()
-		})
-	}
-	
-	public var willDisappear: ControlEvent<Bool> {
-		ControlEvent(events: movedToWindow.flatMap {[weak base] in
-			base?.vc?.cb.methodInvoked(#selector(UIViewController.viewWillDisappear)).map { $0.first as? Bool ?? false }
-				.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()
-		})
-	}
-	
-	public var didDisappear: ControlEvent<Bool> {
-		ControlEvent(events: movedToWindow.flatMap {[weak base] in
-			base?.vc?.cb.methodInvoked(#selector(UIViewController.viewDidDisappear)).map { $0.first as? Bool ?? false }
-				.eraseToAnyPublisher() ?? Empty().eraseToAnyPublisher()
-		})
-	}
-	
-	public var layoutSubviews: ControlEvent<Void> {
-		let source = self.methodInvoked(#selector(Base.layoutSubviews)).map { _ in }
-		return ControlEvent(events: source)
-	}
-	
+
 	public var isHidden: AnyPublisher<Bool, Never> {
 		value(at: \.isHidden)
 	}
@@ -97,16 +62,8 @@ extension Reactive where Base: UIView {
 		value(at: \.opacity).map { CGFloat($0) }.eraseToAnyPublisher()
 	}
 	
-	public var isVisible: AnyPublisher<Bool, Never> {
-		isHidden
-			.combineLatest(alpha, isOnScreen, willAppear.map { _ in true }.merge(with: didDisappear.map { _ in false }).prepend(base.window != nil))
-			.map { !$0.0 && $0.1 > 0 && $0.2 && $0.3 }
-			.removeDuplicates()
-			.eraseToAnyPublisher()
-	}
-	
 	private func value<T: Equatable>(at keyPath: KeyPath<CALayer, T>) -> AnyPublisher<T, Never> {
-		create {[weak base] sbr in
+        .create {[weak base] sbr in
             if let observer = base?.layer.observe(keyPath, { _ = sbr.receive($0) }) {
                 base?.layerObservers.observers.append(observer)
                 return AnyCancellable(observer.invalidate)
@@ -118,6 +75,34 @@ extension Reactive where Base: UIView {
 		.eraseToAnyPublisher()
 	}
 
+}
+
+private final class MovedToWindowObserver: UIView {
+    
+    var onMoveToWindow: [AnySubscriber<Void, Never>] = []
+    
+    init() {
+        super.init(frame: .zero)
+        isHidden = true
+        isUserInteractionEnabled = false
+    }
+    
+    deinit {
+        onMoveToWindow.forEach {
+            $0.receive(completion: .finished)
+        }
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func didMoveToWindow() {
+        super.didMoveToWindow()
+        onMoveToWindow.forEach {
+            _ = $0.receive(())
+        }
+    }
 }
 
 extension UIView {
@@ -138,6 +123,27 @@ extension UIView {
 	var isOnScreen: Bool {
 		window?.bounds.intersects(convert(bounds, to: window)) == true
 	}
+    
+    private var movedToWindowObserver: MovedToWindowObserver? {
+        subviews.compactMap { $0 as? MovedToWindowObserver }.first ??
+        subviews.compactMap(\.movedToWindowObserver).first
+    }
+    
+    func observeMoveToWindow(subscriber: AnySubscriber<Void, Never>) -> AnyCancellable {
+        let view: MovedToWindowObserver
+        if let added = movedToWindowObserver {
+            view = added
+        } else {
+            view = MovedToWindowObserver()
+            addSubview(view)
+        }
+        view.onMoveToWindow.append(subscriber)
+        return AnyCancellable {
+            view.onMoveToWindow = view.onMoveToWindow.filter {
+                $0.combineIdentifier != subscriber.combineIdentifier
+            }
+        }
+    }
 	
 	@discardableResult
 	func observeIsOnScreen(_ action: @escaping (Bool) -> Void) -> () -> Void {
@@ -220,3 +226,4 @@ extension CATransform3D: Equatable {
 		lhs.ms == rhs.ms
 	}
 }
+#endif

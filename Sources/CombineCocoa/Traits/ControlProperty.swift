@@ -1,11 +1,3 @@
-//
-//  ControlProperty.swift
-//  CombineCocoa
-//
-//  Created by Krunoslav Zaher on 8/28/15.
-//  Copyright © 2015 Krunoslav Zaher. All rights reserved.
-//
-
 import Foundation
 import Combine
 import CombineOperators
@@ -58,9 +50,9 @@ public struct ControlProperty<PropertyType>: ControlPropertyType {
     /// - parameter valueSink: Observer that enables binding values to control property.
     /// - returns: Control property created with a observable sequence of values and an observer that enables binding values
     /// to property.
-	public init<Values: Publisher, Sink: Subscriber>(values: Values, valueSink: Sink) where PropertyType == Values.Output, PropertyType == Sink.Input {
-		self.values = values.subscribe(on: DispatchQueue.main).catch({ _ in Empty() }).eraseToAnyPublisher()
-		self.valueSink = AnySubscriber(valueSink.ignoreFailure())
+    public init<Values: Publisher, Sink: Subscriber>(values: Values, valueSink: Sink) where PropertyType == Values.Output, PropertyType == Sink.Input, Sink.Failure == Never {
+		self.values = values.receive(on: RunLoop.main).catch({ _ in Empty() }).eraseToAnyPublisher()
+		self.valueSink = AnySubscriber(valueSink)
 	}
 
     /// `ControlEvent` of user initiated value changes. Every time user updates control value change event
@@ -104,10 +96,14 @@ public struct ControlProperty<PropertyType>: ControlPropertyType {
 extension ControlPropertyType where Output == String? {
     /// Transforms control property of type `String?` into control property of type `String`.
     public var orEmpty: ControlProperty<String> {
-			let original: ControlProperty<String?> = self.asControlProperty()
-			let values = original.values.map { $0 ?? "" }
-			let valueSink = original.valueSink.mapSubscriber { $0 as String }
-			return ControlProperty<String>(values: values, valueSink: valueSink)
+        let original: ControlProperty<String?> = self.asControlProperty()
+        let values = original.values.map { $0 ?? "" }
+        let valueSink = Subscribers.Sink<String, Never> { _ in
+            original.valueSink.receive(completion: .finished)
+        } receiveValue: {
+            _ = original.valueSink.receive($0)
+        }
+        return ControlProperty<String>(values: values, valueSink: valueSink)
     }
 	
 }

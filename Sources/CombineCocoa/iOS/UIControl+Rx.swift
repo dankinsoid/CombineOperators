@@ -1,11 +1,3 @@
-//
-//  UIControl+Combine.swift
-//  CombineCocoa
-//
-//  Created by Daniel Tartaglia on 5/23/15.
-//  Copyright © 2015 Krunoslav Zaher. All rights reserved.
-//
-
 #if os(iOS) || os(tvOS)
 
 import Combine
@@ -17,26 +9,43 @@ extension Reactive where Base: UIControl {
     /// Reactive wrapper for target action pattern.
     ///
     /// - parameter controlEvents: Filter for observed event types.
-    public func controlEvent(_ controlEvents: UIControl.Event) -> ControlEvent<()> {
-			ControlEvent(events: create { [weak control = self.base] observer in
+    public func controlEvent(_ controlEvents: UIControl.Event) -> ControlEvent<Void> {
+        ControlEvent(
+            events: AnyPublisher<Void, Error>.create { [weak control = self.base] observer in
                 DispatchQueue.ensureRunningOnMainThread()
-
                 guard let control = control else {
-									observer.receive(completion: .finished)
-									return AnyCancellable { }
+                observer.receive(completion: .finished)
+                    return AnyCancellable { }
                 }
-
                 let controlTarget = ControlTarget(control: control, controlEvents: controlEvents) { _ in
                     _ = observer.receive()
                 }
 
                 return controlTarget
             }
-            .prefix(untilOutputFrom: deallocated)
-						.eraseToAnyPublisher()
-				)
+                .prefix(untilOutputFrom: deallocated)
+                .eraseToAnyPublisher()
+        )
     }
 
+    
+    /// Creates a `ControlProperty` that is triggered by target/action pattern value updates.
+    ///
+    /// - parameter controlEvents: Events that trigger value update sequence elements.
+    /// - parameter getter: Property value getter.
+    /// - parameter setter: Property value setter.
+    public func controlProperty<T>(
+        _ getter: @escaping (Base) -> T,
+        on controlEvents: UIControl.Event = .valueChanged
+    ) -> ControlEvent<T> {
+        ControlEvent(
+            events: controlEvent(controlEvents).compactMap { [weak base] in
+                base.map(getter)
+            }
+                .prepend(getter(base))
+        )
+    }
+    
     /// Creates a `ControlProperty` that is triggered by target/action pattern value updates.
     ///
     /// - parameter controlEvents: Events that trigger value update sequence elements.
@@ -45,9 +54,9 @@ extension Reactive where Base: UIControl {
     public func controlProperty<T>(
         editingEvents: UIControl.Event,
         getter: @escaping (Base) -> T,
-				setter: @escaping (Base, T) -> Void
+        setter: @escaping (Base, T) -> Void
     ) -> ControlProperty<T> {
-			let source: AnyPublisher<T, Error> = create { [weak weakControl = base] observer in
+        let source: AnyPublisher<T, Error> = .create { [weak weakControl = base] observer in
                 guard let control = weakControl else {
                     observer.receive(completion: .finished)
 									return AnyCancellable { }
