@@ -1,10 +1,3 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 26.02.2021.
-//
-
 import Foundation
 import Combine
 
@@ -52,31 +45,31 @@ public func =>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output?, O.Failure == T.Failure, T.Output: Equatable {
+public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> AnyCancellable where O.Output == T.Output?, O.Failure == T.Failure, T.Output: Equatable {
 	rhs.flatMap { lhs?.removeDuplicates().map { $0 }.subscribe($0) } ?? AnyCancellable()
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output?, O.Failure == T.Failure, O.Failure == Error, T.Output: Equatable {
+public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> AnyCancellable where O.Output == T.Output?, O.Failure == T.Failure, O.Failure == Error, T.Output: Equatable {
 	rhs.flatMap { lhs?.removeDuplicates().map { $0 }.subscribe($0) } ?? AnyCancellable()
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output?, O.Failure == T.Failure, O.Failure == Never, T.Output: Equatable {
+public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> AnyCancellable where O.Output == T.Output?, O.Failure == T.Failure, O.Failure == Never, T.Output: Equatable {
 	rhs.flatMap { lhs?.removeDuplicates().map { $0 }.subscribe($0) } ?? AnyCancellable()
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output?, O.Failure == Error, T.Output: Equatable {
+public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> AnyCancellable where O.Output == T.Output?, O.Failure == Error, T.Output: Equatable {
 	rhs.flatMap { lhs?.removeDuplicates().map { $0 }.simpleError().subscribe($0) } ?? AnyCancellable()
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output == T.Output?, O.Failure == Never, T.Output: Equatable {
+public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> AnyCancellable where O.Output == T.Output?, O.Failure == Never, T.Output: Equatable {
 	rhs.flatMap { lhs?.removeDuplicates().map { $0 }.skipFailure().subscribe($0) } ?? AnyCancellable()
 }
 
@@ -131,31 +124,31 @@ public func =>><T: Publisher, O: Subscriber>(_ lhs: T?, _ rhs: O?) where O.Input
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output? == T.Output, O.Failure == T.Failure, O.Output: Equatable {
+public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> AnyCancellable where O.Output? == T.Output, O.Failure == T.Failure, O.Output: Equatable {
 	rhs.flatMap { lhs?.removeDuplicates().skipNil().subscribe($0) } ?? AnyCancellable()
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output? == T.Output, O.Failure == T.Failure, O.Failure == Error, O.Output: Equatable {
+public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> AnyCancellable where O.Output? == T.Output, O.Failure == T.Failure, O.Failure == Error, O.Output: Equatable {
 	rhs.flatMap { lhs?.removeDuplicates().skipNil().subscribe($0) } ?? AnyCancellable()
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output? == T.Output, O.Failure == T.Failure, O.Failure == Never, O.Output: Equatable {
+public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> AnyCancellable where O.Output? == T.Output, O.Failure == T.Failure, O.Failure == Never, O.Output: Equatable {
 	rhs.flatMap { lhs?.removeDuplicates().skipNil().subscribe($0) } ?? AnyCancellable()
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output? == T.Output, O.Failure == Error, O.Output: Equatable {
+public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> AnyCancellable where O.Output? == T.Output, O.Failure == Error, O.Output: Equatable {
 	rhs.flatMap { lhs?.removeDuplicates().skipNil().simpleError().subscribe($0) } ?? AnyCancellable()
 }
 
 @available(iOS 13.0, macOS 10.15, *)
 @inlinable
-public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> Cancellable where O.Output? == T.Output, O.Failure == Never, O.Output: Equatable {
+public func =>><T: Publisher, O: Subject>(_ lhs: T?, _ rhs: O?) -> AnyCancellable where O.Output? == T.Output, O.Failure == Never, O.Output: Equatable {
 	rhs.flatMap { lhs?.removeDuplicates().skipNil().skipFailure().subscribe($0) } ?? AnyCancellable()
 }
 
