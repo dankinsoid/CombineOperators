@@ -16,7 +16,7 @@ public class TouchDownGestureRecognizer: UIGestureRecognizer {
 									return trigger.eraseToAnyPublisher()
                 }
 							return trigger
-								.delay(for: .init(.microseconds(Int(minimumTouchDuration * 1_000_000))), scheduler: RunLoop.main)
+								.delay(for: .microseconds(Int(minimumTouchDuration * 1_000_000)), scheduler: RunLoop.main)
 								.eraseToAnyPublisher()
             }
             .sink(receiveValue: { [unowned self] _ in
