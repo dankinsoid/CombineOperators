@@ -32,7 +32,7 @@ public final class Binder<Input>: Subscriber {
 	}
 	
 	public convenience init<Target: AnyObject>(_ target: Target, binding: @escaping (Target, Input) -> Void) {
-		self.init(target, scheduler: DispatchQueue.main, binding: binding)
+		self.init(target, scheduler: RunLoop.main, binding: binding)
 	}
 	
 	public func receive(subscription: Subscription) {

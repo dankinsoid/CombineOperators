@@ -35,7 +35,7 @@ extension ReactiveBinder: Subscriber where KP: ReferenceWritableKeyPath<Target, 
 	}
 	
 	public func receive(_ input: Input) -> Subscribers.Demand {
-		DispatchQueue.main.schedule {
+		RunLoop.main.schedule {
 			if let target = self.target {
 				target[keyPath: self.keyPath] = input
 			}
