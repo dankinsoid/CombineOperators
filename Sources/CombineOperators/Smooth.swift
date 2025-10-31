@@ -1,8 +1,34 @@
 import Foundation
 import Combine
 
+/// Animates value transitions between emissions by interpolating intermediate values.
+///
+/// The `smooth` operators split value changes into multiple emissions over time,
+/// creating smooth transitions. Specialized versions exist for `FloatingPoint` and `String` types.
 extension Publisher {
 
+	/// Animates transitions between values using a custom interpolation strategy.
+	///
+	/// Transitions occur over the specified duration at 50fps (20ms intervals).
+	/// The `condition` closure determines whether to animate a transition.
+	///
+	/// - Parameters:
+	///   - duration: Total animation duration in seconds. Default is 1 second.
+	///   - float: Extracts a numeric value from Output for interpolation.
+	///   - value: Reconstructs Output from an interpolated numeric value.
+	///   - runLoop: RunLoop for scheduling intermediate emissions. Default is `.main`.
+	///   - condition: Returns `true` if transition should animate. Default always animates.
+	///
+	/// ```swift
+	/// struct Model { var progress: Double }
+	///
+	/// publisher
+	///     .smooth(
+	///         0.5,
+	///         float: \.progress,
+	///         value: { Model(progress: $0) }
+	///     )
+	/// ```
 	public func smooth<F: FloatingPoint>(
 		_ duration: TimeInterval = 1,
 		float: @escaping (Output) -> F,
@@ -21,6 +47,17 @@ extension Publisher {
         )
 	}
 
+	/// Animates transitions with explicit control over frame rate and count.
+	///
+	/// Lower-level variant that specifies exact timing parameters instead of duration.
+	///
+	/// - Parameters:
+	///   - interval: Time between intermediate emissions.
+	///   - count: Number of intermediate values to emit.
+	///   - runLoop: RunLoop for scheduling intermediate emissions. Default is `.main`.
+	///   - float: Extracts a numeric value from Output for interpolation.
+	///   - value: Reconstructs Output from an interpolated numeric value.
+	///   - condition: Returns `true` if transition should animate. Default always animates.
 	public func smooth<F: FloatingPoint>(
         interval: TimeInterval,
         count: Int,
@@ -42,7 +79,17 @@ extension Publisher {
 			condition: condition
 		)
 	}
-	
+
+	/// Animates transitions using a custom interpolation rule.
+	///
+	/// Most flexible variant that delegates interpolation logic to the `rule` closure.
+	///
+	/// - Parameters:
+	///   - rule: Generates intermediate values between two emissions. Receives previous value, next value, and count.
+	///   - interval: Time between intermediate emissions.
+	///   - count: Number of intermediate values to generate.
+	///   - runLoop: RunLoop for scheduling intermediate emissions. Default is `.main`.
+	///   - condition: Returns `true` if transition should animate. Default always animates.
 	public func smooth(
         rule: @escaping (Output, Output, Int) -> [Output],
         interval: TimeInterval,
@@ -65,6 +112,15 @@ extension Publisher {
 			.any()
 	}
 
+	/// Animates transitions using a custom rule with duration-based timing.
+	///
+	/// Convenience variant that calculates frame count from duration at 50fps.
+	///
+	/// - Parameters:
+	///   - rule: Generates intermediate values between two emissions.
+	///   - duration: Total animation duration in seconds. Default is 1 second.
+	///   - runLoop: RunLoop for scheduling intermediate emissions. Default is `.main`.
+	///   - condition: Returns `true` if transition should animate. Default always animates.
 	public func smooth(
         rule: @escaping (Output, Output, Int) -> [Output],
         duration: TimeInterval = 1,
@@ -77,13 +133,23 @@ extension Publisher {
 	
 }
 
+/// Smooth transitions for numeric values.
 extension Publisher where Output: FloatingPoint {
 
+	/// Animates numeric transitions with linear interpolation.
+	///
+	/// Automatically removes duplicate values before animating at 50fps.
+	///
+	/// ```swift
+	/// Just(10.0)
+	///     .smooth(0.5)  // Smoothly transitions over 0.5 seconds
+	/// ```
 	public func smooth(_ duration: TimeInterval = 1, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 20 / 1000
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop)
 	}
 
+	/// Animates numeric transitions with explicit frame control.
 	public func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		removeDuplicates()
 			.smooth(
@@ -99,13 +165,27 @@ extension Publisher where Output: FloatingPoint {
 	}
 }
 
+/// Smooth transitions for text values.
+///
+/// Animates string changes by morphing characters at the prefix/suffix boundaries,
+/// creating a typing effect.
 extension Publisher where Output == String {
 
+	/// Animates string transitions character-by-character.
+	///
+	/// Preserves common prefix/suffix and morphs the middle section.
+	/// Default duration is 0.3 seconds at ~33fps (30ms intervals).
+	///
+	/// ```swift
+	/// textPublisher
+	///     .smooth(0.5)  // Smooth typing effect
+	/// ```
 	public func smooth(_ duration: TimeInterval = 0.3, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 30 / 1000
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop)
 	}
 
+	/// Animates string transitions with explicit frame control.
 	public func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		removeDuplicates()
 			.smooth(

@@ -1,30 +1,48 @@
 import Combine
 
+/// Subscription operator with automatic duplicate removal.
+///
+/// The `=>>` operator applies `removeDuplicates()` before subscribing.
+/// Does not enforce main thread delivery. For thread-safe variant, use `==>>`.
+///
+/// **Usage:**
+/// ```swift
+/// publisher =>> subscriber       // Removes consecutive duplicates
+/// publisher =>> { print($0) }    // Closure receives unique values only
+/// ```
+///
+/// - Note: Requires `Equatable` output type.
 infix operator =>> : CombinePrecedence
 
 // MARK: - Simple subscribe
 
+/// Subscribes to a publisher, removing consecutive duplicates.
 @inlinable
 public func =>><T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output, O.Failure == T.Failure {
     lhs.removeDuplicates().subscribe(rhs)
 }
 
+/// Subscribes with duplicate removal, converting failure to Error.
 @inlinable
 public func =>><T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output, O.Failure == Error {
     lhs.removeDuplicates().eraseFailure().subscribe(rhs)
 }
 
+/// Subscribes a never-failing publisher with duplicate removal.
 @inlinable
 public func =>><T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output, T.Failure == Never {
     lhs.removeDuplicates().setFailureType(to: O.Failure.self).subscribe(rhs)
 }
 
+/// Subscribes with duplicate removal, wrapping output in Optional.
 @inlinable
 public func =>><T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output?, O.Failure == T.Failure {
     lhs.removeDuplicates().optional().subscribe(rhs)
 }
 
-/// - Warning: When passing a closure that captures `self`, be sure to use a `[weak self]` capture list to avoid retain cycles or wrap the closure in a `Binder` subscriber.
+/// Subscribes with a closure, removing duplicates first.
+///
+/// - Warning: Use `[weak self]` capture list to avoid retain cycles, or wrap in `Binder`.
 @inlinable
 public func =>><O: Publisher>(_ lhs: O, _ rhs: @escaping (O.Output) -> Void) -> AnyCancellable where O.Output: Equatable {
     lhs.removeDuplicates().sink(receiveCompletion: { _ in }, receiveValue: rhs)
