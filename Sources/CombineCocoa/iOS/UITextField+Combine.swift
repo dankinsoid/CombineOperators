@@ -1,17 +1,9 @@
-//
-//  UITextField+Combine.swift
-//  CombineCocoa
-//
-//  Created by Krunoslav Zaher on 2/21/15.
-//  Copyright © 2015 Krunoslav Zaher. All rights reserved.
-//
-
 #if os(iOS) || os(tvOS)
 
 import Combine
 import UIKit
 
-extension Reactive where Base: UITextField {
+public extension Reactive where Base: UITextField {
 	/// Bidirectional binding for text field's `text` property.
 	///
 	/// Setter preserves IME marked text selection by checking before assignment.
@@ -22,8 +14,8 @@ extension Reactive where Base: UITextField {
 	///
 	/// publisher.subscribe(textField.cb.text) // Bind to text field
 	/// ```
-	public var text: ControlProperty<String?> {
-		return base.cb.controlPropertyWithDefaultEvents(
+	var text: ControlProperty<String?> {
+		base.cb.controlPropertyWithDefaultEvents(
 			getter: { textField in
 				textField.text
 			},
@@ -41,8 +33,8 @@ extension Reactive where Base: UITextField {
 	/// Bidirectional binding for text field's `attributedText` property.
 	///
 	/// Setter preserves IME marked text selection by checking before assignment.
-	public var attributedText: ControlProperty<NSAttributedString?> {
-		return base.cb.controlPropertyWithDefaultEvents(
+	var attributedText: ControlProperty<NSAttributedString?> {
+		base.cb.controlPropertyWithDefaultEvents(
 			getter: { textField in
 				textField.attributedText
 			},

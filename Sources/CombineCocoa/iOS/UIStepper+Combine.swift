@@ -1,21 +1,20 @@
 #if os(iOS)
 
-import UIKit
 import Combine
+import UIKit
 
-extension Reactive where Base: UIStepper {
+public extension Reactive where Base: UIStepper {
 
 	/// Bidirectional binding for stepper's `value` property.
-	public var value: ControlProperty<Double> {
-        return base.cb.controlPropertyWithDefaultEvents(
-            getter: { stepper in
-                stepper.value
-            }, setter: { stepper, value in
-                stepper.value = value
-            }
-        )
-    }
+	var value: ControlProperty<Double> {
+		base.cb.controlPropertyWithDefaultEvents(
+			getter: { stepper in
+				stepper.value
+			}, setter: { stepper, value in
+				stepper.value = value
+			}
+		)
+	}
 }
 
 #endif
-

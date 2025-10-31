@@ -1,5 +1,3 @@
-// Copyright (c) CombineSwiftCommunity
-
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -24,35 +22,35 @@ import ObjectiveC
 public typealias Configuration<Gesture: CombineGestureRecognizer> = (Gesture, GenericRxGestureRecognizerDelegate<Gesture>) -> Void
 
 public struct Factory<Gesture: CombineGestureRecognizer> {
-    public let gesture: Gesture
-    public init(_ configuration: Configuration<Gesture>?) {
-        let gesture = Gesture()
-        let delegate = GenericRxGestureRecognizerDelegate<Gesture>()
-        objc_setAssociatedObject(
-            gesture,
-            &gestureRecognizerStrongDelegateKey,
-            delegate,
-            .OBJC_ASSOCIATION_RETAIN_NONATOMIC
-        )
-        gesture.delegate = delegate
-        configuration?(gesture, delegate)
-        self.gesture = gesture
-    }
+	public let gesture: Gesture
+	public init(_ configuration: Configuration<Gesture>?) {
+		let gesture = Gesture()
+		let delegate = GenericRxGestureRecognizerDelegate<Gesture>()
+		objc_setAssociatedObject(
+			gesture,
+			&gestureRecognizerStrongDelegateKey,
+			delegate,
+			.OBJC_ASSOCIATION_RETAIN_NONATOMIC
+		)
+		gesture.delegate = delegate
+		configuration?(gesture, delegate)
+		self.gesture = gesture
+	}
 
-    internal func abstracted() -> AnyFactory {
-        AnyFactory(self.gesture)
-    }
+	func abstracted() -> AnyFactory {
+		AnyFactory(gesture)
+	}
 }
 
-internal func make<G>(configuration: Configuration<G>? = nil) -> Factory<G> {
-    Factory<G>(configuration)
+func make<G>(configuration: Configuration<G>? = nil) -> Factory<G> {
+	Factory<G>(configuration)
 }
 
 public typealias AnyFactory = Factory<CombineGestureRecognizer>
 extension Factory where Gesture == CombineGestureRecognizer {
-    private init<G: CombineGestureRecognizer>(_ gesture: G) {
-        self.gesture = gesture
-    }
+	private init<G: CombineGestureRecognizer>(_ gesture: G) {
+		self.gesture = gesture
+	}
 }
 
 private var gestureRecognizerStrongDelegateKey: UInt8 = 0

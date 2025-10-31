@@ -1,11 +1,11 @@
-import Foundation
 import Combine
+import Foundation
 
 /// Animates value transitions between emissions by interpolating intermediate values.
 ///
 /// The `smooth` operators split value changes into multiple emissions over time,
 /// creating smooth transitions. Specialized versions exist for `FloatingPoint` and `String` types.
-extension Publisher {
+public extension Publisher {
 
 	/// Animates transitions between values using a custom interpolation strategy.
 	///
@@ -29,7 +29,7 @@ extension Publisher {
 	///         value: { Model(progress: $0) }
 	///     )
 	/// ```
-	public func smooth<F: FloatingPoint>(
+	func smooth<F: FloatingPoint>(
 		_ duration: TimeInterval = 1,
 		float: @escaping (Output) -> F,
 		value: @escaping (F, Output) -> Output,
@@ -38,13 +38,13 @@ extension Publisher {
 	) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 20.0 / 1000
 		return smooth(
-            interval: interval,
-            count: Int(duration / interval),
-            runLoop: runLoop,
-            float: float,
-            value: value,
-            condition: condition
-        )
+			interval: interval,
+			count: Int(duration / interval),
+			runLoop: runLoop,
+			float: float,
+			value: value,
+			condition: condition
+		)
 	}
 
 	/// Animates transitions with explicit control over frame rate and count.
@@ -58,19 +58,19 @@ extension Publisher {
 	///   - float: Extracts a numeric value from Output for interpolation.
 	///   - value: Reconstructs Output from an interpolated numeric value.
 	///   - condition: Returns `true` if transition should animate. Default always animates.
-	public func smooth<F: FloatingPoint>(
-        interval: TimeInterval,
-        count: Int,
-        runLoop: RunLoop = .main,
-        float: @escaping (Output) -> F,
-        value: @escaping (F, Output) -> Output,
-        condition: @escaping (Output, Output) -> Bool = { _, _ in true }
-    ) -> AnyPublisher<Output, Failure> {
+	func smooth<F: FloatingPoint>(
+		interval: TimeInterval,
+		count: Int,
+		runLoop: RunLoop = .main,
+		float: @escaping (Output) -> F,
+		value: @escaping (F, Output) -> Output,
+		condition: @escaping (Output, Output) -> Bool = { _, _ in true }
+	) -> AnyPublisher<Output, Failure> {
 		smooth(
 			rule: { f, s, count in
 				let (first, second) = (float(f), float(s))
 				let isGrow = first < second
-				let range = isGrow ? first...second : second...first
+				let range = isGrow ? first ... second : second ... first
 				return (isGrow ? range.split(count: count) : range.split(count: count).reversed()).map { value($0, s) }
 			},
 			interval: interval,
@@ -90,20 +90,20 @@ extension Publisher {
 	///   - count: Number of intermediate values to generate.
 	///   - runLoop: RunLoop for scheduling intermediate emissions. Default is `.main`.
 	///   - condition: Returns `true` if transition should animate. Default always animates.
-	public func smooth(
-        rule: @escaping (Output, Output, Int) -> [Output],
-        interval: TimeInterval,
-        count: Int,
-        runLoop: RunLoop = .main,
-        condition: @escaping (Output, Output) -> Bool = { _, _ in true }
-    ) -> AnyPublisher<Output, Failure> {
+	func smooth(
+		rule: @escaping (Output, Output, Int) -> [Output],
+		interval: TimeInterval,
+		count: Int,
+		runLoop: RunLoop = .main,
+		condition: @escaping (Output, Output) -> Bool = { _, _ in true }
+	) -> AnyPublisher<Output, Failure> {
 		scan([]) { $0.suffix(1) + [$1] }
 			.flatMap { (list: [Output]) -> AnyPublisher<Output, Failure> in
 				guard list.count == 2 else { return Just(list[0]).setFailureType(to: Failure.self).eraseToAnyPublisher() }
 				guard condition(list[0], list[1]) else { return Just(list[1]).setFailureType(to: Failure.self).eraseToAnyPublisher() }
 				let array = rule(list[0], list[1], count)
 				return Timer.TimerPublisher(interval: interval, runLoop: runLoop, mode: .default)
-                    .autoconnect()
+					.autoconnect()
 					.zip(Publishers.Sequence(sequence: array))
 					.map { $0.1 }
 					.setFailureType(to: Failure.self)
@@ -121,20 +121,19 @@ extension Publisher {
 	///   - duration: Total animation duration in seconds. Default is 1 second.
 	///   - runLoop: RunLoop for scheduling intermediate emissions. Default is `.main`.
 	///   - condition: Returns `true` if transition should animate. Default always animates.
-	public func smooth(
-        rule: @escaping (Output, Output, Int) -> [Output],
-        duration: TimeInterval = 1,
-        runLoop: RunLoop = .main,
-        condition: @escaping (Output, Output) -> Bool = { _, _ in true }
-    ) -> AnyPublisher<Output, Failure> {
+	func smooth(
+		rule: @escaping (Output, Output, Int) -> [Output],
+		duration: TimeInterval = 1,
+		runLoop: RunLoop = .main,
+		condition: @escaping (Output, Output) -> Bool = { _, _ in true }
+	) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 20.0 / 1000
 		return smooth(rule: rule, interval: interval, count: Int(duration / interval), runLoop: runLoop, condition: condition)
 	}
-	
 }
 
 /// Smooth transitions for numeric values.
-extension Publisher where Output: FloatingPoint {
+public extension Publisher where Output: FloatingPoint {
 
 	/// Animates numeric transitions with linear interpolation.
 	///
@@ -144,18 +143,18 @@ extension Publisher where Output: FloatingPoint {
 	/// Just(10.0)
 	///     .smooth(0.5)  // Smoothly transitions over 0.5 seconds
 	/// ```
-	public func smooth(_ duration: TimeInterval = 1, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
+	func smooth(_ duration: TimeInterval = 1, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 20 / 1000
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop)
 	}
 
 	/// Animates numeric transitions with explicit frame control.
-	public func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
+	func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		removeDuplicates()
 			.smooth(
 				rule: {
 					let isGrow = $0 < $1
-					let range = isGrow ? $0...$1 : $1...$0
+					let range = isGrow ? $0 ... $1 : $1 ... $0
 					return isGrow ? range.split(count: $2) : range.split(count: $2).reversed()
 				},
 				interval: interval,
@@ -169,7 +168,7 @@ extension Publisher where Output: FloatingPoint {
 ///
 /// Animates string changes by morphing characters at the prefix/suffix boundaries,
 /// creating a typing effect.
-extension Publisher where Output == String {
+public extension Publisher where Output == String {
 
 	/// Animates string transitions character-by-character.
 	///
@@ -180,13 +179,13 @@ extension Publisher where Output == String {
 	/// textPublisher
 	///     .smooth(0.5)  // Smooth typing effect
 	/// ```
-	public func smooth(_ duration: TimeInterval = 0.3, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
+	func smooth(_ duration: TimeInterval = 0.3, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 30 / 1000
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop)
 	}
 
 	/// Animates string transitions with explicit frame control.
-	public func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
+	func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		removeDuplicates()
 			.smooth(
 				rule: {
@@ -212,11 +211,11 @@ extension String {
 		var result = [self]
 		let commonPr = commonPrefix(with: to)
 		let commonSfCount = max(0, min(commonSuffix(with: to).count, min(self.count, to.count) - commonPr.count))
-		for i in commonPr.count..<(max(self.count, to.count) - commonSfCount) {
+		for i in commonPr.count ..< (max(self.count, to.count) - commonSfCount) {
 			var last = result[result.count - 1]
 			if i < last.count, i < to.count {
 				let index = last.index(last.startIndex, offsetBy: i)
-				last.replaceSubrange(index..<last.index(after: index), with: [to[to.index(to.startIndex, offsetBy: i)]])
+				last.replaceSubrange(index ..< last.index(after: index), with: [to[to.index(to.startIndex, offsetBy: i)]])
 			} else if i < to.count {
 				last.append(to[to.index(to.startIndex, offsetBy: i)])
 			} else if i < last.count {
@@ -225,13 +224,13 @@ extension String {
 			result.append(last)
 		}
 		if result.count < count {
-			for _ in 0..<(count - result.count) {
-				let i = Int.random(in: 0..<result.count)
+			for _ in 0 ..< (count - result.count) {
+				let i = Int.random(in: 0 ..< result.count)
 				result.insert(result[i], at: i)
 			}
 		} else if count < result.count {
-			for _ in 0..<(result.count - count) {
-				result.remove(at: .random(in: 0..<result.count))
+			for _ in 0 ..< (result.count - count) {
+				result.remove(at: .random(in: 0 ..< result.count))
 			}
 		}
 		result[result.count - 1] = to
@@ -253,11 +252,11 @@ extension String {
 
 extension ClosedRange where Bound: FloatingPoint {
 
-    func split(count: Int) -> [Bound] {
+	func split(count: Int) -> [Bound] {
 		guard count > 2 else { return [lowerBound, upperBound].suffix(count) }
 		var result: [Bound] = [lowerBound]
 		let delta = (upperBound - lowerBound) / Bound(count)
-		for _ in 2..<count {
+		for _ in 2 ..< count {
 			result.append(result[result.count - 1] + delta)
 		}
 		result.append(upperBound)
@@ -265,9 +264,9 @@ extension ClosedRange where Bound: FloatingPoint {
 	}
 }
 
-extension Timer.TimerPublisher {
+public extension Timer.TimerPublisher {
 
-	public convenience init(_ interval: TimeInterval, tolerance: TimeInterval? = nil, runLoop: RunLoop = .current, mode: RunLoop.Mode = .default, options: RunLoop.SchedulerOptions? = nil) {
+	convenience init(_ interval: TimeInterval, tolerance: TimeInterval? = nil, runLoop: RunLoop = .current, mode: RunLoop.Mode = .default, options: RunLoop.SchedulerOptions? = nil) {
 		self.init(interval: interval, tolerance: tolerance, runLoop: runLoop, mode: mode, options: options)
 	}
 }

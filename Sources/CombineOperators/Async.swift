@@ -8,20 +8,20 @@ public extension Publishers {
 	/// Creates a publisher that executes an async operation and delivers results
 	/// on the main thread. Useful for integrating modern async APIs with Combine-based code.
 	struct Async<Output, Failure: Error>: Publisher {
-		
+
 		private let operation: ((Output) -> Void) async -> Result<Void, Failure>
-		
+
 		public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
 			let subscription = AsyncSubscription(subscriber: subscriber, operation: operation)
 			subscriber.receive(subscription: subscription)
 		}
-		
+
 		private final class AsyncSubscription<S: Subscriber>: Subscription where Failure == S.Failure, Output == S.Input {
-			
+
 			private var subscriber: S?
 			private var operation: ((Output) -> Void) async -> Result<Void, Failure>
 			private let lock = NSLock()
-			
+
 			init(
 				subscriber: S,
 				operation: @escaping ((Output) -> Void) async -> Result<Void, Failure>
@@ -29,23 +29,23 @@ public extension Publishers {
 				self.subscriber = subscriber
 				self.operation = operation
 			}
-			
+
 			func request(_ demand: Subscribers.Demand) {
 				Task {
 					let result = await operation { [weak self] output in
-						guard let self = self else { return }
-						
+						guard let self else { return }
+
 						let localSubscriber = self.lock.withLock { self.subscriber }
-						
+
 						if let subscriber = localSubscriber {
 							onMainIfNeeded {
 								_ = subscriber.receive(output)
 							}
 						}
 					}
-					
+
 					self.cancel()
-					
+
 					switch result {
 					case .success:
 						let finalSubscriber = lock.withLock { self.subscriber }
@@ -60,7 +60,7 @@ public extension Publishers {
 					}
 				}
 			}
-			
+
 			func cancel() {
 				lock.lock()
 				subscriber = nil

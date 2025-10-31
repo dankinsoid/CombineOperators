@@ -1,5 +1,3 @@
-// Copyright (c) CombineSwiftCommunity
-
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -20,46 +18,46 @@
 
 #if canImport(UIKit)
 
-import UIKit
 import Combine
+import UIKit
 
 public typealias RotationConfiguration = Configuration<UIRotationGestureRecognizer>
 public typealias RotationControlEvent = ControlEvent<UIRotationGestureRecognizer>
 public typealias RotationPublisher = AnyPublisher<UIRotationGestureRecognizer, Never>
 
-extension Factory where Gesture == CombineGestureRecognizer {
+public extension Factory where Gesture == CombineGestureRecognizer {
 
-    /**
-     Returns an `AnyFactory` for `UIRotationGestureRecognizer`
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public static func rotation(configuration: RotationConfiguration? = nil) -> AnyFactory {
-        make(configuration: configuration).abstracted()
-    }
+	/**
+	 Returns an `AnyFactory` for `UIRotationGestureRecognizer`
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	static func rotation(configuration: RotationConfiguration? = nil) -> AnyFactory {
+		make(configuration: configuration).abstracted()
+	}
 }
 
-extension Reactive where Base: CombineGestureView {
+public extension Reactive where Base: CombineGestureView {
 
-    /**
-     Returns an observable `UIRotationGestureRecognizer` events sequence
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public func rotationGesture(configuration: RotationConfiguration? = nil) -> RotationControlEvent {
-        gesture(make(configuration: configuration))
-    }
+	/**
+	 Returns an observable `UIRotationGestureRecognizer` events sequence
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	func rotationGesture(configuration: RotationConfiguration? = nil) -> RotationControlEvent {
+		gesture(make(configuration: configuration))
+	}
 }
 
-extension Publisher where Output: UIRotationGestureRecognizer {
+public extension Publisher where Output: UIRotationGestureRecognizer {
 
-    /**
-     Maps the observable `GestureRecognizer` events sequence to an observable sequence of rotation values of the gesture in radians alongside the gesture velocity.
-     */
-    public func asRotation() -> AnyPublisher<(rotation: CGFloat, velocity: CGFloat), Failure> {
-        self.map { gesture in
-            (gesture.rotation, gesture.velocity)
-        }
-				.eraseToAnyPublisher()
-    }
+	/**
+	 Maps the observable `GestureRecognizer` events sequence to an observable sequence of rotation values of the gesture in radians alongside the gesture velocity.
+	 */
+	func asRotation() -> AnyPublisher<(rotation: CGFloat, velocity: CGFloat), Failure> {
+		map { gesture in
+			(gesture.rotation, gesture.velocity)
+		}
+		.eraseToAnyPublisher()
+	}
 }
 
 #endif

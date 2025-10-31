@@ -1,28 +1,28 @@
-import Foundation
 import Combine
+import Foundation
 
-extension Publisher {
+public extension Publisher {
 
-    /// Emits values at regular intervals.
-    ///
-    /// Combines publisher with timer, emitting original values at specified rate.
-    public func interval(_ period: TimeInterval, runLoop: RunLoop = .main) -> AnyPublisher<Output, Never> {
-        skipFailure()
-            .zip(
-                Timer.TimerPublisher(interval: period, runLoop: runLoop, mode: .default)
-                    .autoconnect()
-                    .prepend(Date())
-            )
-            .map { $0.0 }
-            .eraseToAnyPublisher()
-    }
+	/// Emits values at regular intervals.
+	///
+	/// Combines publisher with timer, emitting original values at specified rate.
+	func interval(_ period: TimeInterval, runLoop: RunLoop = .main) -> AnyPublisher<Output, Never> {
+		skipFailure()
+			.zip(
+				Timer.TimerPublisher(interval: period, runLoop: runLoop, mode: .default)
+					.autoconnect()
+					.prepend(Date())
+			)
+			.map { $0.0 }
+			.eraseToAnyPublisher()
+	}
 
 	/// Emits tuples of (previous, current) values with initial value.
 	///
 	/// ```swift
 	/// numbers.withLast(initial: 0)  // (0,1), (1,2), (2,3)
 	/// ```
-	public func withLast(initial value: Output) -> Publishers.Scan<Self, (previous: Output, current: Output)> {
+	func withLast(initial value: Output) -> Publishers.Scan<Self, (previous: Output, current: Output)> {
 		scan((value, value)) { ($0.1, $1) }
 	}
 
@@ -31,7 +31,7 @@ extension Publisher {
 	/// ```swift
 	/// numbers.withLast()  // (nil,1), (1,2), (2,3)
 	/// ```
-	public func withLast() -> Publishers.WithLast<Self> {
+	func withLast() -> Publishers.WithLast<Self> {
 		scan((nil, nil)) { ($0.1, $1) }.map { ($0.0, $0.1!) }
 	}
 
@@ -40,13 +40,13 @@ extension Publisher {
 	/// ```swift
 	/// buttonTap.value("clicked")  // emits "clicked" for each tap
 	/// ```
-	public func value<T>(_ value: T) -> Publishers.Map<Self, T> {
+	func value<T>(_ value: T) -> Publishers.Map<Self, T> {
 		map { _ in value }
 	}
 
 	/// Shorthand for `eraseToAnyPublisher()`.
 	@inlinable
-	public func any() -> AnyPublisher<Output, Failure> {
+	func any() -> AnyPublisher<Output, Failure> {
 		eraseToAnyPublisher()
 	}
 
@@ -55,7 +55,7 @@ extension Publisher {
 	/// ```swift
 	/// publisher.append(1, 2, 3)
 	/// ```
-	public func append(_ values: Output...) -> Publishers.Concatenate<Self, Publishers.Sequence<[Output], Failure>> {
+	func append(_ values: Output...) -> Publishers.Concatenate<Self, Publishers.Sequence<[Output], Failure>> {
 		append(Publishers.Sequence(sequence: values))
 	}
 
@@ -64,7 +64,7 @@ extension Publisher {
 	/// ```swift
 	/// users.andIsSame(\.id)  // (user, didIdChange: Bool)
 	/// ```
-	public func andIsSame<T: Equatable>(_ keyPath: KeyPath<Output, T>) -> Publishers.Map<Publishers.WithLast<Self>, (Self.Output, Bool)> {
+	func andIsSame<T: Equatable>(_ keyPath: KeyPath<Output, T>) -> Publishers.Map<Publishers.WithLast<Self>, (Self.Output, Bool)> {
 		withLast().map {
 			($0.1, $0.0?[keyPath: keyPath] == $0.1[keyPath: keyPath])
 		}

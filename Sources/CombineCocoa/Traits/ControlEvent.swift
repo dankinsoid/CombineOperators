@@ -1,11 +1,11 @@
-import Foundation
 import Combine
+import Foundation
 
 /// A protocol that extends `ControlEvent`.
 public protocol ControlEventType: Publisher {
 
-    /// - returns: `ControlEvent` interface
-    func asControlEvent() -> ControlEvent<Output>
+	/// - returns: `ControlEvent` interface
+	func asControlEvent() -> ControlEvent<Output>
 }
 
 /// Publisher trait representing UI control events (button taps, value changes, etc.).
@@ -23,24 +23,24 @@ public protocol ControlEventType: Publisher {
 ///
 /// **Warning:** Only use this trait if your publisher satisfies all properties above.
 public struct ControlEvent<PropertyType>: ControlEventType {
-	
+
 	public typealias Failure = Never
-    public typealias Output = PropertyType
+	public typealias Output = PropertyType
 
-    let events: AnyPublisher<PropertyType, Failure>
+	let events: AnyPublisher<PropertyType, Failure>
 
-    /// Initializes control event with a observable sequence that represents events.
-    ///
-    /// - parameter events: Publisher sequence that represents events.
-    /// - returns: Control event created with a observable sequence of events.
+	/// Initializes control event with a observable sequence that represents events.
+	///
+	/// - parameter events: Publisher sequence that represents events.
+	/// - returns: Control event created with a observable sequence of events.
 	public init<Ev: Publisher>(events: Ev) where Ev.Output == Output {
-		self.events = events.catch({_ in Empty() }).eraseToAnyPublisher()
+		self.events = events.catch { _ in Empty() }.eraseToAnyPublisher()
 	}
 
 	public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, PropertyType == S.Input {
 		events.receive(subscriber: subscriber)
 	}
-	
+
 	public func asControlEvent() -> ControlEvent<PropertyType> {
 		self
 	}

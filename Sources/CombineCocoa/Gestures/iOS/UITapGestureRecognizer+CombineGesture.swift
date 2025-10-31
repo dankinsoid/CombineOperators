@@ -1,5 +1,3 @@
-// Copyright (c) CombineSwiftCommunity
-
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -20,33 +18,33 @@
 
 #if canImport(UIKit)
 
-import UIKit
 import Combine
+import UIKit
 
 public typealias TapConfiguration = Configuration<UITapGestureRecognizer>
 public typealias TapControlEvent = ControlEvent<UITapGestureRecognizer>
 public typealias TapPublisher = AnyPublisher<UITapGestureRecognizer, Never>
 
-extension Factory where Gesture == CombineGestureRecognizer {
+public extension Factory where Gesture == CombineGestureRecognizer {
 
-    /**
-     Returns an `AnyFactory` for `UITapGestureRecognizer`
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public static func tap(configuration: TapConfiguration? = nil) -> AnyFactory {
-        make(configuration: configuration).abstracted()
-    }
+	/**
+	 Returns an `AnyFactory` for `UITapGestureRecognizer`
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	static func tap(configuration: TapConfiguration? = nil) -> AnyFactory {
+		make(configuration: configuration).abstracted()
+	}
 }
 
-extension Reactive where Base: CombineGestureView {
+public extension Reactive where Base: CombineGestureView {
 
-    /**
-     Returns an observable `UITapGestureRecognizer` events sequence
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public func tapGesture(configuration: TapConfiguration? = nil) -> TapControlEvent {
-        gesture(make(configuration: configuration))
-    }
+	/**
+	 Returns an observable `UITapGestureRecognizer` events sequence
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	func tapGesture(configuration: TapConfiguration? = nil) -> TapControlEvent {
+		gesture(make(configuration: configuration))
+	}
 }
 
 #endif

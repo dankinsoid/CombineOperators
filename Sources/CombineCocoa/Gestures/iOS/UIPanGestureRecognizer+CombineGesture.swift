@@ -1,5 +1,3 @@
-// Copyright (c) CombineSwiftCommunity
-
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -20,52 +18,52 @@
 
 #if canImport(UIKit)
 
-import UIKit
 import Combine
+import UIKit
 
 public typealias PanConfiguration = Configuration<UIPanGestureRecognizer>
 public typealias PanControlEvent = ControlEvent<UIPanGestureRecognizer>
 public typealias PanPublisher = AnyPublisher<UIPanGestureRecognizer, Never>
 
-extension Factory where Gesture == CombineGestureRecognizer {
+public extension Factory where Gesture == CombineGestureRecognizer {
 
-    /**
-     Returns an `AnyFactory` for `UIPanGestureRecognizer`
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public static func pan(configuration: PanConfiguration? = nil) -> AnyFactory {
-        make(configuration: configuration).abstracted()
-    }
+	/**
+	 Returns an `AnyFactory` for `UIPanGestureRecognizer`
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	static func pan(configuration: PanConfiguration? = nil) -> AnyFactory {
+		make(configuration: configuration).abstracted()
+	}
 }
 
-extension Reactive where Base: CombineGestureView {
+public extension Reactive where Base: CombineGestureView {
 
-    /**
-     Returns an observable `UIPanGestureRecognizer` events sequence
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public func panGesture(configuration: PanConfiguration? = nil) -> PanControlEvent {
-        gesture(make(configuration: configuration))
-    }
+	/**
+	 Returns an observable `UIPanGestureRecognizer` events sequence
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	func panGesture(configuration: PanConfiguration? = nil) -> PanControlEvent {
+		gesture(make(configuration: configuration))
+	}
 }
 
-extension Publisher where Output: UIPanGestureRecognizer {
+public extension Publisher where Output: UIPanGestureRecognizer {
 
-    /**
-     Maps the observable `GestureRecognizer` events sequence to an observable sequence of translation values of the pan gesture in the coordinate system of the specified `view` alongside the gesture velocity.
+	/**
+	 Maps the observable `GestureRecognizer` events sequence to an observable sequence of translation values of the pan gesture in the coordinate system of the specified `view` alongside the gesture velocity.
 
-     - parameter view: A `TargetView` value on which the gesture took place.
-     */
-    public func asTranslation(in view: TargetView = .view) -> AnyPublisher<(translation: CGPoint, velocity: CGPoint), Failure> {
-        self.map { gesture in
-            let view = view.targetView(for: gesture)
-            return (
-                gesture.translation(in: view),
-                gesture.velocity(in: view)
-            )
-        }
-				.eraseToAnyPublisher()
-    }
+	 - parameter view: A `TargetView` value on which the gesture took place.
+	 */
+	func asTranslation(in view: TargetView = .view) -> AnyPublisher<(translation: CGPoint, velocity: CGPoint), Failure> {
+		map { gesture in
+			let view = view.targetView(for: gesture)
+			return (
+				gesture.translation(in: view),
+				gesture.velocity(in: view)
+			)
+		}
+		.eraseToAnyPublisher()
+	}
 }
 
 #endif

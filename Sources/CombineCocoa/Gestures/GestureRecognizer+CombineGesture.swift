@@ -1,5 +1,3 @@
-// Copyright (c) CombineSwiftCommunity
-
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -23,55 +21,54 @@ import struct CoreGraphics.CGPoint
 
 public typealias LocationInView = (CombineGestureView) -> CGPoint
 
-extension Publisher where Output: CombineGestureRecognizer {
+public extension Publisher where Output: CombineGestureRecognizer {
 
-    /**
-     Filters the observable `GestureRecognizer` events sequence based on the `GestureRecognizer` state.
+	/**
+	 Filters the observable `GestureRecognizer` events sequence based on the `GestureRecognizer` state.
 
-     - parameter state: An `GestureRecognizerState` that is used to filter the `GestureRecognizer` events sequence.
-     - returns: An observable `GestureRecognizer` events sequence that only contains events emitted while the `GestureRecognizer`'s state match the given `state`.
-     */
-    public func when(_ states: CombineGestureRecognizerState...) -> AnyPublisher<Output, Failure> {
-        filter { gesture in
-            states.contains(gesture.state)
-        }
-				.eraseToAnyPublisher()
-    }
+	 - parameter state: An `GestureRecognizerState` that is used to filter the `GestureRecognizer` events sequence.
+	 - returns: An observable `GestureRecognizer` events sequence that only contains events emitted while the `GestureRecognizer`'s state match the given `state`.
+	 */
+	func when(_ states: CombineGestureRecognizerState...) -> AnyPublisher<Output, Failure> {
+		filter { gesture in
+			states.contains(gesture.state)
+		}
+		.eraseToAnyPublisher()
+	}
 
-    /**
-     Filters the observable `GestureRecognizer` events sequence based on the `GestureRecognizer` state.
+	/**
+	 Filters the observable `GestureRecognizer` events sequence based on the `GestureRecognizer` state.
 
-     - parameter state: An `GestureRecognizerState` that is used to filter the `GestureRecognizer` events sequence.
-     - returns: An observable `GestureRecognizer` events sequence that only contains events emitted while the `GestureRecognizer`'s state match the given `state`.
-     */
-    internal func when(_ states: [CombineGestureRecognizerState]) -> AnyPublisher<Output, Failure> {
-        filter { gesture in
-            states.contains(gesture.state)
-        }
-				.eraseToAnyPublisher()
-    }
+	 - parameter state: An `GestureRecognizerState` that is used to filter the `GestureRecognizer` events sequence.
+	 - returns: An observable `GestureRecognizer` events sequence that only contains events emitted while the `GestureRecognizer`'s state match the given `state`.
+	 */
+	internal func when(_ states: [CombineGestureRecognizerState]) -> AnyPublisher<Output, Failure> {
+		filter { gesture in
+			states.contains(gesture.state)
+		}
+		.eraseToAnyPublisher()
+	}
 
-    /**
-     Maps the observable `GestureRecognizer` events sequence to an observable sequence of points computed as the location in the given `view` of the gesture.
+	/**
+	 Maps the observable `GestureRecognizer` events sequence to an observable sequence of points computed as the location in the given `view` of the gesture.
 
-     - parameter view: A `TargetView` value on which the gesture took place.
-     */
-    public func asLocation(in view: TargetView = .view) -> AnyPublisher<CombineGesturePoint, Failure> {
-        map { gesture in
-            gesture.location(in: view.targetView(for: gesture))
-        }
-				.eraseToAnyPublisher()
-    }
+	 - parameter view: A `TargetView` value on which the gesture took place.
+	 */
+	func asLocation(in view: TargetView = .view) -> AnyPublisher<CombineGesturePoint, Failure> {
+		map { gesture in
+			gesture.location(in: view.targetView(for: gesture))
+		}
+		.eraseToAnyPublisher()
+	}
 
-    public func asLocationInView() -> AnyPublisher<LocationInView, Failure> {
-        map { gesture in
-            let targetView = gesture.view!
-            let location = gesture.location(in: targetView)
-            return { view in
-                targetView.convert(location, to: view)
-            }
-        }
-				.eraseToAnyPublisher()
-    }
-
+	func asLocationInView() -> AnyPublisher<LocationInView, Failure> {
+		map { gesture in
+			let targetView = gesture.view!
+			let location = gesture.location(in: targetView)
+			return { view in
+				targetView.convert(location, to: view)
+			}
+		}
+		.eraseToAnyPublisher()
+	}
 }

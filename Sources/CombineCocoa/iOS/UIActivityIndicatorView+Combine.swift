@@ -1,27 +1,19 @@
-//
-//  UIActivityIndicatorView+Combine.swift
-//  CombineCocoa
-//
-//  Created by Ivan Persidskiy on 02/12/15.
-//  Copyright © 2015 Krunoslav Zaher. All rights reserved.
-//
-
 #if os(iOS) || os(tvOS)
 
-import UIKit
 import Combine
+import UIKit
 
-extension Reactive where Base: UIActivityIndicatorView {
+public extension Reactive where Base: UIActivityIndicatorView {
 	/// Binds to animation state (calls `startAnimating()`/`stopAnimating()`).
-	public var isAnimating: Binder<Bool> {
-        Binder(self.base) { activityIndicator, active in
-            if active {
-                activityIndicator.startAnimating()
-            } else {
-                activityIndicator.stopAnimating()
-            }
-        }
-    }
+	var isAnimating: Binder<Bool> {
+		Binder(base) { activityIndicator, active in
+			if active {
+				activityIndicator.startAnimating()
+			} else {
+				activityIndicator.stopAnimating()
+			}
+		}
+	}
 }
 
 #endif

@@ -1,4 +1,4 @@
-/**
+/* 
  Use `Reactive` proxy as customization point for constrained protocol extensions.
 
  General pattern would be:
@@ -20,25 +20,25 @@ import CombineOperators
 @dynamicMemberLookup
 public struct Reactive<Base> {
 
-    /// Base object to extend.
-    public let base: Base
+	/// Base object to extend.
+	public let base: Base
 
-    /// Creates extensions with base object.
-    ///
-    /// - parameter base: Base object.
-    public init(_ base: Base) {
-        self.base = base
-    }
+	/// Creates extensions with base object.
+	///
+	/// - parameter base: Base object.
+	public init(_ base: Base) {
+		self.base = base
+	}
 }
 
-extension Reactive where Base: AnyObject {
+public extension Reactive where Base: AnyObject {
 
 	/// Synthesizes binder for read-only property access via dynamic member lookup.
 	///
 	/// ```swift
 	/// label.cb.text // Returns ReactiveBinder<UILabel, String?, KeyPath<...>>
 	/// ```
-	public subscript<T>(dynamicMember keyPath: KeyPath<Base, T>) -> ReactiveBinder<Base, T, KeyPath<Base, T>> {
+	subscript<T>(dynamicMember keyPath: KeyPath<Base, T>) -> ReactiveBinder<Base, T, KeyPath<Base, T>> {
 		ReactiveBinder<Base, T, KeyPath<Base, T>>(base, keyPath: keyPath)
 	}
 
@@ -48,7 +48,7 @@ extension Reactive where Base: AnyObject {
 	/// ```swift
 	/// publisher.subscribe(label.cb.text) // Binds publisher output to label.text
 	/// ```
-	public subscript<T>(dynamicMember keyPath: ReferenceWritableKeyPath<Base, T>) -> ReactiveBinder<Base, T, ReferenceWritableKeyPath<Base, T>> {
+	subscript<T>(dynamicMember keyPath: ReferenceWritableKeyPath<Base, T>) -> ReactiveBinder<Base, T, ReferenceWritableKeyPath<Base, T>> {
 		ReactiveBinder<Base, T, ReferenceWritableKeyPath<Base, T>>(base, keyPath: keyPath)
 	}
 }
@@ -58,31 +58,31 @@ extension Reactive where Base: AnyObject {
 /// Conform to this protocol to add reactive capabilities to your types.
 public protocol ReactiveCompatible {
 
-    /// Extended type
-    associatedtype ReactiveBase
+	/// Extended type
+	associatedtype ReactiveBase
 
-    /// Reactive extensions namespace (type-level).
-    static var cb: Reactive<ReactiveBase>.Type { get set }
+	/// Reactive extensions namespace (type-level).
+	static var cb: Reactive<ReactiveBase>.Type { get set }
 
-    /// Reactive extensions namespace (instance-level).
-    var cb: Reactive<ReactiveBase> { get set }
+	/// Reactive extensions namespace (instance-level).
+	var cb: Reactive<ReactiveBase> { get set }
 }
 
-extension ReactiveCompatible {
+public extension ReactiveCompatible {
 
-    /// Reactive extensions.
-    public static var cb: Reactive<Self>.Type {
-        get { Reactive<Self>.self }
-        // this enables using Reactive to "mutate" base type
-        // swiftlint:disable:next unused_setter_value
-        set { }
-    }
+	/// Reactive extensions.
+	static var cb: Reactive<Self>.Type {
+		get { Reactive<Self>.self }
+		// this enables using Reactive to "mutate" base type
+		// swiftlint:disable:next unused_setter_value
+		set {}
+	}
 
-    /// Reactive extensions.
-    public var cb: Reactive<Self> {
-        get { Reactive(self) }
-        // this enables using Reactive to "mutate" base object
-        // swiftlint:disable:next unused_setter_value
-        set { }
-    }
+	/// Reactive extensions.
+	var cb: Reactive<Self> {
+		get { Reactive(self) }
+		// this enables using Reactive to "mutate" base object
+		// swiftlint:disable:next unused_setter_value
+		set {}
+	}
 }

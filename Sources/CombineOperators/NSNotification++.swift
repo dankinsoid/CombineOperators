@@ -1,7 +1,7 @@
-import Foundation
 import Combine
+import Foundation
 
-extension NSNotification.Name {
+public extension NSNotification.Name {
 
 	/// Shorthand publisher for this notification on default center.
 	///
@@ -11,7 +11,7 @@ extension NSNotification.Name {
 	///         // handle keyboard
 	///     }
 	/// ```
-	public var cb: NotificationCenter.Publisher {
+	var cb: NotificationCenter.Publisher {
 		NotificationCenter.Publisher(center: .default, name: self)
 	}
 }

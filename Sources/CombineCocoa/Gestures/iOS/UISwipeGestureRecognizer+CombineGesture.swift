@@ -1,5 +1,3 @@
-// Copyright (c) CombineSwiftCommunity
-
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -20,75 +18,74 @@
 
 #if canImport(UIKit)
 
-import UIKit
 import Combine
+import UIKit
 
 public enum SwipeDirection {
-    case right, left, up, down
+	case right, left, up, down
 
-    fileprivate typealias SwipeGestureRecognizerDirection = UISwipeGestureRecognizer.Direction
-    
-    fileprivate var direction: SwipeGestureRecognizerDirection {
-        switch self {
-        case .right: return .right
-        case .left: return .left
-        case .up: return .up
-        case .down: return .down
-        }
-    }
+	fileprivate typealias SwipeGestureRecognizerDirection = UISwipeGestureRecognizer.Direction
+
+	fileprivate var direction: SwipeGestureRecognizerDirection {
+		switch self {
+		case .right: return .right
+		case .left: return .left
+		case .up: return .up
+		case .down: return .down
+		}
+	}
 }
 
 private func make(direction: SwipeDirection, configuration: Configuration<UISwipeGestureRecognizer>?) -> Factory<UISwipeGestureRecognizer> {
-    make {
-        $0.direction = direction.direction
-        configuration?($0, $1)
-    }
+	make {
+		$0.direction = direction.direction
+		configuration?($0, $1)
+	}
 }
 
 public typealias SwipeConfiguration = Configuration<UISwipeGestureRecognizer>
 public typealias SwipeControlEvent = ControlEvent<UISwipeGestureRecognizer>
 public typealias SwipePublisher = AnyPublisher<UISwipeGestureRecognizer, Never>
 
-extension Factory where Gesture == CombineGestureRecognizer {
+public extension Factory where Gesture == CombineGestureRecognizer {
 
-    /**
-     Returns an `AnyFactory` for `UISwipeGestureRecognizer`
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public static func swipe(direction: SwipeDirection, configuration: SwipeConfiguration? = nil) -> AnyFactory {
-        make(direction: direction, configuration: configuration).abstracted()
-    }
+	/**
+	 Returns an `AnyFactory` for `UISwipeGestureRecognizer`
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	static func swipe(direction: SwipeDirection, configuration: SwipeConfiguration? = nil) -> AnyFactory {
+		make(direction: direction, configuration: configuration).abstracted()
+	}
 }
 
-extension Reactive where Base: CombineGestureView {
+public extension Reactive where Base: CombineGestureView {
 
-    /**
-     Returns an observable `UISwipeGestureRecognizer` events sequence
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    private func swipeGesture(direction: SwipeDirection,configuration: SwipeConfiguration? = nil) -> SwipeControlEvent {
-        gesture(make(direction: direction, configuration: configuration))
-    }
+	/**
+	 Returns an observable `UISwipeGestureRecognizer` events sequence
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	private func swipeGesture(direction: SwipeDirection, configuration: SwipeConfiguration? = nil) -> SwipeControlEvent {
+		gesture(make(direction: direction, configuration: configuration))
+	}
 
-    /**
-     Returns an observable `UISwipeGestureRecognizer` events sequence
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public func swipeGesture(_ directions: Set<SwipeDirection>,configuration: SwipeConfiguration? = nil) -> SwipeControlEvent {
-			let source = Publishers.MergeMany(directions.map {
-            swipeGesture(direction: $0, configuration: configuration)
-        })
-        return ControlEvent(events: source)
-    }
+	/**
+	 Returns an observable `UISwipeGestureRecognizer` events sequence
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	func swipeGesture(_ directions: Set<SwipeDirection>, configuration: SwipeConfiguration? = nil) -> SwipeControlEvent {
+		let source = Publishers.MergeMany(directions.map {
+			swipeGesture(direction: $0, configuration: configuration)
+		})
+		return ControlEvent(events: source)
+	}
 
-    /**
-     Returns an observable `UISwipeGestureRecognizer` events sequence
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public func swipeGesture(_ directions: SwipeDirection...,configuration: SwipeConfiguration? = nil) -> SwipeControlEvent {
-        swipeGesture(Set(directions), configuration: configuration)
-    }
-
+	/**
+	 Returns an observable `UISwipeGestureRecognizer` events sequence
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	func swipeGesture(_ directions: SwipeDirection..., configuration: SwipeConfiguration? = nil) -> SwipeControlEvent {
+		swipeGesture(Set(directions), configuration: configuration)
+	}
 }
 
 #endif

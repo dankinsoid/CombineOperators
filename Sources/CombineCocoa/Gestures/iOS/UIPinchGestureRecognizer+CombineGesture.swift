@@ -1,5 +1,3 @@
-// Copyright (c) CombineSwiftCommunity
-
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -20,46 +18,46 @@
 
 #if canImport(UIKit)
 
-import UIKit
 import Combine
+import UIKit
 
 public typealias PinchConfiguration = Configuration<UIPinchGestureRecognizer>
 public typealias PinchControlEvent = ControlEvent<UIPinchGestureRecognizer>
 public typealias PinchPublisher = AnyPublisher<UIPinchGestureRecognizer, Never>
 
-extension Factory where Gesture == CombineGestureRecognizer {
+public extension Factory where Gesture == CombineGestureRecognizer {
 
-    /**
-     Returns an `AnyFactory` for `UIPinchGestureRecognizer`
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public static func pinch(configuration: PinchConfiguration? = nil) -> AnyFactory {
-        make(configuration: configuration).abstracted()
-    }
+	/**
+	 Returns an `AnyFactory` for `UIPinchGestureRecognizer`
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	static func pinch(configuration: PinchConfiguration? = nil) -> AnyFactory {
+		make(configuration: configuration).abstracted()
+	}
 }
 
-extension Reactive where Base: CombineGestureView {
+public extension Reactive where Base: CombineGestureView {
 
-    /**
-     Returns an observable `UIPinchGestureRecognizer` events sequence
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public func pinchGesture(configuration: PinchConfiguration? = nil) -> PinchControlEvent {
-        gesture(make(configuration: configuration))
-    }
+	/**
+	 Returns an observable `UIPinchGestureRecognizer` events sequence
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	func pinchGesture(configuration: PinchConfiguration? = nil) -> PinchControlEvent {
+		gesture(make(configuration: configuration))
+	}
 }
 
-extension Publisher where Output: UIPinchGestureRecognizer {
+public extension Publisher where Output: UIPinchGestureRecognizer {
 
-    /**
-     Maps the observable `GestureRecognizer` events sequence to an observable sequence of scale factors relative to the points of the two touches in screen coordinates alongside the gesture velocity.
-     */
-    public func asScale() -> AnyPublisher<(scale: CGFloat, velocity: CGFloat), Failure> {
-        self.map { gesture in
-            (gesture.scale, gesture.velocity)
-        }
-				.eraseToAnyPublisher()
-    }
+	/**
+	 Maps the observable `GestureRecognizer` events sequence to an observable sequence of scale factors relative to the points of the two touches in screen coordinates alongside the gesture velocity.
+	 */
+	func asScale() -> AnyPublisher<(scale: CGFloat, velocity: CGFloat), Failure> {
+		map { gesture in
+			(gesture.scale, gesture.velocity)
+		}
+		.eraseToAnyPublisher()
+	}
 }
 
 #endif

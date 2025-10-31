@@ -1,10 +1,10 @@
-import Foundation
 import Combine
+import Foundation
 
-extension Publisher {
+public extension Publisher {
 
 	/// Maps output to boolean indicating if value is nil.
-	public func isNil<T>() -> Publishers.Map<Self, Bool> where Output == T? {
+	func isNil<T>() -> Publishers.Map<Self, Bool> where Output == T? {
 		map { $0 == nil }
 	}
 
@@ -13,7 +13,7 @@ extension Publisher {
 	/// ```swift
 	/// optionalPublisher.skipNil()  // Publisher<String, Never>
 	/// ```
-	public func skipNil<T>() -> Publishers.SkipNil<Self, T> where Output == T? {
+	func skipNil<T>() -> Publishers.SkipNil<Self, T> where Output == T? {
 		Publishers.SkipNil(source: self)
 	}
 
@@ -22,25 +22,25 @@ extension Publisher {
 	/// ```swift
 	/// optionalText.or("N/A")
 	/// ```
-	public func or<T>(_ value: T) -> Publishers.Map<Self, T> where Output == T? {
+	func or<T>(_ value: T) -> Publishers.Map<Self, T> where Output == T? {
 		map { $0 ?? value }
 	}
 
-    /// Wraps output in Optional.
-    public func optional() -> Publishers.Map<Self, Output?> {
-        map { $0 }
-    }
+	/// Wraps output in Optional.
+	func optional() -> Publishers.Map<Self, Output?> {
+		map { $0 }
+	}
 
 	/// Returns true if value is nil or empty collection.
-	public func isNilOrEmpty<T: Collection>() -> Publishers.Map<Self, Bool> where Output == T? {
+	func isNilOrEmpty<T: Collection>() -> Publishers.Map<Self, Bool> where Output == T? {
 		map { $0?.isEmpty != false }
 	}
 }
 
-extension Publishers {
+public extension Publishers {
 
 	/// Publisher that filters out nil values from optional publisher.
-	public struct SkipNil<P: Publisher, Output>: Publisher where P.Output == Output? {
+	struct SkipNil<P: Publisher, Output>: Publisher where P.Output == Output? {
 
 		public typealias Failure = P.Failure
 		public let source: P

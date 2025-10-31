@@ -1,8 +1,8 @@
-import Foundation
 import Combine
+import Foundation
 import os
 
-extension Publishers {
+public extension Publishers {
 
 	/// Publisher created from a closure that receives a subscriber.
 	///
@@ -16,7 +16,7 @@ extension Publishers {
 	///     return AnyCancellable {}
 	/// }
 	/// ```
-	public struct Create<Output, Failure: Swift.Error>: Publisher {
+	struct Create<Output, Failure: Swift.Error>: Publisher {
 
 		private let closure: (AnySubscriber<Output, Failure>) -> Cancellable
 
@@ -24,7 +24,7 @@ extension Publishers {
 			self.closure = closure
 		}
 
-		public func receive<S>(subscriber: S) where S : Subscriber, Failure == S.Failure, Output == S.Input {
+		public func receive<S>(subscriber: S) where S: Subscriber, Failure == S.Failure, Output == S.Input {
 			let subscription = Subscriptions.Anonymous(subscriber: subscriber, closure: closure)
 			subscriber.receive(subscription: subscription)
 		}
@@ -32,16 +32,17 @@ extension Publishers {
 }
 
 extension Subscriptions {
-	
+
 	final class Anonymous<SubscriberType: Subscriber, Output, Failure>: Subscription where
-        SubscriberType.Input == Output,
-        Failure == SubscriberType.Failure {
-		
+		SubscriberType.Input == Output,
+		Failure == SubscriberType.Failure
+	{
+
 		private let subscriber: SubscriberType
 		private var cancellable: Cancellable?
-        private let lock = Lock()
+		private let lock = Lock()
 		private var closure: (AnySubscriber<Output, Failure>) -> Cancellable
-		
+
 		init(subscriber: SubscriberType, closure: @escaping (AnySubscriber<Output, Failure>) -> Cancellable) {
 			self.subscriber = subscriber
 			self.closure = closure
@@ -49,19 +50,19 @@ extension Subscriptions {
 
 		func request(_ demand: Subscribers.Demand) {
 			guard demand > 0 else { return }
-            let cancellable = closure(AnySubscriber(subscriber))
-            lock.withLock {
-                self.cancellable = cancellable
-            }
+			let cancellable = closure(AnySubscriber(subscriber))
+			lock.withLock {
+				self.cancellable = cancellable
+			}
 		}
 
 		func cancel() {
-            let cancellable = lock.withLock { () -> Cancellable? in
-                let cancellable = self.cancellable
-                self.cancellable = nil
-                return cancellable
-            }
-            cancellable?.cancel()
+			let cancellable = lock.withLock { () -> Cancellable? in
+				let cancellable = self.cancellable
+				self.cancellable = nil
+				return cancellable
+			}
+			cancellable?.cancel()
 		}
 
 		deinit {
@@ -70,7 +71,7 @@ extension Subscriptions {
 	}
 }
 
-extension AnyPublisher {
+public extension AnyPublisher {
 
 	/// Creates a publisher from a closure with full control over emissions.
 	///
@@ -81,7 +82,7 @@ extension AnyPublisher {
 	///     return AnyCancellable { print("Cancelled") }
 	/// }
 	/// ```
-	public static func create(_ closure: @escaping (AnySubscriber<Output, Failure>) -> Cancellable) -> AnyPublisher {
+	static func create(_ closure: @escaping (AnySubscriber<Output, Failure>) -> Cancellable) -> AnyPublisher {
 		Publishers.Create<Output, Failure>(closure).eraseToAnyPublisher()
 	}
 }

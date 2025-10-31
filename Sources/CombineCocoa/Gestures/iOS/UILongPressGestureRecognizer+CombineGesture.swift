@@ -1,5 +1,3 @@
-// Copyright (c) CombineSwiftCommunity
-
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -20,33 +18,33 @@
 
 #if canImport(UIKit)
 
-import UIKit
 import Combine
+import UIKit
 
 public typealias LongPressConfiguration = Configuration<UILongPressGestureRecognizer>
 public typealias LongPressControlEvent = ControlEvent<UILongPressGestureRecognizer>
 public typealias LongPressPublisher = AnyPublisher<UILongPressGestureRecognizer, Never>
 
-extension Factory where Gesture == CombineGestureRecognizer {
+public extension Factory where Gesture == CombineGestureRecognizer {
 
-    /**
-     Returns an `AnyFactory` for `UILongPressGestureRecognizer`
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public static func longPress(configuration: LongPressConfiguration? = nil) -> AnyFactory {
-        make(configuration: configuration).abstracted()
-    }
+	/**
+	 Returns an `AnyFactory` for `UILongPressGestureRecognizer`
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	static func longPress(configuration: LongPressConfiguration? = nil) -> AnyFactory {
+		make(configuration: configuration).abstracted()
+	}
 }
 
-extension Reactive where Base: CombineGestureView {
+public extension Reactive where Base: CombineGestureView {
 
-    /**
-     Returns an observable `UILongPressGestureRecognizer` events sequence
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public func longPressGesture(configuration: LongPressConfiguration? = nil) -> LongPressControlEvent {
-        gesture(make(configuration: configuration))
-    }
+	/**
+	 Returns an observable `UILongPressGestureRecognizer` events sequence
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	func longPressGesture(configuration: LongPressConfiguration? = nil) -> LongPressControlEvent {
+		gesture(make(configuration: configuration))
+	}
 }
 
 #endif

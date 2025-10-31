@@ -1,5 +1,5 @@
-import Foundation
 import Combine
+import Foundation
 
 /// Result builder for composing multiple cancellables.
 ///
@@ -14,49 +14,49 @@ import Combine
 /// ```
 @resultBuilder
 public struct CancellableBuilder {
-	
+
 	@inlinable
 	public static func buildBlock(_ components: Cancellable...) -> Cancellable {
 		create(from: components)
 	}
-	
+
 	@inlinable
 	public static func buildArray(_ components: [Cancellable]) -> Cancellable {
 		create(from: components)
 	}
-	
+
 	@inlinable
 	public static func buildEither(first component: Cancellable) -> Cancellable {
 		component
 	}
-	
+
 	@inlinable
 	public static func buildEither(second component: Cancellable) -> Cancellable {
 		component
 	}
-	
+
 	@inlinable
 	public static func buildOptional(_ component: Cancellable?) -> Cancellable {
 		component ?? create(from: [])
 	}
-	
+
 	@inlinable
 	public static func buildLimitedAvailability(_ component: Cancellable) -> Cancellable {
 		component
 	}
-	
+
 	@inlinable
 	public static func buildExpression(_ expression: Cancellable) -> Cancellable {
 		expression
 	}
-	
+
 	@inlinable
 	public static func create(from: [Cancellable]) -> Cancellable {
 		from.count == 1 ? from[0] : ManualAnyCancellable(from)
 	}
 }
 
-extension AnyCancellable {
+public extension AnyCancellable {
 
 	/// Creates cancellable from variadic list.
 	///
@@ -64,7 +64,7 @@ extension AnyCancellable {
 	/// let bag = AnyCancellable(sub1, sub2, sub3)
 	/// bag.cancel()  // cancels all
 	/// ```
-	public convenience init(_ list: Cancellable...) {
+	convenience init(_ list: Cancellable...) {
 		self.init(list)
 	}
 
@@ -76,16 +76,16 @@ extension AnyCancellable {
 	///     publisher2.sink { }
 	/// }
 	/// ```
-    public convenience init(@CancellableBuilder _ builder: () -> Cancellable) {
-        self.init(builder())
+	convenience init(@CancellableBuilder _ builder: () -> Cancellable) {
+		self.init(builder())
 	}
 
 	/// Creates cancellable from a sequence.
-    public convenience init<S: Sequence>(_ sequence: S) where S.Element == Cancellable {
-        self.init {
-            sequence.forEach { $0.cancel() }
-        }
-    }
+	convenience init<S: Sequence>(_ sequence: S) where S.Element == Cancellable {
+		self.init {
+			sequence.forEach { $0.cancel() }
+		}
+	}
 }
 
 /// Combines two cancellables using `+` operator.
@@ -94,34 +94,34 @@ extension AnyCancellable {
 /// let combined = subscription1 + subscription2
 /// combined.cancel()  // cancels both
 /// ```
-public func +(_ lhs: Cancellable, _ rhs: Cancellable) -> Cancellable {
-    ManualAnyCancellable(lhs, rhs)
+public func + (_ lhs: Cancellable, _ rhs: Cancellable) -> Cancellable {
+	ManualAnyCancellable(lhs, rhs)
 }
 
 /// Lightweight cancellable that executes custom cancellation logic.
 public struct ManualAnyCancellable: Cancellable {
 
-    private let cancelAction: () -> Void
-    
-    public init() {
-        self.cancelAction = {}
-    }
+	private let cancelAction: () -> Void
 
-    public init(_ cancelAction: @escaping () -> Void) {
-        self.cancelAction = cancelAction
-    }
-    
-    public init(_ cancellables: Cancellable...) {
-        self.init(cancellables)
-    }
+	public init() {
+		cancelAction = {}
+	}
 
-    public init<S: Sequence>(_ sequence: S) where S.Element == Cancellable {
-        self.cancelAction = {
-            sequence.forEach { $0.cancel() }
-        }
-    }
+	public init(_ cancelAction: @escaping () -> Void) {
+		self.cancelAction = cancelAction
+	}
 
-    public func cancel() {
-        cancelAction()
-    }
+	public init(_ cancellables: Cancellable...) {
+		self.init(cancellables)
+	}
+
+	public init<S: Sequence>(_ sequence: S) where S.Element == Cancellable {
+		cancelAction = {
+			sequence.forEach { $0.cancel() }
+		}
+	}
+
+	public func cancel() {
+		cancelAction()
+	}
 }

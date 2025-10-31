@@ -1,21 +1,21 @@
-import Foundation
 import Combine
+import Foundation
 
-extension AnyPublisher {
+public extension AnyPublisher {
 
 	/// Creates a publisher that emits a single value then completes.
 	///
 	/// ```swift
 	/// AnyPublisher<Int, Never>.just(42)
 	/// ```
-	public static func just(_ value: Output) -> AnyPublisher {
+	static func just(_ value: Output) -> AnyPublisher {
 		Just(value).setFailureType(to: Failure.self).eraseToAnyPublisher()
 	}
 
 	/// Creates a publisher that never emits or completes.
 	///
 	/// Useful for placeholders or testing.
-	public static var never: AnyPublisher {
+	static var never: AnyPublisher {
 		Empty(completeImmediately: false).eraseToAnyPublisher()
 	}
 
@@ -24,7 +24,7 @@ extension AnyPublisher {
 	/// ```swift
 	/// AnyPublisher<Int, Never>.from(1, 2, 3)
 	/// ```
-	public static func from(_ values: Output...) -> AnyPublisher {
+	static func from(_ values: Output...) -> AnyPublisher {
 		from(values)
 	}
 
@@ -33,7 +33,7 @@ extension AnyPublisher {
 	/// ```swift
 	/// AnyPublisher<Int, Never>.from([1, 2, 3])
 	/// ```
-	public static func from<S: Sequence>(_ values: S) -> AnyPublisher where S.Element == Output {
+	static func from<S: Sequence>(_ values: S) -> AnyPublisher where S.Element == Output {
 		Publishers.Sequence(sequence: values).eraseToAnyPublisher()
 	}
 
@@ -42,12 +42,12 @@ extension AnyPublisher {
 	/// ```swift
 	/// AnyPublisher<Int, MyError>.failure(.notFound)
 	/// ```
-	public static func failure(_ failure: Failure) -> AnyPublisher {
+	static func failure(_ failure: Failure) -> AnyPublisher {
 		Result.Publisher(.failure(failure)).eraseToAnyPublisher()
 	}
 
 	/// Creates a publisher that completes immediately without emitting.
-	public static var empty: AnyPublisher {
+	static var empty: AnyPublisher {
 		Empty(completeImmediately: true).eraseToAnyPublisher()
 	}
 }

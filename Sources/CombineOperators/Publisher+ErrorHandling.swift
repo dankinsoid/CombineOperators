@@ -1,10 +1,10 @@
-import Foundation
 import Combine
+import Foundation
 
-extension Publisher {
+public extension Publisher {
 
 	/// Ignores failures, completing silently on error.
-	public func skipFailure() -> Publishers.Catch<Self, Empty<Output, Never>> {
+	func skipFailure() -> Publishers.Catch<Self, Empty<Output, Never>> {
 		self.catch { _ in Empty() }
 	}
 
@@ -13,12 +13,12 @@ extension Publisher {
 	/// ```swift
 	/// fetchData().catch(defaultData)
 	/// ```
-	public func `catch`(_ just: Output) -> Publishers.Catch<Self, Just<Output>> {
+	func `catch`(_ just: Output) -> Publishers.Catch<Self, Just<Output>> {
 		self.catch { _ in Just(just) }
 	}
 
 	/// Type-erases failure to generic `Error`.
-	public func eraseFailure() -> Publishers.MapError<Self, Error> {
+	func eraseFailure() -> Publishers.MapError<Self, Error> {
 		mapError { $0 as Error }
 	}
 
@@ -34,7 +34,7 @@ extension Publisher {
 	///         }
 	///     }
 	/// ```
-	public func asResult() -> some Publisher<Result<Output, Failure>, Never> {
+	func asResult() -> some Publisher<Result<Output, Failure>, Never> {
 		map { .success($0) }
 			.catch { Just(.failure($0)) }
 	}

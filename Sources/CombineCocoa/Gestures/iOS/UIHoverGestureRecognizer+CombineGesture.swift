@@ -1,5 +1,3 @@
-// Copyright (c) CombineSwiftCommunity
-
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
@@ -20,35 +18,33 @@
 
 #if canImport(UIKit)
 
-import UIKit
 import Combine
-
+import UIKit
 
 public typealias HoverConfiguration = Configuration<UIHoverGestureRecognizer>
 public typealias HoverControlEvent = ControlEvent<UIHoverGestureRecognizer>
 public typealias HoverPublisher = AnyPublisher<UIHoverGestureRecognizer, Never>
 
+public extension Factory where Gesture == CombineGestureRecognizer {
 
-extension Factory where Gesture == CombineGestureRecognizer {
-
-    /**
-     Returns an `AnyFactory` for `UIHoverGestureRecognizer`
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public static func hover(configuration: HoverConfiguration? = nil) -> AnyFactory {
-        make(configuration: configuration).abstracted()
-    }
+	/**
+	 Returns an `AnyFactory` for `UIHoverGestureRecognizer`
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	static func hover(configuration: HoverConfiguration? = nil) -> AnyFactory {
+		make(configuration: configuration).abstracted()
+	}
 }
 
-extension Reactive where Base: CombineGestureView {
+public extension Reactive where Base: CombineGestureView {
 
-    /**
-     Returns an observable `UIHoverGestureRecognizer` events sequence
-     - parameter configuration: A closure that allows to fully configure the gesture recognizer
-     */
-    public func hoverGesture(configuration: HoverConfiguration? = nil) -> HoverControlEvent {
-        gesture(make(configuration: configuration))
-    }
+	/**
+	 Returns an observable `UIHoverGestureRecognizer` events sequence
+	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
+	 */
+	func hoverGesture(configuration: HoverConfiguration? = nil) -> HoverControlEvent {
+		gesture(make(configuration: configuration))
+	}
 }
 
 #endif
