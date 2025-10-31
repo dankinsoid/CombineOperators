@@ -3,7 +3,7 @@
 import Combine
 import UIKit
 
-/// This should be only used from `MainScheduler`
+/// Wraps gesture recognizer target-action pattern for Combine. Must run on main thread.
 final class GestureTarget<Recognizer: UIGestureRecognizer>: CombineTarget {
 	typealias Callback = (Recognizer) -> Void
 

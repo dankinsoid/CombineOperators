@@ -1,31 +1,25 @@
-/* 
- Use `Reactive` proxy as customization point for constrained protocol extensions.
-
- General pattern would be:
-
- // 1. Extend Reactive protocol with constrain on Base
- // Read as: Reactive Extension where Base is a SomeType
- extension Reactive where Base: SomeType {
- // 2. Put any specific reactive extension for SomeType here
- }
-
- With this approach we can have more specialized methods and properties using
- `Base` and not just specialized on common base type.
-
- `Binder`s are also automatically synthesized using `@dynamicMemberLookup` for writable reference properties of the reactive base.
- */
-
 import CombineOperators
 
+/// Namespace for reactive extensions via the `cb` property.
+///
+/// Provides customization point for constrained protocol extensions:
+/// ```swift
+/// extension Reactive where Base: SomeType {
+///     var myProperty: Publisher<Value, Never> { ... }
+/// }
+/// ```
+///
+/// Automatically synthesizes binders for writable properties via `@dynamicMemberLookup`:
+/// ```swift
+/// label.cb.text // Returns ReactiveBinder for label.text
+/// publisher.subscribe(label.cb.text) // Binds publisher to label.text
+/// ```
 @dynamicMemberLookup
 public struct Reactive<Base> {
-
 	/// Base object to extend.
 	public let base: Base
 
-	/// Creates extensions with base object.
-	///
-	/// - parameter base: Base object.
+	/// Creates reactive wrapper around base object.
 	public init(_ base: Base) {
 		self.base = base
 	}
@@ -53,12 +47,16 @@ public extension Reactive where Base: AnyObject {
 	}
 }
 
-/// Protocol enabling reactive extensions via the `cb` namespace.
+/// Enables reactive extensions via the `cb` namespace.
 ///
-/// Conform to this protocol to add reactive capabilities to your types.
+/// Conform to this protocol to access reactive capabilities:
+/// ```swift
+/// extension MyType: ReactiveCompatible {}
+/// let instance = MyType()
+/// instance.cb.someReactiveProperty // Accesses Reactive<MyType> extensions
+/// ```
 public protocol ReactiveCompatible {
-
-	/// Extended type
+	/// Extended type.
 	associatedtype ReactiveBase
 
 	/// Reactive extensions namespace (type-level).

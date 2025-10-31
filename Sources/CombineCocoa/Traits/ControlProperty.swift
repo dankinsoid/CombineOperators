@@ -36,13 +36,9 @@ public struct ControlProperty<PropertyType>: ControlPropertyType {
 	let values: AnyPublisher<PropertyType, Failure>
 	let valueSink: AnySubscriber<PropertyType, Failure>
 
-	/// Initializes control property with a observable sequence that represents property values and observer that enables
-	/// binding values to property.
+	/// Creates control property from publisher and subscriber for bidirectional binding.
 	///
-	/// - parameter values: Publisher sequence that represents property values.
-	/// - parameter valueSink: Observer that enables binding values to control property.
-	/// - returns: Control property created with a observable sequence of values and an observer that enables binding values
-	/// to property.
+	/// Values are delivered on main thread. Errors are caught and suppressed.
 	public init<Values: Publisher, Sink: Subscriber>(values: Values, valueSink: Sink) where PropertyType == Values.Output, PropertyType == Sink.Input, Sink.Failure == Never {
 		self.values = values.receive(on: MainScheduler.instance).catch { _ in Empty() }.eraseToAnyPublisher()
 		self.valueSink = AnySubscriber(valueSink)

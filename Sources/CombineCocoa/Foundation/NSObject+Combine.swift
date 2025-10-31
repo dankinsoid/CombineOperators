@@ -4,26 +4,6 @@ import Foundation
 
 #if !os(Linux)
 
-/**
- KVO is a tricky mechanism.
-
- When observing child in a ownership hierarchy, usually retaining observing target is wanted behavior.
- When observing parent in a ownership hierarchy, usually retaining target isn't wanter behavior.
-
- KVO with weak references is especially tricky. For it to work, some kind of swizzling is required.
- That can be done by
-     * replacing object class dynamically (like KVO does)
-     * by swizzling `dealloc` method on all instances for a class.
-     * some third method ...
-
- Both approaches can fail in certain scenarios:
-     * problems arise when swizzlers return original object class (like KVO does when nobody is observing)
-     * Problems can arise because replacing dealloc method isn't atomic operation (get implementation,
-     set implementation).
-
- Second approach is chosen. It can fail in case there are multiple libraries dynamically trying
- to replace dealloc method. In case that isn't the case, it should be ok.
- */
 public extension Reactive where Base: NSObject {
 
 	/// KVO publisher for property at keypath.
@@ -74,11 +54,7 @@ public extension Reactive where Base: AnyObject {
 private var deallocatedKey = 0
 
 extension Reactive where Base: AnyObject {
-
-	/**
-	 Helper to make sure that `Publisher` returned from `createCachedPublisher` is only created once.
-	 This is important because there is only one `target` and `action` properties on `NSControl` or `UIBarButtonItem`.
-	 */
+	/// Caches publisher instance per object. Required for single target/action UI controls.
 	func lazyInstanceAnyPublisher<T>(_ key: UnsafeRawPointer, createCachedPublisher: () -> T) -> T {
 		if let value = objc_getAssociatedObject(base, key) {
 			return (value as! Wrapper<T>).value

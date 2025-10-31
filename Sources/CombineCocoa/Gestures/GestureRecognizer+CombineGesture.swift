@@ -22,13 +22,13 @@ import struct CoreGraphics.CGPoint
 public typealias LocationInView = (CombineGestureView) -> CGPoint
 
 public extension Publisher where Output: CombineGestureRecognizer {
-
-	/**
-	 Filters the observable `GestureRecognizer` events sequence based on the `GestureRecognizer` state.
-
-	 - parameter state: An `GestureRecognizerState` that is used to filter the `GestureRecognizer` events sequence.
-	 - returns: An observable `GestureRecognizer` events sequence that only contains events emitted while the `GestureRecognizer`'s state match the given `state`.
-	 */
+	/// Filters gesture events by recognizer state.
+	///
+	/// ```swift
+	/// view.cb.gesture(panGesture)
+	///     .when(.began, .changed)
+	///     .sink { /* handle pan */ }
+	/// ```
 	func when(_ states: CombineGestureRecognizerState...) -> AnyPublisher<Output, Failure> {
 		filter { gesture in
 			states.contains(gesture.state)
@@ -36,12 +36,7 @@ public extension Publisher where Output: CombineGestureRecognizer {
 		.eraseToAnyPublisher()
 	}
 
-	/**
-	 Filters the observable `GestureRecognizer` events sequence based on the `GestureRecognizer` state.
-
-	 - parameter state: An `GestureRecognizerState` that is used to filter the `GestureRecognizer` events sequence.
-	 - returns: An observable `GestureRecognizer` events sequence that only contains events emitted while the `GestureRecognizer`'s state match the given `state`.
-	 */
+	/// Filters gesture events by recognizer state (internal array version).
 	internal func when(_ states: [CombineGestureRecognizerState]) -> AnyPublisher<Output, Failure> {
 		filter { gesture in
 			states.contains(gesture.state)
@@ -49,11 +44,7 @@ public extension Publisher where Output: CombineGestureRecognizer {
 		.eraseToAnyPublisher()
 	}
 
-	/**
-	 Maps the observable `GestureRecognizer` events sequence to an observable sequence of points computed as the location in the given `view` of the gesture.
-
-	 - parameter view: A `TargetView` value on which the gesture took place.
-	 */
+	/// Maps gesture events to location points in target view's coordinate space.
 	func asLocation(in view: TargetView = .view) -> AnyPublisher<CombineGesturePoint, Failure> {
 		map { gesture in
 			gesture.location(in: view.targetView(for: gesture))
@@ -61,6 +52,7 @@ public extension Publisher where Output: CombineGestureRecognizer {
 		.eraseToAnyPublisher()
 	}
 
+	/// Maps gesture events to location converter closures for dynamic coordinate conversion.
 	func asLocationInView() -> AnyPublisher<LocationInView, Failure> {
 		map { gesture in
 			let targetView = gesture.view!

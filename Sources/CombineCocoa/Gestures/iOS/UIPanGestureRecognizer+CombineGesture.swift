@@ -26,34 +26,21 @@ public typealias PanControlEvent = ControlEvent<UIPanGestureRecognizer>
 public typealias PanPublisher = AnyPublisher<UIPanGestureRecognizer, Never>
 
 public extension Factory where Gesture == CombineGestureRecognizer {
-
-	/**
-	 Returns an `AnyFactory` for `UIPanGestureRecognizer`
-	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
-	 */
+	/// Creates pan gesture factory with optional configuration.
 	static func pan(configuration: PanConfiguration? = nil) -> AnyFactory {
 		make(configuration: configuration).abstracted()
 	}
 }
 
 public extension Reactive where Base: CombineGestureView {
-
-	/**
-	 Returns an observable `UIPanGestureRecognizer` events sequence
-	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
-	 */
+	/// Observes pan gesture events.
 	func panGesture(configuration: PanConfiguration? = nil) -> PanControlEvent {
 		gesture(make(configuration: configuration))
 	}
 }
 
 public extension Publisher where Output: UIPanGestureRecognizer {
-
-	/**
-	 Maps the observable `GestureRecognizer` events sequence to an observable sequence of translation values of the pan gesture in the coordinate system of the specified `view` alongside the gesture velocity.
-
-	 - parameter view: A `TargetView` value on which the gesture took place.
-	 */
+	/// Maps pan gesture events to translation and velocity in target view coordinates.
 	func asTranslation(in view: TargetView = .view) -> AnyPublisher<(translation: CGPoint, velocity: CGPoint), Failure> {
 		map { gesture in
 			let view = view.targetView(for: gesture)

@@ -29,10 +29,7 @@ public struct ControlEvent<PropertyType>: ControlEventType {
 
 	let events: AnyPublisher<PropertyType, Failure>
 
-	/// Initializes control event with a observable sequence that represents events.
-	///
-	/// - parameter events: Publisher sequence that represents events.
-	/// - returns: Control event created with a observable sequence of events.
+	/// Creates control event from publisher. Errors are caught and suppressed.
 	public init<Ev: Publisher>(events: Ev) where Ev.Output == Output {
 		self.events = events.catch { _ in Empty() }.eraseToAnyPublisher()
 	}

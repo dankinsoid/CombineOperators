@@ -2,11 +2,8 @@ import Foundation
 
 /// Data source with access to underlying sectioned model.
 public protocol SectionedViewDataSourceType {
-	// Returns model at index path.
-	//
-	// In case data source doesn't contain any sections when this method is being called, `CombineCocoaError.ItemsNotYetBound(object: self)` is thrown.
-
-	/// - parameter indexPath: Model index path
-	/// - returns: Model at index path.
+	/// Returns model at index path.
+	///
+	/// Throws `CombineCocoaError.itemsNotYetBound` if data not yet bound to UI.
 	func model(at indexPath: IndexPath) throws -> Any
 }

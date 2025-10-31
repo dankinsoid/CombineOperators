@@ -4,8 +4,11 @@ import Combine
 import UIKit
 
 public extension Reactive where Base: UIStepper {
-
 	/// Bidirectional binding for stepper's `value` property.
+	///
+	/// ```swift
+	/// stepper.cb.value.sink { print("Value: \($0)") }
+	/// ```
 	var value: ControlProperty<Double> {
 		base.cb.controlPropertyWithDefaultEvents(
 			getter: { stepper in

@@ -19,10 +19,14 @@
 import Combine
 import ObjectiveC
 
+/// Configuration closure for customizing gesture recognizer and delegate.
 public typealias Configuration<Gesture: CombineGestureRecognizer> = (Gesture, GenericRxGestureRecognizerDelegate<Gesture>) -> Void
 
+/// Factory for creating configured gesture recognizers with automatic delegate setup.
 public struct Factory<Gesture: CombineGestureRecognizer> {
 	public let gesture: Gesture
+
+	/// Creates factory with optional configuration for gesture and delegate policies.
 	public init(_ configuration: Configuration<Gesture>?) {
 		let gesture = Gesture()
 		let delegate = GenericRxGestureRecognizerDelegate<Gesture>()

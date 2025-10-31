@@ -5,6 +5,10 @@ import UIKit
 
 public extension Reactive where Base: UISegmentedControl {
 	/// Bidirectional binding for selected segment index.
+	///
+	/// ```swift
+	/// segmentedControl.cb.selectedSegmentIndex.sink { print("Index: \($0)") }
+	/// ```
 	var selectedSegmentIndex: ControlProperty<Int> {
 		base.cb.controlPropertyWithDefaultEvents(
 			getter: { segmentedControl in

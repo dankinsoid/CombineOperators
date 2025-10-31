@@ -102,7 +102,7 @@ intPublisher ==> intSubscriber => cancellableSet
 4. `CancellableBuilder` and `MergeBuilder`, `CombineLatestBuilder` - result builders
 
 5. Some features:
-- `UIView.cb` operators: `isVisible`, `willAppear`, `isOnScreen`, `didAppear`, `movedToWindow`, `frame`, `frameOnWindow`, etc. 
+- `UIView.cb` operators: `isVisible`, `isOnScreen`, `didAppear`, `movedToWindow`, `frame`, `frameOnWindow`, etc. 
 - `skipNil()` operator
 - `or(Bool), .toggle(), !` operators for boolean sequences
 - use `+` and `+=` operator for merging publishers, creating Cancellables, etc

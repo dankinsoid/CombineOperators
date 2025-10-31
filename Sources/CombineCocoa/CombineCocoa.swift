@@ -5,22 +5,21 @@ import Foundation
 import UIKit
 #endif
 
-/// CombineCocoa errors.
+/// Errors that can occur during CombineCocoa operations.
 public enum CombineCocoaError: Swift.Error, CustomDebugStringConvertible {
-
-	/// Unknown error has occurred.
+	/// Unknown error occurred.
 	case unknown
-	/// Invalid operation was attempted.
+	/// Invalid operation attempted on object.
 	case invalidOperation(object: Any)
-	/// Items are not yet bound to user interface but have been requested.
+	/// Items not yet bound to UI when requested.
 	case itemsNotYetBound(object: Any)
-	/// Invalid KVO Path.
+	/// Invalid KVO property name.
 	case invalidPropertyName(object: Any, propertyName: String)
-	/// Invalid object on key path.
+	/// Invalid object found on keypath.
 	case invalidObjectOnKeyPath(object: Any, sourceObject: AnyObject, propertyName: String)
-	/// Error during swizzling.
+	/// Swizzling failed.
 	case errorDuringSwizzling
-	/// Casting error.
+	/// Type casting failed.
 	case castingError(object: Any, targetType: Any.Type)
 }
 
@@ -50,6 +49,7 @@ public extension CombineCocoaError {
 
 // MARK: Error binding policies
 
+/// Reports binding error. Crashes in DEBUG, prints in release.
 func bindingError(_ error: Swift.Error) {
 	let error = "Binding error: \(error)"
 	#if DEBUG
@@ -59,7 +59,7 @@ func bindingError(_ error: Swift.Error) {
 	#endif
 }
 
-/// Swift does not implement abstract methods. This method is used as a runtime check to ensure that methods which intended to be abstract (i.e., they should be implemented in subclasses) are not called directly on the superclass.
+/// Runtime check for abstract methods that must be overridden in subclasses.
 func rxAbstractMethod(message: String = "Abstract method", file: StaticString = #file, line: UInt = #line) -> Swift.Never {
 	rxFatalError(message, file: file, line: line)
 }

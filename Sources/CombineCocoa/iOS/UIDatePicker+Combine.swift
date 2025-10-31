@@ -5,6 +5,10 @@ import UIKit
 
 public extension Reactive where Base: UIDatePicker {
 	/// Bidirectional binding for date picker's `date` property.
+	///
+	/// ```swift
+	/// datePicker.cb.date.sink { print("Date: \($0)") }
+	/// ```
 	var date: ControlProperty<Date> {
 		value
 	}

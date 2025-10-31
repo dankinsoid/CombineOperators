@@ -23,6 +23,13 @@ import AppKit
 #endif
 import Combine
 
+/// Policy for controlling gesture recognizer delegate decisions.
+///
+/// ```swift
+/// let policy = GestureRecognizerDelegatePolicy<UITapGestureRecognizer>.custom { gesture in
+///     gesture.numberOfTouches == 2
+/// }
+/// ```
 public struct GestureRecognizerDelegatePolicy<PolicyInput> {
 	public typealias PolicyBody = (PolicyInput) -> Bool
 
@@ -32,16 +39,19 @@ public struct GestureRecognizerDelegatePolicy<PolicyInput> {
 		self.policy = policy
 	}
 
+	/// Creates custom policy with closure.
 	public static func custom(_ policy: @escaping PolicyBody)
 		-> GestureRecognizerDelegatePolicy<PolicyInput>
 	{
 		.init(policy: policy)
 	}
 
+	/// Policy that always returns true.
 	public static var always: GestureRecognizerDelegatePolicy<PolicyInput> {
 		.init { _ in true }
 	}
 
+	/// Policy that always returns false.
 	public static var never: GestureRecognizerDelegatePolicy<PolicyInput> {
 		.init { _ in false }
 	}
@@ -63,28 +73,29 @@ public func && <PolicyInput>(lhs: GestureRecognizerDelegatePolicy<PolicyInput>, 
 	}
 }
 
+/// Configurable gesture recognizer delegate with policy-based decision making.
+///
+/// Set policies to control gesture behavior without subclassing.
 public final class GenericRxGestureRecognizerDelegate<Gesture: CombineGestureRecognizer>: NSObject, CombineGestureRecognizerDelegate {
-
-	/// Corresponding delegate method: gestureRecognizerShouldBegin(:_)
+	/// Controls `gestureRecognizerShouldBegin(_:)`.
 	public var beginPolicy: GestureRecognizerDelegatePolicy<Gesture> = .always
 
-	/// Corresponding delegate method: gestureRecognizer(_:shouldReceive:)
+	/// Controls `gestureRecognizer(_:shouldReceive:)` for touches.
 	public var touchReceptionPolicy: GestureRecognizerDelegatePolicy<(Gesture, CombineGestureTouch)> = .always
 
-	/// Corresponding delegate method: gestureRecognizer(_:shouldBeRequiredToFailBy:)
+	/// Controls `gestureRecognizer(_:shouldBeRequiredToFailBy:)`.
 	public var selfFailureRequirementPolicy: GestureRecognizerDelegatePolicy<(Gesture, CombineGestureRecognizer)> = .never
 
-	/// Corresponding delegate method: gestureRecognizer(_:shouldRequireFailureOf:)
+	/// Controls `gestureRecognizer(_:shouldRequireFailureOf:)`.
 	public var otherFailureRequirementPolicy: GestureRecognizerDelegatePolicy<(Gesture, CombineGestureRecognizer)> = .never
 
-	/// Corresponding delegate method: gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:)
+	/// Controls `gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:)`.
 	public var simultaneousRecognitionPolicy: GestureRecognizerDelegatePolicy<(Gesture, CombineGestureRecognizer)> = .always
 
 	#if os(iOS)
-	/// Workaround because we can't have stored properties with @available annotation
 	private var _pressReceptionPolicy: Any?
 
-	/// Corresponding delegate method: gestureRecognizer(_:shouldReceive:)
+	/// Controls `gestureRecognizer(_:shouldReceive:)` for presses.
 	public var pressReceptionPolicy: GestureRecognizerDelegatePolicy<(Gesture, UIPress)> {
 		get {
 			_pressReceptionPolicy as? GestureRecognizerDelegatePolicy<(Gesture, UIPress)> ?? .always
@@ -96,7 +107,7 @@ public final class GenericRxGestureRecognizerDelegate<Gesture: CombineGestureRec
 	#endif
 
 	#if os(OSX)
-	/// Corresponding delegate method: gestureRecognizer(_:shouldAttemptToRecognizeWith:)
+	/// Controls `gestureRecognizer(_:shouldAttemptToRecognizeWith:)`.
 	public var eventRecognitionAttemptPolicy: GestureRecognizerDelegatePolicy<(Gesture, NSEvent)> = .always
 	#endif
 

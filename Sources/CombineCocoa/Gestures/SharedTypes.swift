@@ -38,17 +38,18 @@ public typealias CombineGestureView = NSView
 public typealias CombineGesturePoint = NSPoint
 #endif
 
+/// Target coordinate space for gesture location calculations.
 public enum TargetView {
-	/// The target view will be the gestureRecognizer's view
+	/// Gesture recognizer's own view.
 	case view
 
-	/// The target view will be the gestureRecognizer's view's superview
+	/// Gesture recognizer's superview.
 	case superview
 
-	/// The target view will be the gestureRecognizer's view's window
+	/// Gesture recognizer's window.
 	case window
 
-	/// The target view will be the given view
+	/// Specific custom view.
 	case this(CombineGestureView)
 
 	public func targetView(for gestureRecognizer: CombineGestureRecognizer) -> CombineGestureView? {

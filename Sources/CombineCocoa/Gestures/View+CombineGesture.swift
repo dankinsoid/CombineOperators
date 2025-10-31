@@ -22,15 +22,16 @@ import Dispatch
 
 public extension Reactive where Base: CombineGestureView {
 
-	/**
-	 Reactive wrapper for multiple view gesture recognizers.
-	 It automatically attaches the gesture recognizers to the receiver view.
-	 The value the `Publisher` emits is the gesture recognizer itself.
-
-	 rx.anyGesture can't error and is subscribed/observed on main scheduler.
-	 - parameter factories: a `(Factory + state)` collection you want to use to create the `GestureRecognizers` to add and observe
-	 - returns: a `ControlEvent<G>` that re-emit the gesture recognizer itself
-	 */
+	/// Observes multiple gesture recognizers with state filtering.
+	///
+	/// Auto-attaches gestures to view. Emits gesture recognizer on specified states.
+	///
+	/// ```swift
+	/// view.cb.anyGesture(
+	///     (tapGesture, when: .recognized),
+	///     (panGesture, when: .changed)
+	/// ).sink { gesture in /* handle */ }
+	/// ```
 	func anyGesture(_ factories: (AnyFactory, when: CombineGestureRecognizerState)...) -> ControlEvent<CombineGestureRecognizer> {
 		let publishers = factories.map { gesture, state in
 			self.gesture(gesture).when(state)
@@ -38,15 +39,9 @@ public extension Reactive where Base: CombineGestureView {
 		return ControlEvent(events: Publishers.MergeMany(publishers))
 	}
 
-	/**
-	 Reactive wrapper for multiple view gesture recognizers.
-	 It automatically attaches the gesture recognizers to the receiver view.
-	 The value the `Publisher` emits is the gesture recognizer itself.
-
-	 rx.anyGesture can't error and is subscribed/observed on main scheduler.
-	 - parameter factories: a `Factory` collection you want to use to create the `GestureRecognizers` to add and observe
-	 - returns: a `ControlEvent<G>` that re-emit the gesture recognizer itself
-	 */
+	/// Observes multiple gesture recognizers (all states).
+	///
+	/// Auto-attaches gestures to view. Emits gesture recognizer on any state change.
 	func anyGesture(_ factories: AnyFactory...) -> ControlEvent<CombineGestureRecognizer> {
 		let publishers = factories.map { factory in
 			self.gesture(factory)
@@ -54,28 +49,23 @@ public extension Reactive where Base: CombineGestureView {
 		return ControlEvent(events: Publishers.MergeMany(publishers))
 	}
 
-	/**
-	 Reactive wrapper for a single view gesture recognizer.
-	 It automatically attaches the gesture recognizer to the receiver view.
-	 The value the `Publisher` emits is the gesture recognizer itself.
-
-	 rx.gesture can't error and is subscribed/observed on main scheduler.
-	 - parameter factory: a `Factory` you want to use to create the `GestureRecognizer` to add and observe
-	 - returns: a `ControlEvent<G>` that re-emit the gesture recognizer itself
-	 */
+	/// Observes single gesture recognizer created from factory.
+	///
+	/// Auto-attaches gesture to view. Emits gesture recognizer on state changes.
 	func gesture<G>(_ factory: Factory<G>) -> ControlEvent<G> {
 		gesture(factory.gesture)
 	}
 
-	/**
-	 Reactive wrapper for a single view gesture recognizer.
-	 It automatically attaches the gesture recognizer to the receiver view.
-	 The value the `Publisher` emits is the gesture recognizer itself.
-
-	 rx.gesture can't error and is subscribed/observed on main scheduler.
-	 - parameter gesture: a `GestureRecognizer` you want to add and observe
-	 - returns: a `ControlEvent<G>` that re-emit the gesture recognizer itself
-	 */
+	/// Observes single gesture recognizer instance.
+	///
+	/// Auto-attaches gesture to view. Emits gesture recognizer on state changes.
+	/// Removes gesture on cancellation.
+	///
+	/// ```swift
+	/// let tap = UITapGestureRecognizer()
+	/// view.cb.gesture(tap)
+	///     .sink { recognizer in print("Tapped") }
+	/// ```
 	func gesture<G: CombineGestureRecognizer>(_ gesture: G) -> ControlEvent<G> {
 		let source = Deferred { [weak control = self.base] () -> AnyPublisher<G, Never> in
 			DispatchQueue.ensureRunningOnMainThread()

@@ -26,22 +26,19 @@ public typealias TapControlEvent = ControlEvent<UITapGestureRecognizer>
 public typealias TapPublisher = AnyPublisher<UITapGestureRecognizer, Never>
 
 public extension Factory where Gesture == CombineGestureRecognizer {
-
-	/**
-	 Returns an `AnyFactory` for `UITapGestureRecognizer`
-	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
-	 */
+	/// Creates tap gesture factory with optional configuration.
 	static func tap(configuration: TapConfiguration? = nil) -> AnyFactory {
 		make(configuration: configuration).abstracted()
 	}
 }
 
 public extension Reactive where Base: CombineGestureView {
-
-	/**
-	 Returns an observable `UITapGestureRecognizer` events sequence
-	 - parameter configuration: A closure that allows to fully configure the gesture recognizer
-	 */
+	/// Observes tap gesture events.
+	///
+	/// ```swift
+	/// view.cb.tapGesture { tap, _ in tap.numberOfTapsRequired = 2 }
+	///     .sink { print("Double tapped") }
+	/// ```
 	func tapGesture(configuration: TapConfiguration? = nil) -> TapControlEvent {
 		gesture(make(configuration: configuration))
 	}
