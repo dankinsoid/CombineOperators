@@ -12,8 +12,8 @@ import UIKit
 import Combine
 
 extension Reactive where Base: UIActivityIndicatorView {
-    /// Bindable sink for `startAnimating()`, `stopAnimating()` methods.
-    public var isAnimating: Binder<Bool> {
+	/// Binds to animation state (calls `startAnimating()`/`stopAnimating()`).
+	public var isAnimating: Binder<Bool> {
         Binder(self.base) { activityIndicator, active in
             if active {
                 activityIndicator.startAnimating()

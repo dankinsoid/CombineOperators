@@ -4,15 +4,18 @@ import Combine
 
 extension Reactive where Base: UIView {
 
+	/// Binds to accessibility identifier.
 	public var accessibilityIdentifier: Binder<String?> {
 		Binder(base, binding: { $0.accessibilityIdentifier = $1 })
 	}
 
+	/// Binds to view's transform.
 	public var transform: Binder<CGAffineTransform> {
 		Binder(base, binding: { $0.transform = $1 })
 	}
 
-    public var movedToWindow: AnyPublisher<Void, Never> {
+	/// Emits once when view moves to window (first occurrence only).
+	public var movedToWindow: AnyPublisher<Void, Never> {
         AnyPublisher<Void, Never>.create { [weak base] in
             let cancellable = base?.observeMoveToWindow(subscriber: $0)
             return AnyCancellable {
@@ -27,6 +30,9 @@ extension Reactive where Base: UIView {
         .eraseToAnyPublisher()
     }
 	
+	/// Emits whether view is visible on screen (within window bounds).
+	///
+	/// Tracks frame changes across view hierarchy. Useful for lazy loading.
 	public var isOnScreen: AnyPublisher<Bool, Never> {
         .create {[weak base] sbr in
 			AnyCancellable(base?.observeIsOnScreen { _ = sbr.receive($0) } ?? {})
@@ -34,7 +40,10 @@ extension Reactive where Base: UIView {
 		.skipFailure()
 		.eraseToAnyPublisher()
 	}
-	
+
+	/// Emits view's frame in its own coordinate space on changes.
+	///
+	/// Observes layer position, bounds, and transform. Skips duplicate frames.
 	public var frame: AnyPublisher<CGRect, Never> {
         .create {[weak base] observer in
 			AnyCancellable(base?.observeFrame { _ = observer.receive($0.frame) } ?? {})
@@ -43,7 +52,10 @@ extension Reactive where Base: UIView {
 		.removeDuplicates()
 		.eraseToAnyPublisher()
 	}
-	
+
+	/// Emits view's frame in window coordinate space on changes.
+	///
+	/// Tracks entire view hierarchy for comprehensive frame monitoring.
 	public var frameOnWindow: AnyPublisher<CGRect, Never> {
         .create {[weak base] sbr in
 			AnyCancellable(base?.observeFrameInWindow { _ = sbr.receive($0) } ?? {})
@@ -53,10 +65,12 @@ extension Reactive where Base: UIView {
 		.eraseToAnyPublisher()
 	}
 
+	/// Emits layer's `isHidden` value on changes.
 	public var isHidden: AnyPublisher<Bool, Never> {
 		value(at: \.isHidden)
 	}
-	
+
+	/// Emits layer's opacity as `CGFloat` on changes.
 	public var alpha: AnyPublisher<CGFloat, Never> {
 		value(at: \.opacity).map { CGFloat($0) }.eraseToAnyPublisher()
 	}

@@ -11,13 +11,13 @@
 import Combine
 import UIKit
 extension Reactive where Base: UIDatePicker {
-    /// Reactive wrapper for `date` property.
-    public var date: ControlProperty<Date> {
+	/// Bidirectional binding for date picker's `date` property.
+	public var date: ControlProperty<Date> {
         value
     }
 
-    /// Reactive wrapper for `date` property.
-    public var value: ControlProperty<Date> {
+	/// Bidirectional binding for date picker's `date` property (alias for `date`).
+	public var value: ControlProperty<Date> {
         return base.cb.controlPropertyWithDefaultEvents(
             getter: { datePicker in
                 datePicker.date
@@ -27,8 +27,8 @@ extension Reactive where Base: UIDatePicker {
         )
     }
 
-    /// Reactive wrapper for `countDownDuration` property.
-    public var countDownDuration: ControlProperty<TimeInterval> {
+	/// Bidirectional binding for countdown duration (timer mode).
+	public var countDownDuration: ControlProperty<TimeInterval> {
         return base.cb.controlPropertyWithDefaultEvents(
             getter: { datePicker in
                 datePicker.countDownDuration

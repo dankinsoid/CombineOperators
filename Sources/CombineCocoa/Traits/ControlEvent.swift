@@ -8,26 +8,20 @@ public protocol ControlEventType: Publisher {
     func asControlEvent() -> ControlEvent<Output>
 }
 
-/**
-    A trait for `Publisher`/`Publisher` that represents an event on a UI element.
-
-    Properties:
-
-    - it doesn’t send any initial value on subscription,
-    - it `Complete`s the sequence when the control deallocates,
-    - it never errors out
-    - it delivers events on `MainScheduler.instance`.
-
-    **The implementation of `ControlEvent` will ensure that sequence of events is being subscribed on main scheduler
-     (`subscribe(on: ConcurrentMainScheduler.instance)` behavior).**
-
-    **It is the implementor’s responsibility to make sure that all other properties enumerated above are satisfied.**
-
-    **If they aren’t, using this trait will communicate wrong properties, and could potentially break someone’s code.**
-
-    **If the `events` observable sequence passed into the initializer doesn’t satisfy all enumerated
-     properties, don’t use this trait.**
-*/
+/// Publisher trait representing UI control events (button taps, value changes, etc.).
+///
+/// Guarantees:
+/// - No initial value on subscription
+/// - Completes when control deallocates
+/// - Never errors (failures caught internally)
+/// - Delivers on main thread
+///
+/// ```swift
+/// button.cb.tap // ControlEvent<Void>
+///     .sink { print("Button tapped") }
+/// ```
+///
+/// **Warning:** Only use this trait if your publisher satisfies all properties above.
 public struct ControlEvent<PropertyType>: ControlEventType {
 	
 	public typealias Failure = Never

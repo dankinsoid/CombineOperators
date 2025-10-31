@@ -3,12 +3,14 @@ import Combine
 #if canImport(UIKit)
 import UIKit
 
-/// Represents text input with reactive extensions.
+/// Wrapper providing reactive access to text input controls.
+///
+/// Combines base control with reactive text property for unified text handling.
 public struct TextInput<Base: UITextInput> {
     /// Base text input to extend.
     public let base: Base
-    
-    /// Reactive wrapper for `text` property.
+
+    /// Reactive text property (bidirectional binding).
     public let text: ControlProperty<String?>
     
     /// Initializes new text input.
@@ -22,10 +24,10 @@ public struct TextInput<Base: UITextInput> {
 }
 
 extension Reactive where Base: UITextField {
-        /// Reactive text input.
-        public var textInput: TextInput<Base> {
-            return TextInput(base: base, text: self.text)
-        }
-    }
+	/// Reactive text input wrapper.
+	public var textInput: TextInput<Base> {
+		return TextInput(base: base, text: self.text)
+	}
+}
 
 #endif

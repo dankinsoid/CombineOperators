@@ -14,8 +14,12 @@ import CombineOperators
 
 private var rx_tap_key: UInt8 = 0
 extension Reactive where Base: UIBarButtonItem {
-    /// Reactive wrapper for target action pattern on `self`.
-    public var tap: ControlEvent<()> {
+	/// Emits when bar button item is tapped.
+	///
+	/// ```swift
+	/// barButton.cb.tap.sink { print("Tapped") }
+	/// ```
+	public var tap: ControlEvent<()> {
         let source = lazyInstanceAnyPublisher(&rx_tap_key) { () -> AnyPublisher<(), Error> in
             .create { [weak control = self.base] observer in
                 guard let control = control else {

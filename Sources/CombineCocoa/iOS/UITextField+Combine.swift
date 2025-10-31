@@ -12,7 +12,16 @@ import Combine
 import UIKit
 
 extension Reactive where Base: UITextField {
-	/// Reactive wrapper for `text` property.
+	/// Bidirectional binding for text field's `text` property.
+	///
+	/// Setter preserves IME marked text selection by checking before assignment.
+	///
+	/// ```swift
+	/// textField.cb.text
+	///     .sink { print("Text: \($0 ?? "")") }
+	///
+	/// publisher.subscribe(textField.cb.text) // Bind to text field
+	/// ```
 	public var text: ControlProperty<String?> {
 		return base.cb.controlPropertyWithDefaultEvents(
 			getter: { textField in
@@ -28,8 +37,10 @@ extension Reactive where Base: UITextField {
 			}
 		)
 	}
-	
-	/// Bindable sink for `attributedText` property.
+
+	/// Bidirectional binding for text field's `attributedText` property.
+	///
+	/// Setter preserves IME marked text selection by checking before assignment.
 	public var attributedText: ControlProperty<NSAttributedString?> {
 		return base.cb.controlPropertyWithDefaultEvents(
 			getter: { textField in

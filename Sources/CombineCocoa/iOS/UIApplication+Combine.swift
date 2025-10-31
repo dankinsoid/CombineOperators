@@ -12,86 +12,91 @@ import UIKit
 import Combine
 
 extension Reactive where Base: UIApplication {
-    
-    /// Reactive wrapper for `UIApplication.didEnterBackgroundNotification`
-    public static var didEnterBackground: ControlEvent<Void> {
+
+	/// Emits when app enters background.
+	///
+	/// ```swift
+	/// UIApplication.cb.didEnterBackground
+	///     .sink { saveState() }
+	/// ```
+	public static var didEnterBackground: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.didEnterBackgroundNotification).map { _ in }
         
         return ControlEvent(events: source)
     }
     
-    /// Reactive wrapper for `UIApplication.willEnterForegroundNotification`
-    public static var willEnterForeground: ControlEvent<Void> {
+	/// Emits when app will enter foreground.
+	public static var willEnterForeground: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification).map { _ in }
-        
+
         return ControlEvent(events: source)
     }
-    
-    /// Reactive wrapper for `UIApplication.didFinishLaunchingNotification`
-    public static var didFinishLaunching: ControlEvent<Void> {
+
+	/// Emits when app finishes launching.
+	public static var didFinishLaunching: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.didFinishLaunchingNotification).map { _ in }
-        
+
         return ControlEvent(events: source)
     }
-    
-    /// Reactive wrapper for `UIApplication.didBecomeActiveNotification`
-    public static var didBecomeActive: ControlEvent<Void> {
+
+	/// Emits when app becomes active.
+	public static var didBecomeActive: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification).map { _ in }
-        
+
         return ControlEvent(events: source)
     }
-    
-    /// Reactive wrapper for `UIApplication.willResignActiveNotification`
-    public static var willResignActive: ControlEvent<Void> {
+
+	/// Emits when app will resign active state.
+	public static var willResignActive: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification).map { _ in }
-        
+
         return ControlEvent(events: source)
     }
-    
-    /// Reactive wrapper for `UIApplication.didReceiveMemoryWarningNotification`
-    public static var didReceiveMemoryWarning: ControlEvent<Void> {
+
+	/// Emits when system issues memory warning.
+	public static var didReceiveMemoryWarning: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.didReceiveMemoryWarningNotification).map { _ in }
-        
+
         return ControlEvent(events: source)
     }
-    
-    /// Reactive wrapper for `UIApplication.willTerminateNotification`
-    public static var willTerminate: ControlEvent<Void> {
+
+	/// Emits when app will terminate.
+	public static var willTerminate: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.willTerminateNotification).map { _ in }
-        
+
         return ControlEvent(events: source)
     }
-    
-    /// Reactive wrapper for `UIApplication.significantTimeChangeNotification`
-    public static var significantTimeChange: ControlEvent<Void> {
+
+	/// Emits on significant time change (midnight, timezone change, etc.).
+	public static var significantTimeChange: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification).map { _ in }
-        
+
         return ControlEvent(events: source)
     }
-    
-    /// Reactive wrapper for `UIApplication.backgroundRefreshStatusDidChangeNotification`
-    public static var backgroundRefreshStatusDidChange: ControlEvent<Void> {
+
+	/// Emits when background refresh status changes.
+	public static var backgroundRefreshStatusDidChange: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.backgroundRefreshStatusDidChangeNotification).map { _ in }
-        
+
         return ControlEvent(events: source)
     }
-    
-    /// Reactive wrapper for `UIApplication.protectedDataWillBecomeUnavailableNotification`
-    public static var protectedDataWillBecomeUnavailable: ControlEvent<Void> {
+
+	/// Emits when protected data will become unavailable (device locks).
+	public static var protectedDataWillBecomeUnavailable: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.protectedDataWillBecomeUnavailableNotification).map { _ in }
-        
+
         return ControlEvent(events: source)
     }
-    
-    /// Reactive wrapper for `UIApplication.protectedDataDidBecomeAvailableNotification`
-    public static var protectedDataDidBecomeAvailable: ControlEvent<Void> {
+
+	/// Emits when protected data becomes available (device unlocks).
+	public static var protectedDataDidBecomeAvailable: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.protectedDataDidBecomeAvailableNotification).map { _ in }
-        
+
         return ControlEvent(events: source)
     }
-    
-    /// Reactive wrapper for `UIApplication.userDidTakeScreenshotNotification`
-    public static var userDidTakeScreenshot: ControlEvent<Void> {
+
+	/// Emits when user takes screenshot.
+	public static var userDidTakeScreenshot: ControlEvent<Void> {
         let source = NotificationCenter.default.publisher(for: UIApplication.userDidTakeScreenshotNotification).map { _ in }
 
         return ControlEvent(events: source)

@@ -50,9 +50,17 @@ final class GestureTarget<Recognizer: UIGestureRecognizer>: CombineTarget {
 }
 
 extension Reactive where Base: UIGestureRecognizer {
-    
-    /// Reactive wrapper for gesture recognizer events.
-    public var event: ControlEvent<Base> {
+
+	/// Emits gesture recognizer instance on each gesture event.
+	///
+	/// ```swift
+	/// panGesture.cb.event
+	///     .sink { recognizer in
+	///         let translation = recognizer.translation(in: view)
+	///         // Handle gesture
+	///     }
+	/// ```
+	public var event: ControlEvent<Base> {
         ControlEvent(
             events: AnyPublisher<Base, Never>.create { [weak control = self.base] observer in
                 DispatchQueue.ensureRunningOnMainThread()

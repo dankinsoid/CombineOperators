@@ -2,6 +2,10 @@ import Foundation
 import Combine
 import CombineOperators
 
+/// Subject wrapper that tracks active subscriber count.
+///
+/// Used internally to enable lazy resource management (e.g., start/stop event listeners
+/// only when observers are present).
 final class HasObserver<Output>: Subject {
 	typealias Failure = Error
 	private let subject = PassthroughSubject<Output, Error>()

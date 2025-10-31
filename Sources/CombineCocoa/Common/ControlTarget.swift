@@ -20,7 +20,9 @@ import Combine
     typealias Control = Cocoa.NSControl
 #endif
 
-// This should be only used from `MainScheduler`
+/// Wraps UIControl/NSControl target-action pattern for Combine integration.
+///
+/// Must be used from `MainScheduler`. Automatically removes target on cancellation.
 final class ControlTarget: CombineTarget {
     typealias Callback = (Control) -> Void
 

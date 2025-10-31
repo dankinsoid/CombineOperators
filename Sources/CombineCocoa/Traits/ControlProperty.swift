@@ -9,30 +9,25 @@ public protocol ControlPropertyType: Publisher, Subscriber where Output == Input
     func asControlProperty() -> ControlProperty<Output>
 }
 
-/**
-    Trait for `Publisher`/`Publisher` that represents property of UI element.
- 
-    Sequence of values only represents initial control value and user initiated value changes.
-    Programmatic value changes won't be reported.
-
-    It's properties are:
-
-    - `shareReplay(1)` behavior
-        - it's stateful, upon subscription (calling subscribe) last element is immediately replayed if it was produced
-    - it will `Complete` sequence on control being deallocated
-    - it never errors out
-    - it delivers events on `MainScheduler.instance`
-
-    **The implementation of `ControlProperty` will ensure that sequence of values is being subscribed on main scheduler
-    (`subscribe(on: ConcurrentMainScheduler.instance)` behavior).**
-
-    **It is implementor's responsibility to make sure that that all other properties enumerated above are satisfied.**
-
-    **If they aren't, then using this trait communicates wrong properties and could potentially break someone's code.**
-
-    **In case `values` observable sequence that is being passed into initializer doesn't satisfy all enumerated
-    properties, please don't use this trait.**
-*/
+/// Publisher/Subscriber trait representing UI control properties (text, isEnabled, etc.).
+///
+/// Represents initial value + user-initiated changes only (programmatic changes excluded).
+///
+/// Guarantees:
+/// - Replays last value on subscription (stateful)
+/// - Completes when control deallocates
+/// - Never errors (failures caught internally)
+/// - Delivers on main thread
+/// - Bidirectional binding support via `Subscriber` conformance
+///
+/// ```swift
+/// textField.cb.text // ControlProperty<String?>
+///     .sink { print("Text: \($0 ?? "")") }
+///
+/// publisher.subscribe(textField.cb.text) // Bind to property
+/// ```
+///
+/// **Warning:** Only use this trait if your publisher satisfies all properties above.
 public struct ControlProperty<PropertyType>: ControlPropertyType {
 	public typealias Output = PropertyType
 	public typealias Failure = Never
@@ -53,17 +48,11 @@ public struct ControlProperty<PropertyType>: ControlPropertyType {
 		self.valueSink = AnySubscriber(valueSink)
 	}
 
-    /// `ControlEvent` of user initiated value changes. Every time user updates control value change event
-    /// will be emitted from `changed` event.
-    ///
-    /// Programmatic changes to control value won't be reported.
-    ///
-    /// It contains all control property values except for first one.
-    ///
-    /// The name only implies that sequence element will be generated once user changes a value and not that
-    /// adjacent sequence values need to be different (e.g. because of interaction between programmatic and user updates,
-    /// or for any other reason).
-    public var changed: ControlEvent<PropertyType> {
+	/// User-initiated value changes only (skips initial value).
+	///
+	/// Excludes programmatic changes. Emits on every user interaction, even if value
+	/// doesn't change.
+	public var changed: ControlEvent<PropertyType> {
         ControlEvent(events: self.values.dropFirst(1))
     }
 
@@ -91,8 +80,8 @@ public struct ControlProperty<PropertyType>: ControlPropertyType {
 }
 
 extension ControlPropertyType where Output == String? {
-    /// Transforms control property of type `String?` into control property of type `String`.
-    public var orEmpty: ControlProperty<String> {
+	/// Transforms optional string property to non-optional (nil → "").
+	public var orEmpty: ControlProperty<String> {
         let original: ControlProperty<String?> = self.asControlProperty()
         let values = original.values.map { $0 ?? "" }
         let valueSink = Subscribers.Sink<String, Never> { _ in

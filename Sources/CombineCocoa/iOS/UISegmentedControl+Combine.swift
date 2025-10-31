@@ -3,8 +3,8 @@
 import UIKit
 import Combine
 extension Reactive where Base: UISegmentedControl {
-    /// Reactive wrapper for `selectedSegmentIndex` property.
-    public var selectedSegmentIndex: ControlProperty<Int> {
+	/// Bidirectional binding for selected segment index.
+	public var selectedSegmentIndex: ControlProperty<Int> {
         base.cb.controlPropertyWithDefaultEvents(
             getter: { segmentedControl in
                 segmentedControl.selectedSegmentIndex
@@ -13,23 +13,23 @@ extension Reactive where Base: UISegmentedControl {
             }
         )
     }
-    
-    /// Reactive wrapper for `setEnabled(_:forSegmentAt:)`
-    public func enabledForSegment(at index: Int) -> Binder<Bool> {
+
+	/// Binds to enabled state for specific segment.
+	public func enabledForSegment(at index: Int) -> Binder<Bool> {
         Binder(self.base) { segmentedControl, segmentEnabled -> Void in
             segmentedControl.setEnabled(segmentEnabled, forSegmentAt: index)
         }
     }
-    
-    /// Reactive wrapper for `setTitle(_:forSegmentAt:)`
-    public func titleForSegment(at index: Int) -> Binder<String?> {
+
+	/// Binds to title for specific segment.
+	public func titleForSegment(at index: Int) -> Binder<String?> {
         Binder(self.base) { segmentedControl, title -> Void in
             segmentedControl.setTitle(title, forSegmentAt: index)
         }
     }
-    
-    /// Reactive wrapper for `setImage(_:forSegmentAt:)`
-    public func imageForSegment(at index: Int) -> Binder<UIImage?> {
+
+	/// Binds to image for specific segment.
+	public func imageForSegment(at index: Int) -> Binder<UIImage?> {
         Binder(self.base) { segmentedControl, image -> Void in
             segmentedControl.setImage(image, forSegmentAt: index)
         }

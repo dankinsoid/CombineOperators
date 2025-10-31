@@ -5,10 +5,13 @@ import CombineOperators
 import UIKit
 
 extension Reactive where Base: UIControl {
-    /// Reactive wrapper for target action pattern.
-    ///
-    /// - parameter controlEvents: Filter for observed event types.
-    public func controlEvent(_ controlEvents: UIControl.Event) -> ControlEvent<Void> {
+	/// Reactive wrapper for target-action pattern events.
+	///
+	/// ```swift
+	/// button.cb.controlEvent(.touchUpInside)
+	///     .sink { print("Tapped") }
+	/// ```
+	public func controlEvent(_ controlEvents: UIControl.Event) -> ControlEvent<Void> {
         ControlEvent(
             events: AnyPublisher<Void, Error>.create { [weak control = self.base] observer in
                 DispatchQueue.ensureRunningOnMainThread()
@@ -27,13 +30,12 @@ extension Reactive where Base: UIControl {
         )
     }
 
-    
-    /// Creates a `ControlProperty` that is triggered by target/action pattern value updates.
-    ///
-    /// - parameter controlEvents: Events that trigger value update sequence elements.
-    /// - parameter getter: Property value getter.
-    /// - parameter setter: Property value setter.
-    public func controlProperty<T>(
+
+
+	/// Creates read-only control event that emits property values on control events.
+	///
+	/// Emits initial value immediately, then on each control event.
+	public func controlProperty<T>(
         _ getter: @escaping (Base) -> T,
         on controlEvents: UIControl.Event = .valueChanged
     ) -> ControlEvent<T> {
@@ -44,13 +46,20 @@ extension Reactive where Base: UIControl {
                 .prepend(getter(base))
         )
     }
-    
-    /// Creates a `ControlProperty` that is triggered by target/action pattern value updates.
-    ///
-    /// - parameter controlEvents: Events that trigger value update sequence elements.
-    /// - parameter getter: Property value getter.
-    /// - parameter setter: Property value setter.
-    public func controlProperty<T>(
+
+
+	/// Creates bidirectional control property with getter/setter.
+	///
+	/// Enables both observing and binding control values.
+	///
+	/// ```swift
+	/// let property = slider.cb.controlProperty(
+	///     editingEvents: .valueChanged,
+	///     getter: { $0.value },
+	///     setter: { $0.value = $1 }
+	/// )
+	/// ```
+	public func controlProperty<T>(
         editingEvents: UIControl.Event,
         getter: @escaping (Base) -> T,
         setter: @escaping (Base, T) -> Void

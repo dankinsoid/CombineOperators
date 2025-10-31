@@ -34,38 +34,24 @@ extension CombineCocoaURLError: CustomDebugStringConvertible {
 }
 
 extension Reactive where Base: URLSession {
-    /**
-    Publisher sequence of responses for URL request.
-    
-    Performing of request starts after observer is subscribed and not after invoking this method.
-    
-    **URL requests will be performed per subscribed observer.**
-    
-    Any error during fetching of the response will cause observed sequence to terminate with error.
-    
-    - parameter request: URL request.
-    - returns: Publisher sequence of URL responses.
-    */
+	/// Publisher for URL request responses (data + URLResponse pair).
+	///
+	/// Request starts on subscription. Each subscriber triggers separate request.
+	///
+	/// ```swift
+	/// urlSession.cb.response(request: request)
+	///     .sink { print($0.data, $0.response) }
+	/// ```
 	public func response(request: URLRequest) -> URLSession.DataTaskPublisher {
 		base.dataTaskPublisher(for: request)
 	}
 
-    /**
-    Publisher sequence of response data for URL request.
-    
-    Performing of request starts after observer is subscribed and not after invoking this method.
-    
-    **URL requests will be performed per subscribed observer.**
-    
-    Any error during fetching of the response will cause observed sequence to terminate with error.
-    
-    If response is not HTTP response with status code in the range of `200 ..< 300`, sequence
-    will terminate with `(CombineCocoaErrorDomain, CombineCocoaError.NetworkError)`.
-    
-    - parameter request: URL request.
-    - returns: Publisher sequence of response data.
-    */
-    public func data(request: URLRequest) -> AnyPublisher<Data, Error> {
+	/// Publisher for URL request data. Fails on non-2xx HTTP status codes.
+	///
+	/// Request starts on subscription. Each subscriber triggers separate request.
+	///
+	/// Throws `CombineCocoaURLError.httpRequestFailed` for status codes outside `200..<300`.
+	public func data(request: URLRequest) -> AnyPublisher<Data, Error> {
 			self.response(request: request).tryMap { pair -> Data in
 				if 200 ..< 300 ~= (pair.1._statusCode ?? 201) {
 					return pair.0
@@ -77,24 +63,12 @@ extension Reactive where Base: URLSession {
 			.eraseToAnyPublisher()
     }
 
-    /**
-    Publisher sequence of response JSON for URL request.
-    
-    Performing of request starts after observer is subscribed and not after invoking this method.
-    
-    **URL requests will be performed per subscribed observer.**
-    
-    Any error during fetching of the response will cause observed sequence to terminate with error.
-    
-    If response is not HTTP response with status code in the range of `200 ..< 300`, sequence
-    will terminate with `(CombineCocoaErrorDomain, CombineCocoaError.NetworkError)`.
-    
-    If there is an error during JSON deserialization observable sequence will fail with that error.
-    
-    - parameter request: URL request.
-    - returns: Publisher sequence of response JSON.
-    */
-    public func json(request: URLRequest, options: JSONSerialization.ReadingOptions = []) -> AnyPublisher<Any, Error> {
+	/// Publisher for URL request JSON. Fails on non-2xx status or invalid JSON.
+	///
+	/// Request starts on subscription. Each subscriber triggers separate request.
+	///
+	/// Throws `CombineCocoaURLError.httpRequestFailed` or `.deserializationError`.
+	public func json(request: URLRequest, options: JSONSerialization.ReadingOptions = []) -> AnyPublisher<Any, Error> {
 			self.data(request: request).tryMap { data -> Any in
 				do {
 					return try JSONSerialization.jsonObject(with: data, options: options)
@@ -105,24 +79,10 @@ extension Reactive where Base: URLSession {
 			.eraseToAnyPublisher()
     }
 
-    /**
-    Publisher sequence of response JSON for GET request with `URL`.
-     
-    Performing of request starts after observer is subscribed and not after invoking this method.
-    
-    **URL requests will be performed per subscribed observer.**
-    
-    Any error during fetching of the response will cause observed sequence to terminate with error.
-    
-    If response is not HTTP response with status code in the range of `200 ..< 300`, sequence
-    will terminate with `(CombineCocoaErrorDomain, CombineCocoaError.NetworkError)`.
-    
-    If there is an error during JSON deserialization observable sequence will fail with that error.
-    
-    - parameter url: URL of `NSURLRequest` request.
-    - returns: Publisher sequence of response JSON.
-    */
-    public func json(url: Foundation.URL) -> AnyPublisher<Any, Error> {
+	/// Publisher for GET request JSON from URL.
+	///
+	/// Convenience wrapper for `json(request:)` with GET request.
+	public func json(url: Foundation.URL) -> AnyPublisher<Any, Error> {
 			self.json(request: URLRequest(url: url))
     }
 }

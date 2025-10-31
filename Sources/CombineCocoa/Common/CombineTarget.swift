@@ -10,6 +10,7 @@ import Foundation
 
 import Combine
 
+/// Base class for Combine target-action wrappers. Must be created on main thread.
 class CombineTarget: NSObject, Cancellable {
     
     override init() {

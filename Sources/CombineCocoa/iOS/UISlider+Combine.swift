@@ -12,9 +12,16 @@ import Combine
 import UIKit
 
 extension Reactive where Base: UISlider {
-    
-    /// Reactive wrapper for `value` property.
-    public var value: ControlProperty<Float> {
+
+	/// Bidirectional binding for slider's `value` property.
+	///
+	/// ```swift
+	/// slider.cb.value
+	///     .sink { print("Value: \($0)") }
+	///
+	/// publisher.subscribe(slider.cb.value) // Bind to slider
+	/// ```
+	public var value: ControlProperty<Float> {
         return base.cb.controlPropertyWithDefaultEvents(
             getter: { slider in
                 slider.value
@@ -23,7 +30,7 @@ extension Reactive where Base: UISlider {
             }
         )
     }
-    
+
 }
 
 #endif

@@ -26,17 +26,15 @@ to replace dealloc method. In case that isn't the case, it should be ok.
 */
 extension Reactive where Base: NSObject {
 
-    /**
-    Observes values at the provided key path using the provided options.
-
-     - parameter keyPath: A key path between the object and one of its properties.
-     - parameter options: Key-value observation options, defaults to `.new` and `.initial`.
-
-     - note: When the object is deallocated, a completion event is emitted.
-
-     - returns: An observable emitting value changes at the provided key path.
-    */
-    public func observe<Element>(
+	/// KVO publisher for property at keypath.
+	///
+	/// Completes when object deallocates. Defaults to emitting initial + new values.
+	///
+	/// ```swift
+	/// view.cb.observe(\.frame)
+	///     .sink { print("Frame: \($0)") }
+	/// ```
+	public func observe<Element>(
         _ keyPath: KeyPath<Base, Element>,
         options: NSKeyValueObservingOptions = [.new, .initial]
     ) -> NSObject.KeyValueObservingPublisher<Base, Element> {
@@ -48,15 +46,14 @@ extension Reactive where Base: NSObject {
 
 // Dealloc
 extension Reactive where Base: AnyObject {
-    
-    /**
-    Publisher sequence of object deallocated events.
-    
-    After object is deallocated one `()` element will be produced and sequence will immediately complete.
-    
-    - returns: Publisher sequence of object deallocated events.
-    */
-    public var deallocated: AnyPublisher<Void, Never> {
+
+	/// Emits once when object deallocates, then completes.
+	///
+	/// Useful for automatic cleanup:
+	/// ```swift
+	/// publisher.prefix(untilOutputFrom: view.cb.deallocated)
+	/// ```
+	public var deallocated: AnyPublisher<Void, Never> {
         Publishers.Create { subscriber in
             if let value = objc_getAssociatedObject(self.base, &deallocatedKey) as? DeolocateSubscribers {
                 value.subscribers.append(subscriber)

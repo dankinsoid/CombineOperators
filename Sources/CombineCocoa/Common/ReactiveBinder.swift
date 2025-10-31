@@ -2,9 +2,18 @@ import Foundation
 import Combine
 import CombineOperators
 
+/// Binds publisher values to target object properties via keypaths.
+///
+/// Weakly holds target and schedules updates on main thread. Automatically cancels
+/// subscription when target deallocates.
+///
+/// ```swift
+/// let label = UILabel()
+/// publisher.subscribe(label.cb.text) // Updates label.text on main thread
+/// ```
 @dynamicMemberLookup
 public struct ReactiveBinder<Target: AnyObject, Input, KP: KeyPath<Target, Input>>: CustomCombineIdentifierConvertible {
-	
+
 	fileprivate weak var _target: Target?
 	fileprivate let keyPath: KP
     public let combineIdentifier = CombineIdentifier()
@@ -20,14 +29,20 @@ public struct ReactiveBinder<Target: AnyObject, Input, KP: KeyPath<Target, Input
 	public init(_ target: Target, keyPath: KP) {
         self.init(target: target, keyPath: keyPath)
 	}
-	
+
+	/// Chains read-only keypath for nested property access.
 	public subscript<T>(dynamicMember keyPath: KeyPath<Input, T>) -> ReactiveBinder<Target, T, KeyPath<Target, T>> {
         ReactiveBinder<Target, T, KeyPath<Target, T>>(
             target: target,
             keyPath: self.keyPath.appending(path: keyPath)
         )
 	}
-	
+
+	/// Chains writable keypath for nested property binding.
+	///
+	/// ```swift
+	/// publisher.subscribe(view.cb.layer.opacity) // Binds to view.layer.opacity
+	/// ```
 	public subscript<T>(dynamicMember keyPath: ReferenceWritableKeyPath<Input, T>) -> ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>> {
         ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>>(
             target: target,
@@ -65,7 +80,8 @@ private var deiniterKey = 0
 extension ReactiveBinder: Subscriber where KP: ReferenceWritableKeyPath<Target, Input> {
 
 	public typealias Failure = Never
-	
+
+	/// Starts subscription, cancels automatically when target deallocates.
     public func receive(subscription: Subscription) {
         if let target {
             objc_setAssociatedObject(
@@ -82,6 +98,7 @@ extension ReactiveBinder: Subscriber where KP: ReferenceWritableKeyPath<Target, 
         }
     }
 
+	/// Receives value and updates target property on main thread.
     public func receive(_ input: Input) -> Subscribers.Demand {
         if let target {
             MainScheduler.instance.schedule { [keyPath] in

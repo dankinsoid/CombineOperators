@@ -32,28 +32,39 @@ public struct Reactive<Base> {
 }
 
 extension Reactive where Base: AnyObject {
-	
-	/// Automatically synthesized binder for a key path between the reactive
-	/// base and one of its properties
+
+	/// Synthesizes binder for read-only property access via dynamic member lookup.
+	///
+	/// ```swift
+	/// label.cb.text // Returns ReactiveBinder<UILabel, String?, KeyPath<...>>
+	/// ```
 	public subscript<T>(dynamicMember keyPath: KeyPath<Base, T>) -> ReactiveBinder<Base, T, KeyPath<Base, T>> {
 		ReactiveBinder<Base, T, KeyPath<Base, T>>(base, keyPath: keyPath)
 	}
-	
+
+	/// Synthesizes binder for writable property binding via dynamic member lookup.
+	///
+	/// Enables reactive binding to object properties:
+	/// ```swift
+	/// publisher.subscribe(label.cb.text) // Binds publisher output to label.text
+	/// ```
 	public subscript<T>(dynamicMember keyPath: ReferenceWritableKeyPath<Base, T>) -> ReactiveBinder<Base, T, ReferenceWritableKeyPath<Base, T>> {
 		ReactiveBinder<Base, T, ReferenceWritableKeyPath<Base, T>>(base, keyPath: keyPath)
 	}
 }
 
-/// A type that has reactive extensions.
+/// Protocol enabling reactive extensions via the `cb` namespace.
+///
+/// Conform to this protocol to add reactive capabilities to your types.
 public protocol ReactiveCompatible {
 
     /// Extended type
     associatedtype ReactiveBase
 
-    /// Reactive extensions.
+    /// Reactive extensions namespace (type-level).
     static var cb: Reactive<ReactiveBase>.Type { get set }
 
-    /// Reactive extensions.
+    /// Reactive extensions namespace (instance-level).
     var cb: Reactive<ReactiveBase> { get set }
 }
 
