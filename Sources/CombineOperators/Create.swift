@@ -1,20 +1,25 @@
-//
-//  File.swift
-//  
-//
-//  Created by Данил Войдилов on 27.02.2021.
-//
-
 import Foundation
 import Combine
 import os
 
 extension Publishers {
-	
+
+	/// Publisher created from a closure that receives a subscriber.
+	///
+	/// Provides manual control over publisher lifecycle.
+	///
+	/// ```swift
+	/// let publisher = Publishers.Create<Int, Never> { subscriber in
+	///     subscriber.receive(1)
+	///     subscriber.receive(2)
+	///     subscriber.receive(completion: .finished)
+	///     return AnyCancellable {}
+	/// }
+	/// ```
 	public struct Create<Output, Failure: Swift.Error>: Publisher {
 
 		private let closure: (AnySubscriber<Output, Failure>) -> Cancellable
-		
+
 		public init(_ closure: @escaping (AnySubscriber<Output, Failure>) -> Cancellable) {
 			self.closure = closure
 		}
@@ -67,6 +72,15 @@ extension Subscriptions {
 
 extension AnyPublisher {
 
+	/// Creates a publisher from a closure with full control over emissions.
+	///
+	/// ```swift
+	/// AnyPublisher<String, Never>.create { subscriber in
+	///     subscriber.receive("Hello")
+	///     subscriber.receive(completion: .finished)
+	///     return AnyCancellable { print("Cancelled") }
+	/// }
+	/// ```
 	public static func create(_ closure: @escaping (AnySubscriber<Output, Failure>) -> Cancellable) -> AnyPublisher {
 		Publishers.Create<Output, Failure>(closure).eraseToAnyPublisher()
 	}

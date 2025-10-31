@@ -1,5 +1,17 @@
 import Combine
 
+/// Result builder for merging multiple publishers declaratively.
+///
+/// ```swift
+/// let merged = AnyPublisher<Int, Never>.merge {
+///     publisher1
+///     publisher2
+///     if condition {
+///         publisher3
+///     }
+///     [4, 5, 6]  // sequence as publisher
+/// }
+/// ```
 @resultBuilder
 public struct MergeBuilder<Output, Failure: Error> {
     
@@ -80,6 +92,15 @@ extension MergeBuilder where Failure == Never {
 
 extension AnyPublisher {
 
+    /// Creates a merged publisher from multiple sources using result builder.
+    ///
+    /// ```swift
+    /// let merged = AnyPublisher<String, Never>.merge {
+    ///     textPublisher
+    ///     urlPublisher.map { $0.absoluteString }
+    ///     ["constant", "values"]
+    /// }
+    /// ```
     public static func merge(@MergeBuilder<Output, Failure> _ build: () -> AnyPublisher<Output, Failure>) -> AnyPublisher<Output, Failure> {
         build()
     }

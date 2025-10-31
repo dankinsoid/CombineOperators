@@ -1,6 +1,20 @@
 import Foundation
 import Combine
 
+/// Subject that replays a buffer of values to new subscribers.
+///
+/// Unlike `CurrentValueSubject`, can buffer multiple values (0 to N).
+/// Thread-safe for concurrent subscriptions and emissions.
+///
+/// ```swift
+/// let subject = ReplaySubject<Int, Never>(2)
+/// subject.send(1)
+/// subject.send(2)
+/// subject.send(3)
+///
+/// // New subscriber receives last 2 values: [2, 3]
+/// subject.sink { print($0) }
+/// ```
 public final class ReplaySubject<Output, Failure: Error>: Subject {
 
 	private var buffer: [Output] = []
@@ -8,7 +22,10 @@ public final class ReplaySubject<Output, Failure: Error>: Subject {
 	private var subscriptions = [UUID: ReplaySubjectSubscription<Output, Failure>]()
 	private var completion: Subscribers.Completion<Failure>?
 	private let lock = Lock()
-	
+
+	/// Creates a replay subject with specified buffer size.
+	///
+	/// - Parameter bufferSize: Number of recent values to replay (0 = none)
 	public init(_ bufferSize: Int = 0) {
 		self.bufferSize = bufferSize
 	}
@@ -105,6 +122,17 @@ public final class ReplaySubjectSubscription<Output, Failure: Error>: Subscripti
 
 extension Publisher {
 
+	/// Shares publisher with replay capability for late subscribers.
+	///
+	/// - Parameter bufferSize: Number of values to replay (default: 0)
+	///
+	/// ```swift
+	/// let shared = networkPublisher.share(replay: 1)
+	/// // First subscriber triggers work
+	/// shared.sink { print("A: \($0)") }
+	/// // Second subscriber receives last value immediately
+	/// shared.sink { print("B: \($0)") }
+	/// ```
 	public func share(replay bufferSize: Int = 0) -> some Publisher<Output, Failure> {
 		multicast(subject: ReplaySubject(bufferSize)).autoconnect()
 	}

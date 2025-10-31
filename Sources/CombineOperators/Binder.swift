@@ -1,14 +1,18 @@
 import Foundation
 import Combine
 
-/**
- Observer that enforces interface binding rules:
- * ensures binding is performed on a specific scheduler
-
- `Binder` doesn't retain target and in case target is released, element isn't bound.
- 
- By default it binds elements on main scheduler.
- */
+/// Subscriber that binds values to a target object on a specific scheduler.
+///
+/// Holds a weak reference to target - automatically stops binding when target deallocates.
+/// Defaults to main scheduler for UI bindings.
+///
+/// ```swift
+/// let label = UILabel()
+/// let binder = Binder(label) { label, text in
+///     label.text = text
+/// }
+/// textPublisher.subscribe(binder)
+/// ```
 public struct Binder<Input>: Subscriber {
 
     public typealias Failure = Never
@@ -17,11 +21,13 @@ public struct Binder<Input>: Subscriber {
     private weak var _target: AnyObject?
     public let combineIdentifier = CombineIdentifier()
 
-    /// Initializes `Binder`
+    /// Creates a binder with custom scheduler.
     ///
-    /// - parameter target: Target object.
-    /// - parameter scheduler: Scheduler used to bind the events.
-    /// - parameter binding: Binding logic.
+    /// ```swift
+    /// let binder = Binder(model, scheduler: DispatchQueue.global()) { model, value in
+    ///     model.process(value)
+    /// }
+    /// ```
     public init<Target: AnyObject, S: Scheduler>(
         _ target: Target,
         scheduler: S,
@@ -36,10 +42,16 @@ public struct Binder<Input>: Subscriber {
 		}
 	}
 
-    /// Initializes `Binder`
+    /// Creates a binder that executes on the main actor.
     ///
-    /// - parameter target: Target object.
-    /// - parameter binding: Binding logic.
+    /// Preferred for UI bindings that require main actor isolation.
+    ///
+    /// ```swift
+    /// let button = UIButton()
+    /// let binder = Binder(button) { button, isEnabled in
+    ///     button.isEnabled = isEnabled
+    /// }
+    /// ```
     public init<Target: AnyObject>(
         _ target: Target,
         binding: @escaping @MainActor (Target, Input) -> Void

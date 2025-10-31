@@ -1,6 +1,13 @@
 import Foundation
 import Combine
 
+/// Scheduler that executes on main thread, optimized to avoid unnecessary dispatch.
+///
+/// If already on main thread, executes synchronously. Otherwise dispatches async.
+///
+/// ```swift
+/// publisher.receive(on: MainScheduler.instance)
+/// ```
 public struct MainScheduler: Scheduler {
 
     public var now: DispatchQueue.SchedulerTimeType { DispatchQueue.main.now }
@@ -9,8 +16,10 @@ public struct MainScheduler: Scheduler {
     public typealias SchedulerTimeType = DispatchQueue.SchedulerTimeType
     public typealias SchedulerOptions = Void
     
+    /// Shared main scheduler instance.
     public static let instance = MainScheduler()
-    
+
+    /// Schedules action on main thread. Executes synchronously if already on main.
     public func schedule(options: SchedulerOptions?, _ action: @escaping () -> Void) {
         if Thread.isMainThread {
             action()
@@ -21,6 +30,7 @@ public struct MainScheduler: Scheduler {
         }
     }
     
+    /// Synchronously executes MainActor-isolated closure, respecting isolation.
     public func synchSchedule<T>(_ action: @MainActor () -> T) -> T {
         if Thread.isMainThread {
             return MainActor.assumeIsolated {

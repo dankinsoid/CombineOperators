@@ -1,6 +1,17 @@
 import Foundation
 import Combine
 
+/// Result builder for composing multiple cancellables.
+///
+/// ```swift
+/// let bag = AnyCancellable {
+///     subscription1
+///     subscription2
+///     if condition {
+///         subscription3
+///     }
+/// }
+/// ```
 @resultBuilder
 public struct CancellableBuilder {
 	
@@ -46,15 +57,30 @@ public struct CancellableBuilder {
 }
 
 extension AnyCancellable {
-	
+
+	/// Creates cancellable from variadic list.
+	///
+	/// ```swift
+	/// let bag = AnyCancellable(sub1, sub2, sub3)
+	/// bag.cancel()  // cancels all
+	/// ```
 	public convenience init(_ list: Cancellable...) {
 		self.init(list)
 	}
-	
+
+	/// Creates cancellable using result builder syntax.
+	///
+	/// ```swift
+	/// let bag = AnyCancellable {
+	///     publisher1.sink { }
+	///     publisher2.sink { }
+	/// }
+	/// ```
     public convenience init(@CancellableBuilder _ builder: () -> Cancellable) {
         self.init(builder())
 	}
-    
+
+	/// Creates cancellable from a sequence.
     public convenience init<S: Sequence>(_ sequence: S) where S.Element == Cancellable {
         self.init {
             sequence.forEach { $0.cancel() }
@@ -62,10 +88,17 @@ extension AnyCancellable {
     }
 }
 
+/// Combines two cancellables using `+` operator.
+///
+/// ```swift
+/// let combined = subscription1 + subscription2
+/// combined.cancel()  // cancels both
+/// ```
 public func +(_ lhs: Cancellable, _ rhs: Cancellable) -> Cancellable {
     ManualAnyCancellable(lhs, rhs)
 }
 
+/// Lightweight cancellable that executes custom cancellation logic.
 public struct ManualAnyCancellable: Cancellable {
 
     private let cancelAction: () -> Void

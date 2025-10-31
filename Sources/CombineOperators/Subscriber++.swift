@@ -2,6 +2,7 @@ import Combine
 
 extension Subscriber where Failure == Error {
 
+    /// Type-erases specific error to generic `Error`.
     public func setFailureType<F: Error>(to: F.Type = F.self) -> Subscribers.MapFailure<Self, Error> {
         mapFailure { $0 as Error }
     }
@@ -9,20 +10,28 @@ extension Subscriber where Failure == Error {
 
 extension Subscriber {
 
+    /// Transforms incoming values before they reach this subscriber.
+    ///
+    /// ```swift
+    /// subscriber.map { (string: String) in Int(string) ?? 0 }
+    /// ```
     public func map<NewInput>(_ transform: @escaping (NewInput) -> Input) -> Subscribers.Map<Self, NewInput> {
         Subscribers.Map<Self, NewInput>(self, transform: transform)
     }
 
+    /// Transforms incoming failures before they reach this subscriber.
     public func mapFailure<NewFailure: Error>(_ transform: @escaping (NewFailure) -> Failure) -> Subscribers.MapFailure<Self, NewFailure> {
         Subscribers.MapFailure<Self, NewFailure>(self, transform: transform)
     }
 
+    /// Converts to a non-failing subscriber (Never failure type).
     public func nonFailing() -> Subscribers.MapFailure<Self, Never> {
         mapFailure { never in
             never
         }
     }
 
+    /// Unwraps optional input type.
     public func nonOptional<T>() -> Subscribers.Map<Self, T> where Input == T? {
         map { $0 }
     }
@@ -96,6 +105,14 @@ extension Subscribers {
     }
 }
 
+/// Combines two subscribers to receive the same events.
+///
+/// Both subscribers receive all subscriptions, values, and completions.
+/// Demand is the minimum of both subscribers' demands.
+///
+/// ```swift
+/// let combined = subscriberA + subscriberB
+/// ```
 public func +<T: Subscriber, O: Subscriber>(_ lhs: T, _ rhs: O) -> AnySubscriber<O.Input, O.Failure> where O.Input == T.Input, O.Failure == T.Failure {
     AnySubscriber(
         receiveSubscription: {

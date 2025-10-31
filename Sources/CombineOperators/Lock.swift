@@ -1,6 +1,7 @@
 import os
 import Foundation
 
+/// Thread-safe lock using `os_unfair_lock` for performance.
 package final class Lock {
     
     private var _lock = os_unfair_lock()
@@ -24,6 +25,12 @@ package final class Lock {
     }
 }
 
+/// Property wrapper providing thread-safe access to wrapped value.
+///
+/// ```swift
+/// @Locked var counter = 0
+/// counter += 1  // thread-safe
+/// ```
 @propertyWrapper
 package final class Locked<Value> {
 
