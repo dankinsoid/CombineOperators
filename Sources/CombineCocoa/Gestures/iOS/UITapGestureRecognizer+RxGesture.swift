@@ -23,14 +23,10 @@
 import UIKit
 import Combine
 
-@available(iOS 13.0, macOS 10.15, *)
 public typealias TapConfiguration = Configuration<UITapGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias TapControlEvent = ControlEvent<UITapGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias TapPublisher = AnyPublisher<UITapGestureRecognizer, Never>
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Factory where Gesture == CombineGestureRecognizer {
 
     /**
@@ -42,7 +38,6 @@ extension Factory where Gesture == CombineGestureRecognizer {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: CombineGestureView {
 
     /**

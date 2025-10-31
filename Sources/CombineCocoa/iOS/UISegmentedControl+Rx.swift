@@ -2,7 +2,6 @@
 
 import UIKit
 import Combine
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UISegmentedControl {
     /// Reactive wrapper for `selectedSegmentIndex` property.
     public var selectedSegmentIndex: ControlProperty<Int> {

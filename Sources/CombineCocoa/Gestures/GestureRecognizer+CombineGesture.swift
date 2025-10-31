@@ -23,7 +23,6 @@ import struct CoreGraphics.CGPoint
 
 public typealias LocationInView = (CombineGestureView) -> CGPoint
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Publisher where Output: CombineGestureRecognizer {
 
     /**

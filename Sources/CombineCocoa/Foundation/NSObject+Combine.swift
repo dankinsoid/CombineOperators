@@ -24,7 +24,6 @@ Both approaches can fail in certain scenarios:
 Second approach is chosen. It can fail in case there are multiple libraries dynamically trying
 to replace dealloc method. In case that isn't the case, it should be ok.
 */
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: NSObject {
 
     /**
@@ -48,7 +47,6 @@ extension Reactive where Base: NSObject {
 #endif
 
 // Dealloc
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: AnyObject {
     
     /**
@@ -76,9 +74,8 @@ extension Reactive where Base: AnyObject {
     }
 }
 
-private var deallocatedKey = "deallocatedKey"
+private var deallocatedKey = 0
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: AnyObject {
     
     /**

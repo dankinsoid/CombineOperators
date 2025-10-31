@@ -12,7 +12,6 @@ import UIKit
 import Combine
 
 // This should be only used from `MainScheduler`
-@available(iOS 13.0, macOS 10.15, *)
 final class GestureTarget<Recognizer: UIGestureRecognizer>: CombineTarget {
     typealias Callback = (Recognizer) -> Void
     
@@ -50,7 +49,6 @@ final class GestureTarget<Recognizer: UIGestureRecognizer>: CombineTarget {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIGestureRecognizer {
     
     /// Reactive wrapper for gesture recognizer events.
@@ -61,7 +59,7 @@ extension Reactive where Base: UIGestureRecognizer {
                 
                 guard let control = control else {
                     observer.receive(completion: .finished)
-                    return AnyCancellable { }
+                    return ManualAnyCancellable()
                 }
                 
                 let observer = GestureTarget(control) { control in

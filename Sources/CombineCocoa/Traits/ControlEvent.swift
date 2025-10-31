@@ -2,7 +2,6 @@ import Foundation
 import Combine
 
 /// A protocol that extends `ControlEvent`.
-@available(iOS 13.0, macOS 10.15, *)
 public protocol ControlEventType: Publisher {
 
     /// - returns: `ControlEvent` interface
@@ -29,7 +28,6 @@ public protocol ControlEventType: Publisher {
     **If the `events` observable sequence passed into the initializer doesn’t satisfy all enumerated
      properties, don’t use this trait.**
 */
-@available(iOS 13.0, macOS 10.15, *)
 public struct ControlEvent<PropertyType>: ControlEventType {
 	
 	public typealias Failure = Never

@@ -22,7 +22,6 @@ import Combine
 import CombineOperators
 import Dispatch
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: CombineGestureView {
 	
 	/**

@@ -11,7 +11,6 @@
 import UIKit
 import Combine
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIApplication {
     
     /// Reactive wrapper for `UIApplication.didEnterBackgroundNotification`

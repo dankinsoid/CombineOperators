@@ -64,12 +64,9 @@ public class ForceTouchGestureRecognizer: CombineGestureRecognizer {
 }
 
 public typealias ForceTouchConfiguration = Configuration<ForceTouchGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias ForceTouchControlEvent = ControlEvent<ForceTouchGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias ForceTouchPublisher = AnyPublisher<ForceTouchGestureRecognizer, Never>
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Factory where Gesture == CombineGestureRecognizer {
 	
 	/**
@@ -81,7 +78,6 @@ extension Factory where Gesture == CombineGestureRecognizer {
 	}
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: CombineGestureView {
 	
 	/**
@@ -93,9 +89,9 @@ extension Reactive where Base: CombineGestureView {
 	}
 }
 
-@available(iOS 14.0, macOS 10.15, *)
+@available(macOS 11.0, iOS 14.0, tvOS 14.0, watchOS 7.0, *)
 extension Publisher where Output: ForceTouchGestureRecognizer {
-	
+
 	/**
 	Maps the observable `GestureRecognizer` events sequence to an observable sequence of force values.
 	*/

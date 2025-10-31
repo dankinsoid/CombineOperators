@@ -3,26 +3,26 @@
 import UIKit
 import Combine
 import Foundation
+import CombineOperators
 
-@available(iOS 13.0, macOS 10.15, *)
 public class TouchDownGestureRecognizer: UIGestureRecognizer {
 
     public override init(target: Any?, action: Selector?) {
         super.init(target: target, action: action)
         trigger
-					.flatMap(maxPublishers: .max(1)) { [unowned self] _ -> AnyPublisher<Void, Never> in
+            .flatMap(maxPublishers: .max(1)) { [unowned self] _ -> AnyPublisher<Void, Never> in
                 let trigger = Just(())
                 guard self.state == .possible else {
-									return trigger.eraseToAnyPublisher()
+                    return trigger.eraseToAnyPublisher()
                 }
-							return trigger
-								.delay(for: .microseconds(Int(minimumTouchDuration * 1_000_000)), scheduler: RunLoop.main)
-								.eraseToAnyPublisher()
+                return trigger
+                    .delay(for: .microseconds(Int(minimumTouchDuration * 1_000_000)), scheduler: MainScheduler.instance)
+                    .eraseToAnyPublisher()
             }
             .sink(receiveValue: { [unowned self] _ in
                 self.touches = self._touches
             })
-					.store(in: &triggerDisposeBag)
+            .store(in: &triggerDisposeBag)
     }
 
     public var minimumTouchDuration: TimeInterval = 0
@@ -96,14 +96,10 @@ public class TouchDownGestureRecognizer: UIGestureRecognizer {
 
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 public typealias TouchDownConfiguration = Configuration<TouchDownGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias TouchDownControlEvent = ControlEvent<TouchDownGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias TouchDownPublisher = AnyPublisher<TouchDownGestureRecognizer, Never>
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Factory where Gesture == CombineGestureRecognizer {
 
     /**
@@ -115,7 +111,6 @@ extension Factory where Gesture == CombineGestureRecognizer {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: CombineGestureView {
 
     /**
@@ -127,7 +122,6 @@ extension Reactive where Base: CombineGestureView {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Publisher where Output: TouchDownGestureRecognizer {
 
     /**

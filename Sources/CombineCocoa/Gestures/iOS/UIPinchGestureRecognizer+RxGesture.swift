@@ -23,14 +23,10 @@
 import UIKit
 import Combine
 
-@available(iOS 13.0, macOS 10.15, *)
 public typealias PinchConfiguration = Configuration<UIPinchGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias PinchControlEvent = ControlEvent<UIPinchGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias PinchPublisher = AnyPublisher<UIPinchGestureRecognizer, Never>
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Factory where Gesture == CombineGestureRecognizer {
 
     /**
@@ -42,7 +38,6 @@ extension Factory where Gesture == CombineGestureRecognizer {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: CombineGestureView {
 
     /**
@@ -54,7 +49,6 @@ extension Reactive where Base: CombineGestureView {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Publisher where Output: UIPinchGestureRecognizer {
 
     /**

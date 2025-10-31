@@ -1,61 +1,69 @@
 import Foundation
 import Combine
 
-@available(iOS 13.0, macOS 10.15, *)
 public final class ReplaySubject<Output, Failure: Error>: Subject {
+
 	private var buffer: [Output] = []
 	private let bufferSize: Int
 	private var subscriptions = [UUID: ReplaySubjectSubscription<Output, Failure>]()
 	private var completion: Subscribers.Completion<Failure>?
-	private let lock = NSRecursiveLock()
+	private let lock = Lock()
 	
 	public init(_ bufferSize: Int = 0) {
 		self.bufferSize = bufferSize
 	}
-	
+
 	/// Provides this Subject an opportunity to establish demand for any new upstream subscriptions
 	public func send(subscription: Subscription) {
-		lock.lock(); defer { lock.unlock() }
 		subscription.request(.unlimited)
 	}
-	
+
 	/// Sends a value to the subscriber.
 	public func send(_ value: Output) {
-		lock.lock(); defer { lock.unlock() }
-		buffer.append(value)
-		buffer = buffer.suffix(bufferSize)
-		subscriptions.forEach { $0.value.receive(value) }
+        lock.withLock {
+            buffer.append(value)
+            buffer = buffer.suffix(bufferSize)
+            return subscriptions.values
+        }
+        .forEach { $0.receive(value) }
 	}
-	
+
 	/// Sends a completion signal to the subscriber.
 	public func send(completion: Subscribers.Completion<Failure>) {
-		lock.lock(); defer { lock.unlock() }
-		self.completion = completion
-		subscriptions.forEach { subscription in subscription.value.receive(completion: completion) }
-		subscriptions = [:]
+        lock.withLock {
+            self.completion = completion
+            let results = subscriptions.values
+            subscriptions = [:]
+            return results
+        }
+        .forEach { $0.receive(completion: completion) }
 	}
-	
+
 	/// This function is called to attach the specified `Subscriber` to the`Publisher
 	public func receive<Downstream: Subscriber>(subscriber: Downstream) where Downstream.Failure == Failure, Downstream.Input == Output {
-		lock.lock(); defer { lock.unlock() }
-		let id = UUID()
-		let subscription = ReplaySubjectSubscription<Output, Failure>(AnySubscriber(subscriber)) {[weak self] in
-			self?.cancel(id: id)
-		}
-		subscriber.receive(subscription: subscription)
-		if completion == nil {
-			subscriptions[id] = subscription
-		}
+        let id = UUID()
+        let subscription = ReplaySubjectSubscription<Output, Failure>(AnySubscriber(subscriber)) {[weak self] in
+            self?.cancel(id: id)
+        }
+        let (buffer, completion) = lock.withLock { () -> ([Output], Subscribers.Completion<Failure>?) in
+            if completion == nil {
+                subscriptions[id] = subscription
+            }
+            return (self.buffer, self.completion)
+        }
+        subscriber.receive(subscription: subscription)
 		subscription.replay(buffer, completion: completion)
 	}
-	
+
 	private func cancel(id: UUID) {
-		lock.lock(); defer { lock.unlock() }
-		subscriptions[id] = nil
+        lock.withLock {
+            subscriptions[id] = nil
+        }
 	}
 }
 
 public final class ReplaySubjectSubscription<Output, Failure: Error>: Subscription {
+
 	private let downstream: AnySubscriber<Output, Failure>
 	private var isCompleted = false
 	private var demand: Subscribers.Demand = .none
@@ -78,9 +86,8 @@ public final class ReplaySubjectSubscription<Output, Failure: Error>: Subscripti
 	
 	public func receive(_ value: Output) {
 		guard !isCompleted, demand > 0 else { return }
-		
-		demand += downstream.receive(value)
-		demand -= 1
+
+		demand += downstream.receive(value) - 1
 	}
 	
 	public func receive(completion: Subscribers.Completion<Failure>) {
@@ -96,9 +103,9 @@ public final class ReplaySubjectSubscription<Output, Failure: Error>: Subscripti
 	}
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Publisher {
-	public func share(replay bufferSize: Int = 0) -> AnyPublisher<Output, Failure> {
-		multicast(subject: ReplaySubject(bufferSize)).autoconnect().eraseToAnyPublisher()
+
+	public func share(replay bufferSize: Int = 0) -> some Publisher<Output, Failure> {
+		multicast(subject: ReplaySubject(bufferSize)).autoconnect()
 	}
 }

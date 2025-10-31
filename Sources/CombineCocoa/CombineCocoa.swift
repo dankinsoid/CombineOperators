@@ -1,14 +1,13 @@
 import Foundation
 import Combine
+@_exported import CombineOperators
 #if os(iOS)
     import UIKit
 #endif
 
 /// CombineCocoa errors.
-@available(iOS 13.0, macOS 10.15, *)
-public enum CombineCocoaError
-    : Swift.Error
-    , CustomDebugStringConvertible {
+public enum CombineCocoaError: Swift.Error, CustomDebugStringConvertible {
+
     /// Unknown error has occurred.
     case unknown
     /// Invalid operation was attempted.
@@ -28,7 +27,6 @@ public enum CombineCocoaError
 
 // MARK: Debug descriptions
 
-@available(iOS 13.0, macOS 10.15, *)
 extension CombineCocoaError {
     /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
@@ -85,7 +83,6 @@ func rxFatalErrorInDebug(_ lastMessage: @autoclosure () -> String, file: StaticS
 // MARK: casts or fatal error
 
 // workaround for Swift compiler bug, cheers compiler team :)
-@available(iOS 13.0, macOS 10.15, *)
 func castOptionalOrFatalError<T>(_ value: Any?) -> T? {
     if value == nil {
         return nil
@@ -94,7 +91,6 @@ func castOptionalOrFatalError<T>(_ value: Any?) -> T? {
     return v
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 func castOrThrow<T>(_ resultType: T.Type, _ object: Any) throws -> T {
     guard let returnValue = object as? T else {
         throw CombineCocoaError.castingError(object: object, targetType: resultType)
@@ -103,7 +99,6 @@ func castOrThrow<T>(_ resultType: T.Type, _ object: Any) throws -> T {
     return returnValue
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 func castOptionalOrThrow<T>(_ resultType: T.Type, _ object: AnyObject) throws -> T? {
     if NSNull().isEqual(object) {
         return nil
@@ -116,7 +111,6 @@ func castOptionalOrThrow<T>(_ resultType: T.Type, _ object: AnyObject) throws ->
     return returnValue
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 func castOrFatalError<T>(_ value: AnyObject!, message: String) -> T {
     let maybeResult: T? = value as? T
     guard let result = maybeResult else {
@@ -126,7 +120,6 @@ func castOrFatalError<T>(_ value: AnyObject!, message: String) -> T {
     return result
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 func castOrFatalError<T>(_ value: Any!) -> T {
     let maybeResult: T? = value as? T
     guard let result = maybeResult else {
@@ -138,9 +131,7 @@ func castOrFatalError<T>(_ value: Any!) -> T {
 
 // MARK: Error messages
 
-@available(iOS 13.0, macOS 10.15, *)
 let dataSourceNotSet = "DataSource not set"
-@available(iOS 13.0, macOS 10.15, *)
 let delegateNotSet = "Delegate not set"
 
 // MARK: Shared with CombineSwift

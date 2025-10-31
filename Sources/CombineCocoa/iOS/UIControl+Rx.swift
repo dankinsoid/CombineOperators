@@ -4,7 +4,6 @@ import Combine
 import CombineOperators
 import UIKit
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIControl {
     /// Reactive wrapper for target action pattern.
     ///
@@ -15,7 +14,7 @@ extension Reactive where Base: UIControl {
                 DispatchQueue.ensureRunningOnMainThread()
                 guard let control = control else {
                 observer.receive(completion: .finished)
-                    return AnyCancellable { }
+                    return ManualAnyCancellable()
                 }
                 let controlTarget = ControlTarget(control: control, controlEvents: controlEvents) { _ in
                     _ = observer.receive()
@@ -59,7 +58,7 @@ extension Reactive where Base: UIControl {
         let source: AnyPublisher<T, Error> = .create { [weak weakControl = base] observer in
                 guard let control = weakControl else {
                     observer.receive(completion: .finished)
-									return AnyCancellable { }
+									return ManualAnyCancellable()
                 }
 
 					_ = observer.receive(getter(control))

@@ -38,7 +38,6 @@ public enum SwipeDirection {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 private func make(direction: SwipeDirection, configuration: Configuration<UISwipeGestureRecognizer>?) -> Factory<UISwipeGestureRecognizer> {
     make {
         $0.direction = direction.direction
@@ -46,14 +45,10 @@ private func make(direction: SwipeDirection, configuration: Configuration<UISwip
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 public typealias SwipeConfiguration = Configuration<UISwipeGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias SwipeControlEvent = ControlEvent<UISwipeGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias SwipePublisher = AnyPublisher<UISwipeGestureRecognizer, Never>
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Factory where Gesture == CombineGestureRecognizer {
 
     /**
@@ -65,7 +60,6 @@ extension Factory where Gesture == CombineGestureRecognizer {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: CombineGestureView {
 
     /**

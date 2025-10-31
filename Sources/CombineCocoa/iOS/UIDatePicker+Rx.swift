@@ -10,7 +10,6 @@
 
 import Combine
 import UIKit
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIDatePicker {
     /// Reactive wrapper for `date` property.
     public var date: ControlProperty<Date> {

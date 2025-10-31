@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "CombineOperators",
     platforms: [
-        .iOS(.v13)
+        .iOS(.v13), .macOS(.v10_15), .tvOS(.v13), .watchOS(.v6)
     ],
     products: [
 			.library(name: "CombineOperators", targets: ["CombineOperators"]),
@@ -14,7 +14,19 @@ let package = Package(
     dependencies: [
     ],
     targets: [
-			.target(name: "CombineOperators", dependencies: []),
-			.target(name: "CombineCocoa", dependencies: ["CombineOperators"]),
+			.target(
+                name: "CombineOperators",
+                dependencies: [],
+                swiftSettings: [
+                  .unsafeFlags(["-package-name", "CombineOperators"])
+                ]
+            ),
+			.target(
+                name: "CombineCocoa",
+                dependencies: ["CombineOperators"],
+                swiftSettings: [
+                  .unsafeFlags(["-package-name", "CombineOperators"])
+                ]
+            ),
     ]
 )

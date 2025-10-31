@@ -11,7 +11,6 @@
 import Combine
 import UIKit
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIButton {
     
     /// Reactive wrapper for `TouchUpInside` control event.
@@ -27,7 +26,6 @@ extension Reactive where Base: UIButton {
 import Combine
 import UIKit
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIButton {
 
     /// Reactive wrapper for `PrimaryActionTriggered` control event.
@@ -44,8 +42,8 @@ extension Reactive where Base: UIButton {
 import Combine
 import UIKit
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIButton {
+
     /// Reactive wrapper for `setTitle(_:for:)`
     public func title(for controlState: UIControl.State = []) -> Binder<String?> {
         Binder(self.base) { button, title in
@@ -74,8 +72,8 @@ extension Reactive where Base: UIButton {
     import Combine
     import UIKit
     
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIButton {
+
         /// Reactive wrapper for `setAttributedTitle(_:controlState:)`
         public func attributedTitle(for controlState: UIControl.State = []) -> Binder<NSAttributedString?> {
             return Binder(self.base) { button, attributedTitle -> Void in

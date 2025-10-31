@@ -23,14 +23,10 @@
 import UIKit
 import Combine
 
-@available(iOS 13.0, macOS 10.15, *)
 public typealias LongPressConfiguration = Configuration<UILongPressGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias LongPressControlEvent = ControlEvent<UILongPressGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias LongPressPublisher = AnyPublisher<UILongPressGestureRecognizer, Never>
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Factory where Gesture == CombineGestureRecognizer {
 
     /**
@@ -42,7 +38,6 @@ extension Factory where Gesture == CombineGestureRecognizer {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: CombineGestureView {
 
     /**

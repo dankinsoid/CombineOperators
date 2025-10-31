@@ -3,7 +3,6 @@ import Combine
 import CombineOperators
 
 /// Protocol that enables extension of `ControlProperty`.
-@available(iOS 13.0, macOS 10.15, *)
 public protocol ControlPropertyType: Publisher, Subscriber where Output == Input {
 
     /// - returns: `ControlProperty` interface
@@ -34,7 +33,6 @@ public protocol ControlPropertyType: Publisher, Subscriber where Output == Input
     **In case `values` observable sequence that is being passed into initializer doesn't satisfy all enumerated
     properties, please don't use this trait.**
 */
-@available(iOS 13.0, macOS 10.15, *)
 public struct ControlProperty<PropertyType>: ControlPropertyType {
 	public typealias Output = PropertyType
 	public typealias Failure = Never
@@ -51,7 +49,7 @@ public struct ControlProperty<PropertyType>: ControlPropertyType {
     /// - returns: Control property created with a observable sequence of values and an observer that enables binding values
     /// to property.
     public init<Values: Publisher, Sink: Subscriber>(values: Values, valueSink: Sink) where PropertyType == Values.Output, PropertyType == Sink.Input, Sink.Failure == Never {
-		self.values = values.receive(on: RunLoop.main).catch({ _ in Empty() }).eraseToAnyPublisher()
+        self.values = values.receive(on: MainScheduler.instance).catch({ _ in Empty() }).eraseToAnyPublisher()
 		self.valueSink = AnySubscriber(valueSink)
 	}
 
@@ -92,7 +90,6 @@ public struct ControlProperty<PropertyType>: ControlPropertyType {
 	
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension ControlPropertyType where Output == String? {
     /// Transforms control property of type `String?` into control property of type `String`.
     public var orEmpty: ControlProperty<String> {

@@ -10,9 +10,9 @@
 
 import UIKit
 import Combine
+import CombineOperators
 
 private var rx_tap_key: UInt8 = 0
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIBarButtonItem {
     /// Reactive wrapper for target action pattern on `self`.
     public var tap: ControlEvent<()> {
@@ -20,7 +20,7 @@ extension Reactive where Base: UIBarButtonItem {
             .create { [weak control = self.base] observer in
                 guard let control = control else {
                     observer.receive(completion: .finished)
-                    return AnyCancellable {}
+                    return ManualAnyCancellable()
                 }
                 let target = BarButtonItemTarget(barButtonItem: control) {
                     _ = observer.receive()
@@ -37,7 +37,6 @@ extension Reactive where Base: UIBarButtonItem {
 
 
 @objc
-@available(iOS 13.0, macOS 10.15, *)
 final class BarButtonItemTarget: CombineTarget {
     typealias Callback = () -> Void
     

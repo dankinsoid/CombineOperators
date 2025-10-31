@@ -1,13 +1,13 @@
 import Foundation
 import Combine
+import CombineOperators
 
-@available(iOS 13.0, macOS 10.15, *)
 final class HasObserver<Output>: Subject {
 	typealias Failure = Error
 	private let subject = PassthroughSubject<Output, Error>()
 	var hasObservers: Bool { lock.performLocked { subscriptionsCount > 0 } }
 	private var subscriptionsCount = 0
-	private let lock = NSRecursiveLock()
+	private let lock = Lock()
 	
 	func receive<S: Subscriber>(subscriber: S) where Error == S.Failure, Output == S.Input {
 		subject.receive(subscriber: subscriber)
@@ -41,7 +41,5 @@ final class HasObserver<Output>: Subject {
 			subscription.cancel()
 			onCancelled()
 		}
-		
 	}
-	
 }

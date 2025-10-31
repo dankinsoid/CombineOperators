@@ -11,7 +11,6 @@
 import Combine
 import UIKit
 
-@available(iOS 13.0, macOS 10.15, *)@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UISlider {
     
     /// Reactive wrapper for `value` property.

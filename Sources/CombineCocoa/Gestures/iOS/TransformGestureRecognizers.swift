@@ -35,12 +35,9 @@ public struct TransformVelocity {
     let scale: CGFloat
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 public typealias TransformControlEvent = ControlEvent<TransformGestureRecognizers>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias TransformPublisher = AnyPublisher<TransformGestureRecognizers, Never>
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: CombineGestureView {
     public func transformGestures() -> TransformControlEvent {
         let source = panGesture().combineLatest(rotationGesture(), pinchGesture()) {
@@ -54,7 +51,6 @@ extension Reactive where Base: CombineGestureView {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Publisher where Output == TransformGestureRecognizers {
 
     public func when(_ states: CombineGestureRecognizerState...) -> AnyPublisher<Output, Failure> {

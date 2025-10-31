@@ -6,7 +6,6 @@ import FoundationNetworking
 #endif
 
 /// CombineCocoa URL errors.
-@available(iOS 13.0, macOS 10.15, *)
 public enum CombineCocoaURLError: Swift.Error {
     /// Unknown error occurred.
     case unknown
@@ -18,7 +17,6 @@ public enum CombineCocoaURLError: Swift.Error {
     case deserializationError(error: Swift.Error)
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension CombineCocoaURLError: CustomDebugStringConvertible {
     /// A textual representation of `self`, suitable for debugging.
     public var debugDescription: String {
@@ -35,7 +33,6 @@ extension CombineCocoaURLError: CustomDebugStringConvertible {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: URLSession {
     /**
     Publisher sequence of responses for URL request.
@@ -129,7 +126,6 @@ extension Reactive where Base: URLSession {
 			self.json(request: URLRequest(url: url))
     }
 }
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base == URLSession {
     /// Log URL requests to standard output in curl format.
     public static var shouldLogRequest: (URLRequest) -> Bool = { _ in

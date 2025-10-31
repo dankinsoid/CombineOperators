@@ -21,7 +21,6 @@ import Combine
 #endif
 
 // This should be only used from `MainScheduler`
-@available(iOS 13.0, macOS 10.15, *)
 final class ControlTarget: CombineTarget {
     typealias Callback = (Control) -> Void
 

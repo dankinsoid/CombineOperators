@@ -2,31 +2,30 @@
 import UIKit
 import Combine
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: UIView {
-	
-	public var id: Binder<String?> {
+
+	public var accessibilityIdentifier: Binder<String?> {
 		Binder(base, binding: { $0.accessibilityIdentifier = $1 })
 	}
-	
+
 	public var transform: Binder<CGAffineTransform> {
 		Binder(base, binding: { $0.transform = $1 })
 	}
-	
-	public var movedToWindow: AnyPublisher<Void, Never> {
+
+    public var movedToWindow: AnyPublisher<Void, Never> {
         AnyPublisher<Void, Never>.create { [weak base] in
             let cancellable = base?.observeMoveToWindow(subscriber: $0)
             return AnyCancellable {
                 cancellable?.cancel()
             }
         }
-			.map {[weak base] _ in base?.window != nil }
-			.prepend(base.window != nil)
-			.filter { $0 == true }
-			.map { _ in }
-			.prefix(1)
-			.eraseToAnyPublisher()
-	}
+        .map {[weak base] _ in base?.window != nil }
+        .prepend(base.window != nil)
+        .filter { $0 == true }
+        .map { _ in }
+        .prefix(1)
+        .eraseToAnyPublisher()
+    }
 	
 	public var isOnScreen: AnyPublisher<Bool, Never> {
         .create {[weak base] sbr in
@@ -191,7 +190,7 @@ extension UIView {
 	}
 }
 
-private var layerObservrersKey = "layerObservrersKey0000"
+private var layerObservrersKey = 0
 
 extension CALayer {
 	
@@ -218,7 +217,7 @@ private final class NSKeyValueObservations {
 	}
 }
 
-extension CATransform3D: Equatable {
+extension CATransform3D: @retroactive Equatable {
 	
 	private var ms: [CGFloat] { [m11, m12, m13, m14, m21, m22, m23, m24, m31, m32, m33, m34, m41, m42, m43, m44] }
 	

@@ -1,9 +1,8 @@
 import Foundation
 import Combine
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Publisher {
-	
+
 	public func smooth<F: FloatingPoint>(
 		_ duration: TimeInterval = 1,
 		float: @escaping (Output) -> F,
@@ -12,10 +11,24 @@ extension Publisher {
 		condition: @escaping (Output, Output) -> Bool = { _, _ in true }
 	) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 20.0 / 1000
-		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop, float: float, value: value, condition: condition)
+		return smooth(
+            interval: interval,
+            count: Int(duration / interval),
+            runLoop: runLoop,
+            float: float,
+            value: value,
+            condition: condition
+        )
 	}
-	
-	public func smooth<F: FloatingPoint>(interval: TimeInterval, count: Int, runLoop: RunLoop = .main, float: @escaping (Output) -> F, value: @escaping (F, Output) -> Output, condition: @escaping (Output, Output) -> Bool = { _, _ in true }) -> AnyPublisher<Output, Failure> {
+
+	public func smooth<F: FloatingPoint>(
+        interval: TimeInterval,
+        count: Int,
+        runLoop: RunLoop = .main,
+        float: @escaping (Output) -> F,
+        value: @escaping (F, Output) -> Output,
+        condition: @escaping (Output, Output) -> Bool = { _, _ in true }
+    ) -> AnyPublisher<Output, Failure> {
 		smooth(
 			rule: { f, s, count in
 				let (first, second) = (float(f), float(s))
@@ -30,13 +43,20 @@ extension Publisher {
 		)
 	}
 	
-	public func smooth(rule: @escaping (Output, Output, Int) -> [Output], interval: TimeInterval, count: Int, runLoop: RunLoop = .main, condition: @escaping (Output, Output) -> Bool = { _, _ in true }) -> AnyPublisher<Output, Failure> {
+	public func smooth(
+        rule: @escaping (Output, Output, Int) -> [Output],
+        interval: TimeInterval,
+        count: Int,
+        runLoop: RunLoop = .main,
+        condition: @escaping (Output, Output) -> Bool = { _, _ in true }
+    ) -> AnyPublisher<Output, Failure> {
 		scan([]) { $0.suffix(1) + [$1] }
 			.flatMap { (list: [Output]) -> AnyPublisher<Output, Failure> in
 				guard list.count == 2 else { return Just(list[0]).setFailureType(to: Failure.self).eraseToAnyPublisher() }
 				guard condition(list[0], list[1]) else { return Just(list[1]).setFailureType(to: Failure.self).eraseToAnyPublisher() }
 				let array = rule(list[0], list[1], count)
-				return Timer.TimerPublisher(interval: interval, runLoop: runLoop, mode: .default).autoconnect()
+				return Timer.TimerPublisher(interval: interval, runLoop: runLoop, mode: .default)
+                    .autoconnect()
 					.zip(Publishers.Sequence(sequence: array))
 					.map { $0.1 }
 					.setFailureType(to: Failure.self)
@@ -44,22 +64,26 @@ extension Publisher {
 			}
 			.any()
 	}
-	
-	public func smooth(rule: @escaping (Output, Output, Int) -> [Output], duration: TimeInterval = 1, runLoop: RunLoop = .main, condition: @escaping (Output, Output) -> Bool = { _, _ in true }) -> AnyPublisher<Output, Failure> {
+
+	public func smooth(
+        rule: @escaping (Output, Output, Int) -> [Output],
+        duration: TimeInterval = 1,
+        runLoop: RunLoop = .main,
+        condition: @escaping (Output, Output) -> Bool = { _, _ in true }
+    ) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 20.0 / 1000
 		return smooth(rule: rule, interval: interval, count: Int(duration / interval), runLoop: runLoop, condition: condition)
 	}
 	
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Publisher where Output: FloatingPoint {
-	
+
 	public func smooth(_ duration: TimeInterval = 1, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 20 / 1000
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop)
 	}
-	
+
 	public func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		removeDuplicates()
 			.smooth(
@@ -73,17 +97,15 @@ extension Publisher where Output: FloatingPoint {
 				runLoop: runLoop
 			)
 	}
-	
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Publisher where Output == String {
-	
+
 	public func smooth(_ duration: TimeInterval = 0.3, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		let interval: TimeInterval = 30 / 1000
 		return smooth(interval: interval, count: Int(duration / interval), runLoop: runLoop)
 	}
-	
+
 	public func smooth(interval: TimeInterval, count: Int, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
 		removeDuplicates()
 			.smooth(
@@ -95,11 +117,10 @@ extension Publisher where Output == String {
 				runLoop: runLoop
 			)
 	}
-	
 }
 
 extension String {
-	
+
 	func smooth(to: String, count: Int) -> [String] {
 		guard count > 2 else { return [self, to].suffix(max(0, count)) }
 		guard !to.isEmpty || !isEmpty else {
@@ -136,7 +157,7 @@ extension String {
 		result[result.count - 1] = to
 		return result
 	}
-	
+
 	func commonSuffix(with aString: String) -> String {
 		var suffix = ""
 		var first = self
@@ -148,12 +169,11 @@ extension String {
 		}
 		return suffix
 	}
-	
 }
 
 extension ClosedRange where Bound: FloatingPoint {
-	
-	public func split(count: Int) -> [Bound] {
+
+    func split(count: Int) -> [Bound] {
 		guard count > 2 else { return [lowerBound, upperBound].suffix(count) }
 		var result: [Bound] = [lowerBound]
 		let delta = (upperBound - lowerBound) / Bound(count)
@@ -163,14 +183,11 @@ extension ClosedRange where Bound: FloatingPoint {
 		result.append(upperBound)
 		return result
 	}
-	
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Timer.TimerPublisher {
-	
+
 	public convenience init(_ interval: TimeInterval, tolerance: TimeInterval? = nil, runLoop: RunLoop = .current, mode: RunLoop.Mode = .default, options: RunLoop.SchedulerOptions? = nil) {
 		self.init(interval: interval, tolerance: tolerance, runLoop: runLoop, mode: mode, options: options)
 	}
-	
 }

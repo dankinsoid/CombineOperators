@@ -23,14 +23,10 @@
 import UIKit
 import Combine
 
-@available(iOS 13.0, macOS 10.15, *)
 public typealias PanConfiguration = Configuration<UIPanGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias PanControlEvent = ControlEvent<UIPanGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias PanPublisher = AnyPublisher<UIPanGestureRecognizer, Never>
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Factory where Gesture == CombineGestureRecognizer {
 
     /**
@@ -42,7 +38,6 @@ extension Factory where Gesture == CombineGestureRecognizer {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: CombineGestureView {
 
     /**
@@ -54,7 +49,6 @@ extension Reactive where Base: CombineGestureView {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Publisher where Output: UIPanGestureRecognizer {
 
     /**

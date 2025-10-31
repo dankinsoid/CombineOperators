@@ -10,7 +10,6 @@ import Foundation
 
 import Combine
 
-@available(iOS 13.0, macOS 10.15, *)
 class CombineTarget: NSObject, Cancellable {
     
     override init() {

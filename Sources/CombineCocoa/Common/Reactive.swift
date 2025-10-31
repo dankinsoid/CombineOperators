@@ -17,9 +17,9 @@
 
 import CombineOperators
 
-@available(iOS 13.0, macOS 10.15, *)
 @dynamicMemberLookup
 public struct Reactive<Base> {
+
     /// Base object to extend.
     public let base: Base
 
@@ -31,7 +31,6 @@ public struct Reactive<Base> {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: AnyObject {
 	
 	/// Automatically synthesized binder for a key path between the reactive
@@ -45,10 +44,9 @@ extension Reactive where Base: AnyObject {
 	}
 }
 
-
 /// A type that has reactive extensions.
-@available(iOS 13.0, macOS 10.15, *)
 public protocol ReactiveCompatible {
+
     /// Extended type
     associatedtype ReactiveBase
 
@@ -59,9 +57,8 @@ public protocol ReactiveCompatible {
     var cb: Reactive<ReactiveBase> { get set }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension ReactiveCompatible {
-    
+
     /// Reactive extensions.
     public static var cb: Reactive<Self>.Type {
         get { Reactive<Self>.self }
@@ -78,9 +75,3 @@ extension ReactiveCompatible {
         set { }
     }
 }
-
-import Foundation
-
-/// Extend NSObject with `cb` proxy.
-@available(iOS 13.0, macOS 10.15, *)
-extension NSObject: ReactiveCompatible {}

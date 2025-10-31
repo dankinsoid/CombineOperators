@@ -24,15 +24,11 @@ import UIKit
 import Combine
 
 
-@available(iOS 13.0, macOS 10.15, *)
 public typealias HoverConfiguration = Configuration<UIHoverGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias HoverControlEvent = ControlEvent<UIHoverGestureRecognizer>
-@available(iOS 13.0, macOS 10.15, *)
 public typealias HoverPublisher = AnyPublisher<UIHoverGestureRecognizer, Never>
 
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Factory where Gesture == CombineGestureRecognizer {
 
     /**
@@ -44,7 +40,6 @@ extension Factory where Gesture == CombineGestureRecognizer {
     }
 }
 
-@available(iOS 13.0, macOS 10.15, *)
 extension Reactive where Base: CombineGestureView {
 
     /**

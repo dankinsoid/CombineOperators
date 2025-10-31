@@ -9,7 +9,6 @@
 import Foundation
 
 /// Data source with access to underlying sectioned model.
-@available(iOS 13.0, macOS 10.15, *)
 public protocol SectionedViewDataSourceType {
     /// Returns model at index path.
     ///
