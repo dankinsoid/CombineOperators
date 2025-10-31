@@ -14,7 +14,7 @@ public extension Reactive where Base: UISlider {
 	/// publisher.subscribe(slider.cb.value) // Bind to slider
 	/// ```
 	var value: ControlProperty<Float> {
-		base.cb.controlPropertyWithDefaultEvents(
+		controlPropertyWithDefaultEvents(
 			getter: { slider in
 				slider.value
 			}, setter: { slider, value in

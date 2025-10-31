@@ -10,7 +10,7 @@ public extension Reactive where Base: UIStepper {
 	/// stepper.cb.value.sink { print("Value: \($0)") }
 	/// ```
 	var value: ControlProperty<Double> {
-		base.cb.controlPropertyWithDefaultEvents(
+		controlPropertyWithDefaultEvents(
 			getter: { stepper in
 				stepper.value
 			}, setter: { stepper, value in

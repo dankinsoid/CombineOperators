@@ -15,7 +15,7 @@ public extension Reactive where Base: UITextField {
 	/// publisher.subscribe(textField.cb.text) // Bind to text field
 	/// ```
 	var text: ControlProperty<String?> {
-		base.cb.controlPropertyWithDefaultEvents(
+		controlPropertyWithDefaultEvents(
 			getter: { textField in
 				textField.text
 			},
@@ -34,7 +34,7 @@ public extension Reactive where Base: UITextField {
 	///
 	/// Setter preserves IME marked text selection by checking before assignment.
 	var attributedText: ControlProperty<NSAttributedString?> {
-		base.cb.controlPropertyWithDefaultEvents(
+		controlPropertyWithDefaultEvents(
 			getter: { textField in
 				textField.attributedText
 			},

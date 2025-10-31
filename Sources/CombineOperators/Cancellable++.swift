@@ -98,7 +98,7 @@ public func + (_ lhs: Cancellable, _ rhs: Cancellable) -> Cancellable {
 	ManualAnyCancellable(lhs, rhs)
 }
 
-/// Lightweight cancellable that executes custom cancellation logic.
+/// Lightweight cancellable that executes custom cancellation logic. It does not cancel automatically on deinit.
 public struct ManualAnyCancellable: Cancellable {
 
 	private let cancelAction: () -> Void
