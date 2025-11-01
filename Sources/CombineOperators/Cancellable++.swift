@@ -76,6 +76,7 @@ public extension AnyCancellable {
 	///     publisher2.sink { }
 	/// }
 	/// ```
+    @_disfavoredOverload
 	convenience init(@CancellableBuilder _ builder: () -> Cancellable) {
 		self.init(builder())
 	}
@@ -125,3 +126,7 @@ public struct ManualAnyCancellable: Cancellable {
 		cancelAction()
 	}
 }
+
+#if swift(>=6.0)
+extension Task: @retroactive Cancellable {}
+#endif

@@ -200,9 +200,7 @@ struct OperatorsTests {
 		subject.send(1)
 		subject.send(1)
 		subject.send(2)
-
-		try? await Task.sleep(nanoseconds: 50_000_000)
-
+    
 		#expect(received == [1, 2])
 		#expect(cancellables.count == 1)
 	}

@@ -20,6 +20,7 @@ final class Expectation<Value> {
     init(
         limit: Int?,
         timeLimit: TimeInterval? = 1,
+        failOnTimeout: Bool = true,
         sourceLocation: SourceLocation = #_sourceLocation
     ) {
         self.limit = limit
@@ -27,8 +28,10 @@ final class Expectation<Value> {
         if let timeLimit {
             timeoutTask = Task { [weak self] in
                 try await Task.sleep(nanoseconds: UInt64(timeLimit * 1_000_000_000))
-                Issue.record("Expectation timed out after \(timeLimit) seconds", sourceLocation: sourceLocation)
-                self?.finish()
+                if failOnTimeout {
+                    Issue.record("Expectation timed out after \(timeLimit) seconds", sourceLocation: sourceLocation)
+                }
+                self?.finish(sourceLocation: sourceLocation)
             }
         }
     }
@@ -40,7 +43,7 @@ final class Expectation<Value> {
         }
         currentValues.append(value)
         continuation.yield(value)
-        if let limit, currentValues.count >= limit {
+        if let limit, currentValues.count >= limit, !isFinished {
             finish()
         }
     }
