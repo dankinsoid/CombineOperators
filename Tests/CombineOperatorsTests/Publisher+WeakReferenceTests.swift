@@ -2,6 +2,7 @@ import Combine
 @testable import CombineOperators
 import Foundation
 import Testing
+import TestUtilities
 
 @Suite("Publisher Weak Reference Tests")
 struct PublisherWeakReferenceTests {

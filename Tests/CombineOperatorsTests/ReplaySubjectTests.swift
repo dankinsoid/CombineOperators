@@ -1,6 +1,7 @@
 import Combine
 @testable import CombineOperators
 import Testing
+import TestUtilities
 
 @Suite("ReplaySubject Tests")
 struct ReplaySubjectTests {

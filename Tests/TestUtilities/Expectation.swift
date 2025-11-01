@@ -2,22 +2,22 @@ import Foundation
 import Testing
 import CombineOperators
 
-final class Expectation<Value> {
-    
-    let limit: Int?
-    @Locked private(set) var isFinished = false
-    @Locked private(set) var currentValues: [Value] = []
+public final class Expectation<Value> {
+
+    public let limit: Int?
+    @Locked private(set) package var isFinished = false
+    @Locked private(set) package var currentValues: [Value] = []
     private let stream: AsyncStream<Value>
     private let continuation: AsyncStream<Value>.Continuation
     private var timeoutTask: Task<Void, Error>?
 
-    var values: [Value] {
+    public var values: [Value] {
         get async {
             await stream.reduce(into: []) { $0.append($1) }
         }
     }
 
-    init(
+    public init(
         limit: Int?,
         timeLimit: TimeInterval? = 1,
         failOnTimeout: Bool = true,
@@ -36,7 +36,7 @@ final class Expectation<Value> {
         }
     }
 
-    func fulfill(_ value: Value, sourceLocation: SourceLocation = #_sourceLocation) {
+    public func fulfill(_ value: Value, sourceLocation: SourceLocation = #_sourceLocation) {
         guard !isFinished else {
             Issue.record("Expectation already fulfilled", sourceLocation: sourceLocation)
             return
@@ -47,8 +47,8 @@ final class Expectation<Value> {
             finish()
         }
     }
-    
-    func finish(sourceLocation: SourceLocation = #_sourceLocation) {
+
+    public func finish(sourceLocation: SourceLocation = #_sourceLocation) {
         guard !isFinished else {
             Issue.record("Expectation already finished", sourceLocation: sourceLocation)
             return

@@ -1,6 +1,7 @@
 import Combine
 @testable import CombineOperators
 import Testing
+import TestUtilities
 
 @Suite("Async Publisher Tests")
 struct AsyncTests {

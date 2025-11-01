@@ -6,6 +6,26 @@ import UIKit
 #endif
 
 /// Errors that can occur during CombineCocoa operations.
+///
+/// These errors typically indicate programming errors (wrong property names,
+/// type mismatches) rather than runtime failures.
+///
+/// ```swift
+/// // Handling casting errors:
+/// do {
+///     let result: String = try castOrThrow(String.self, value)
+/// } catch let error as CombineCocoaError {
+///     print(error.debugDescription)
+/// }
+///
+/// // KVO property name validation:
+/// guard object.responds(to: Selector(propertyName)) else {
+///     throw CombineCocoaError.invalidPropertyName(
+///         object: object,
+///         propertyName: propertyName
+///     )
+/// }
+/// ```
 public enum CombineCocoaError: Swift.Error, CustomDebugStringConvertible {
 	/// Unknown error occurred.
 	case unknown
@@ -49,7 +69,10 @@ public extension CombineCocoaError {
 
 // MARK: Error binding policies
 
-/// Reports binding error. Crashes in DEBUG, prints in release.
+/// Reports binding errors during runtime.
+///
+/// In DEBUG: triggers fatal error for immediate detection.
+/// In RELEASE: prints error message and continues.
 func bindingError(_ error: Swift.Error) {
 	let error = "Binding error: \(error)"
 	#if DEBUG
@@ -59,7 +82,10 @@ func bindingError(_ error: Swift.Error) {
 	#endif
 }
 
-/// Runtime check for abstract methods that must be overridden in subclasses.
+/// Enforces abstract method implementation in subclasses.
+///
+/// Call this from base class methods that must be overridden.
+/// Always triggers fatal error.
 func rxAbstractMethod(message: String = "Abstract method", file: StaticString = #file, line: UInt = #line) -> Swift.Never {
 	rxFatalError(message, file: file, line: line)
 }
@@ -69,6 +95,7 @@ func rxFatalError(_ lastMessage: @autoclosure () -> String, file: StaticString =
 	fatalError(lastMessage(), file: file, line: line)
 }
 
+/// Triggers fatal error in DEBUG, prints in RELEASE.
 func rxFatalErrorInDebug(_ lastMessage: @autoclosure () -> String, file: StaticString = #file, line: UInt = #line) {
 	#if DEBUG
 	fatalError(lastMessage(), file: file, line: line)
@@ -77,9 +104,9 @@ func rxFatalErrorInDebug(_ lastMessage: @autoclosure () -> String, file: StaticS
 	#endif
 }
 
-// MARK: casts or fatal error
+// MARK: Type casting utilities
 
-/// workaround for Swift compiler bug, cheers compiler team :)
+/// Casts optional value or crashes. Handles nil gracefully.
 func castOptionalOrFatalError<T>(_ value: Any?) -> T? {
 	if value == nil {
 		return nil
@@ -88,6 +115,7 @@ func castOptionalOrFatalError<T>(_ value: Any?) -> T? {
 	return v
 }
 
+/// Casts value to target type or throws `CombineCocoaError.castingError`.
 func castOrThrow<T>(_ resultType: T.Type, _ object: Any) throws -> T {
 	guard let returnValue = object as? T else {
 		throw CombineCocoaError.castingError(object: object, targetType: resultType)
@@ -96,6 +124,7 @@ func castOrThrow<T>(_ resultType: T.Type, _ object: Any) throws -> T {
 	return returnValue
 }
 
+/// Casts optional value or throws. Treats NSNull as nil.
 func castOptionalOrThrow<T>(_ resultType: T.Type, _ object: AnyObject) throws -> T? {
 	if NSNull().isEqual(object) {
 		return nil
@@ -108,6 +137,7 @@ func castOptionalOrThrow<T>(_ resultType: T.Type, _ object: AnyObject) throws ->
 	return returnValue
 }
 
+/// Casts value or crashes with custom message.
 func castOrFatalError<T>(_ value: AnyObject!, message: String) -> T {
 	let maybeResult: T? = value as? T
 	guard let result = maybeResult else {
@@ -117,6 +147,7 @@ func castOrFatalError<T>(_ value: AnyObject!, message: String) -> T {
 	return result
 }
 
+/// Casts value or crashes with generated message.
 func castOrFatalError<T>(_ value: Any!) -> T {
 	let maybeResult: T? = value as? T
 	guard let result = maybeResult else {

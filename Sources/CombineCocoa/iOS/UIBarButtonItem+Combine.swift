@@ -23,7 +23,7 @@ public extension Reactive where Base: UIBarButtonItem {
 				}
 				return target
 			}
-			.prefix(untilOutputFrom: self.deallocated)
+			.prefix(untilOutputFrom: self.onDeinit)
 			.share()
 			.eraseToAnyPublisher()
 		}

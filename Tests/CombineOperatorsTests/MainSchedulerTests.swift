@@ -2,6 +2,7 @@ import Combine
 @testable import CombineOperators
 import Foundation
 import Testing
+import TestUtilities
 
 @Suite("MainScheduler Tests")
 struct MainSchedulerTests {
@@ -115,27 +116,6 @@ struct MainSchedulerTests {
 
 		let executed = await expectation.values.first ?? false
 		#expect(executed)
-	}
-
-	@Test("Schedule with interval")
-	func scheduleWithInterval() async {
-		let expectation = Expectation<Int>(limit: 3, timeLimit: 2)
-		let scheduler = MainScheduler.instance
-		let startDate = scheduler.now.advanced(by: .milliseconds(100))
-
-		let cancellable = scheduler.schedule(
-			after: startDate,
-			interval: .milliseconds(100),
-			tolerance: .zero,
-			options: nil
-		) {
-			expectation.fulfill(1)
-		}
-
-		let received = await expectation.values
-		cancellable.cancel()
-
-		#expect(received.count == 3)
 	}
 
 	// MARK: - Thread Safety

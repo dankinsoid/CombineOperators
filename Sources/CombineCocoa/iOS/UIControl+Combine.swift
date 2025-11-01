@@ -25,7 +25,7 @@ public extension Reactive where Base: UIControl {
 
 				return controlTarget
 			}
-			.prefix(untilOutputFrom: deallocated)
+			.prefix(untilOutputFrom: onDeinit)
 			.eraseToAnyPublisher()
 		)
 	}
@@ -77,7 +77,7 @@ public extension Reactive where Base: UIControl {
 
 			return controlTarget
 		}
-		.prefix(untilOutputFrom: deallocated)
+		.prefix(untilOutputFrom: onDeinit)
 		.eraseToAnyPublisher()
 
 		let bindingObserver = Binder(base, binding: setter)

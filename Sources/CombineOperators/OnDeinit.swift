@@ -3,12 +3,27 @@ import Combine
 
 public extension Publishers {
 
+	/// Publisher that emits when an object is deallocated.
+	///
+	/// Useful for cleanup, resource management, or debugging object lifecycles.
+	/// Uses associated objects to track deallocation without retaining the target.
+	///
+	/// ```swift
+	/// Publishers.OnDeinit(viewController)
+	///     .sink { print("ViewController deallocated") }
+	///
+	/// // With Reactive extension:
+	/// viewModel.cb.onDeinit
+	///     .sink { cleanup() }
+	/// ```
 	struct OnDeinit: Publisher {
 
 		public typealias Output = Void
 		public typealias Failure = Never
 		weak var object: AnyObject?
 
+		/// Creates a publisher that emits when the object is deallocated.
+		/// - Parameter object: The object to observe. Held weakly.
 		public init(_ object: AnyObject?) {
 			self.object = object
 		}

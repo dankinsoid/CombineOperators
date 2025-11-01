@@ -29,19 +29,24 @@ public protocol ControlPropertyType: Publisher, Subscriber where Output == Input
 ///
 /// **Warning:** Only use this trait if your publisher satisfies all properties above.
 public struct ControlProperty<PropertyType>: ControlPropertyType {
+
 	public typealias Output = PropertyType
 	public typealias Failure = Never
 	public var combineIdentifier: CombineIdentifier { valueSink.combineIdentifier }
 
-	let values: AnyPublisher<PropertyType, Failure>
-	let valueSink: AnySubscriber<PropertyType, Failure>
+	let values: AnyPublisher<PropertyType, Never>
+	let valueSink: AnySubscriber<PropertyType, Never>
 
 	/// Creates control property from publisher and subscriber for bidirectional binding.
 	///
 	/// Values are delivered on main thread. Errors are caught and suppressed.
-	public init<Values: Publisher, Sink: Subscriber>(values: Values, valueSink: Sink) where PropertyType == Values.Output, PropertyType == Sink.Input, Sink.Failure == Never {
-		self.values = values.receive(on: MainScheduler.instance).catch { _ in Empty() }.eraseToAnyPublisher()
-		self.valueSink = AnySubscriber(valueSink)
+	public init<Values: Publisher, Sink: Subscriber>(values: Values, valueSink: Sink) where PropertyType == Values.Output, PropertyType == Sink.Input {
+		self.values = values
+            .receive(on: MainScheduler.instance)
+            .silenсeFailure(complete: false)
+            .endless()
+            .eraseToAnyPublisher()
+        self.valueSink = AnySubscriber(valueSink.nonFailing())
 	}
 
 	/// User-initiated value changes only (skips initial value).
@@ -75,6 +80,7 @@ public struct ControlProperty<PropertyType>: ControlPropertyType {
 }
 
 public extension ControlPropertyType where Output == String? {
+
 	/// Transforms optional string property to non-optional (nil → "").
 	var orEmpty: ControlProperty<String> {
 		let original: ControlProperty<String?> = asControlProperty()

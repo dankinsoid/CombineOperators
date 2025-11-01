@@ -1,15 +1,15 @@
 import Combine
 
-final class TestSubscriber<Input, Failure: Error>: Subscriber {
+public final class TestSubscriber<Input, Failure: Error>: Subscriber {
 
-    var demand: Subscribers.Demand
+    public var demand: Subscribers.Demand
 	private let onValue: (Input) -> Void
 	private let additionalDemand: ((Int) -> Subscribers.Demand)?
     private let onCompletion: (Subscribers.Completion<Failure>) -> Void
 	private let onSubscription: ((Subscription) -> Void)?
 	private var receiveCount = 0
 
-	init(
+	public init(
         demand: Subscribers.Demand = .unlimited,
         onValue: @escaping (Input) -> Void = { _ in },
         onError: @escaping (Failure) -> Void = { _ in },
@@ -31,17 +31,17 @@ final class TestSubscriber<Input, Failure: Error>: Subscriber {
         }
 	}
 
-	func receive(subscription: Subscription) {
+	public func receive(subscription: Subscription) {
 		onSubscription?(subscription)
 		subscription.request(demand)
 	}
 
-	func receive(_ input: Input) -> Subscribers.Demand {
+	public func receive(_ input: Input) -> Subscribers.Demand {
 		guard demand > .none else { return .none }
 
 		onValue(input)
 		receiveCount += 1
-        
+
         let result = additionalDemand?(receiveCount) ?? .none
 
 		if demand != .unlimited {
@@ -52,7 +52,7 @@ final class TestSubscriber<Input, Failure: Error>: Subscriber {
 		return result
 	}
 
-	func receive(completion: Subscribers.Completion<Failure>) {
+	public func receive(completion: Subscribers.Completion<Failure>) {
         onCompletion(completion)
     }
 }

@@ -28,9 +28,18 @@ let package = Package(
 				.unsafeFlags(["-package-name", "CombineOperators"]),
 			]
 		),
+		.target(
+			name: "TestUtilities",
+			dependencies: ["CombineOperators"],
+			path: "Tests/TestUtilities"
+		),
 		.testTarget(
 			name: "CombineOperatorsTests",
-			dependencies: ["CombineOperators"]
+			dependencies: ["CombineOperators", "TestUtilities"]
+		),
+		.testTarget(
+			name: "CombineCocoaTests",
+			dependencies: ["CombineCocoa", "CombineOperators", "TestUtilities"]
 		),
 	]
 )
