@@ -50,15 +50,6 @@ public extension Publisher {
 		eraseToAnyPublisher()
 	}
 
-	/// Appends values to the end of the publisher sequence.
-	///
-	/// ```swift
-	/// publisher.append(1, 2, 3)
-	/// ```
-	func append(_ values: Output...) -> Publishers.Concatenate<Self, Publishers.Sequence<[Output], Failure>> {
-		append(Publishers.Sequence(sequence: values))
-	}
-
 	/// Emits value with boolean indicating if keyPath value changed.
 	///
 	/// ```swift

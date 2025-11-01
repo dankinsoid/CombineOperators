@@ -10,12 +10,12 @@ struct OnDeinitTests {
 
 	@Test("OnDeinit emits when object is deallocated")
 	func onDeinitEmitsWhenObjectDeallocated() async {
-		let expectation = Expectation<Void>(limit: 1)
+		let expectation = Expectation<Int>(limit: 1)
 
 		var object: NSObject? = NSObject()
 		let publisher = Publishers.OnDeinit(object)
 
-		let cancellable = publisher.sink { expectation.fulfill(()) }
+		let cancellable = publisher.sink { expectation.fulfill(0) }
 
 		object = nil
 
@@ -62,8 +62,8 @@ struct OnDeinitTests {
 
 		object = nil
 
-		let received = await expectation.values
-		#expect(received.count == 1)
+        let received = await expectation.values.count
+		#expect(received == 1)
 
 		cancellable.cancel()
 	}
@@ -78,8 +78,8 @@ struct OnDeinitTests {
 		let cancellable = publisher.sink { expectation.fulfill(()) }
 
 		// Object still alive
-		let received = await expectation.values
-		#expect(received.isEmpty)
+		let received = await expectation.values.isEmpty
+		#expect(received)
 
 		cancellable.cancel()
 	}
@@ -99,11 +99,11 @@ struct OnDeinitTests {
 
 		object = nil
 
-		let received1 = await expectation1.values
-		let received2 = await expectation2.values
+		let received1 = await expectation1.values.count
+		let received2 = await expectation2.values.count
 
-		#expect(received1.count == 1)
-		#expect(received2.count == 1)
+		#expect(received1 == 1)
+		#expect(received2 == 1)
 
 		cancellable1.cancel()
 		cancellable2.cancel()
@@ -124,11 +124,11 @@ struct OnDeinitTests {
 
 		object = nil
 
-		let received1 = await expectation1.values
-		let received2 = await expectation2.values
+		let received1 = await expectation1.values.count
+		let received2 = await expectation2.values.count
 
-		#expect(received1.count == 1)
-		#expect(received2.count == 1)
+		#expect(received1 == 1)
+		#expect(received2 == 1)
 
 		cancellable1.cancel()
 		cancellable2.cancel()
@@ -148,24 +148,8 @@ struct OnDeinitTests {
 
 		object = nil
 
-		let received = await expectation.values
-		#expect(received.isEmpty)
-	}
-
-	@Test("OnDeinit cancellation cleans up subscription")
-	func onDeinitCancellationCleansUpSubscription() async {
-		var object: NSObject? = NSObject()
-		let publisher = Publishers.OnDeinit(object)
-
-		let cancellable = publisher.sink { }
-		cancellable.cancel()
-
-		// Check that associated object is cleaned up properly
-		let wrapper = objc_getAssociatedObject(object!, &deiniterKey)
-		// Even if wrapper exists, the subscription should be removed
-		#expect(true) // No crash means cleanup worked
-
-		object = nil
+		let received = await expectation.values.count
+		#expect(received == 0)
 	}
 
 	@Test("OnDeinit partial cancellation allows remaining subscriptions")
@@ -184,11 +168,11 @@ struct OnDeinitTests {
 
 		object = nil
 
-		let received1 = await expectation1.values
-		let received2 = await expectation2.values
+		let received1 = await expectation1.values.count
+		let received2 = await expectation2.values.count
 
-		#expect(received1.isEmpty) // First was cancelled
-		#expect(received2.count == 1) // Second still active
+		#expect(received1 == 0) // First was cancelled
+		#expect(received2 == 1) // Second still active
 
 		cancellable2.cancel()
 	}
@@ -210,8 +194,8 @@ struct OnDeinitTests {
 		// Object should be deallocated
 		#expect(weakObject == nil)
 
-		let received = await expectation.values
-		#expect(received.count == 1)
+		let received = await expectation.values.count
+		#expect(received == 1)
 
 		cancellable.cancel()
 	}
@@ -223,8 +207,8 @@ struct OnDeinitTests {
 		let publisher = Publishers.OnDeinit(nil as NSObject?)
 		let cancellable = publisher.sink { expectation.fulfill(()) }
 
-		let received = await expectation.values
-		#expect(received.count == 1)
+		let received = await expectation.values.count
+		#expect(received == 1)
 
 		cancellable.cancel()
 	}
@@ -254,8 +238,8 @@ struct OnDeinitTests {
 
 		object = nil
 
-		let received = await expectation.values
-		#expect(received.count == 10)
+		let received = await expectation.values.count
+		#expect(received == 10)
 
 		cancellables.forEach { $0.cancel() }
 	}
@@ -316,8 +300,8 @@ struct OnDeinitTests {
 			cancellable.cancel()
 		}
 
-		let received = await expectation.values
-		#expect(received.count == 5)
+		let received = await expectation.values.count
+		#expect(received == 5)
 	}
 
 	@Test("OnDeinit handles subscription without demand request")
@@ -344,11 +328,9 @@ struct OnDeinitTests {
 		object = nil
 		// Try to trigger again (shouldn't emit)
 
-		let received = await expectation.values
-		#expect(received.count == 1)
+		let received = await expectation.values.count
+		#expect(received == 1)
 
 		cancellable.cancel()
 	}
 }
-
-private var deiniterKey: UInt8 = 0

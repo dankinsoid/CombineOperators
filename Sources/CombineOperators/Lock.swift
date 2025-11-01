@@ -73,6 +73,8 @@ package final class Locked<Value> {
 	}
 }
 
+extension Locked: @unchecked Sendable where Value: Sendable {}
+
 package extension Locked {
 
 	convenience init() where Value: ExpressibleByNilLiteral {

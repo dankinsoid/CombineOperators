@@ -43,11 +43,21 @@ public struct MainScheduler: Scheduler {
 		}
 	}
 
-	public func schedule(after date: DispatchQueue.SchedulerTimeType, tolerance: DispatchQueue.SchedulerTimeType.Stride, options: SchedulerOptions?, _ action: @escaping () -> Void) {
+	public func schedule(
+        after date: DispatchQueue.SchedulerTimeType,
+        tolerance: DispatchQueue.SchedulerTimeType.Stride,
+        options: SchedulerOptions?, _ action: @escaping () -> Void
+    ) {
 		DispatchQueue.main.schedule(after: date, tolerance: tolerance, options: nil, action)
 	}
 
-	public func schedule(after date: DispatchQueue.SchedulerTimeType, interval: DispatchQueue.SchedulerTimeType.Stride, tolerance: DispatchQueue.SchedulerTimeType.Stride, options: SchedulerOptions?, _ action: @escaping () -> Void) -> any Cancellable {
+	public func schedule(
+        after date: DispatchQueue.SchedulerTimeType,
+        interval: DispatchQueue.SchedulerTimeType.Stride,
+        tolerance: DispatchQueue.SchedulerTimeType.Stride,
+        options: SchedulerOptions?,
+        _ action: @escaping () -> Void
+    ) -> any Cancellable {
 		DispatchQueue.main.schedule(after: date, interval: interval, tolerance: tolerance, options: nil, action)
 	}
 }

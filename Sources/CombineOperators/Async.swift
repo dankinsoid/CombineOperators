@@ -5,8 +5,10 @@ public extension Publishers {
 
 	/// Bridges Swift Concurrency (async/await) with Combine.
 	///
-	/// Creates a publisher that executes an async operation and delivers results
-	/// on the main thread. Useful for integrating modern async APIs with Combine-based code.
+	/// Creates a publisher that executes an async operation and delivers results.
+    /// Useful for integrating modern async APIs with Combine-based code.
+    ///
+    /// - Note: Each subscriber triggers a new execution of the async operation. Use .share modifier if you want to share results among multiple subscribers.
 	struct Async<Output, Failure: Error>: Publisher {
 
         let priority: TaskPriority?

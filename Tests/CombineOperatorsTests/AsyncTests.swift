@@ -365,11 +365,11 @@ struct AsyncTests {
 
 	@Test("Multiple subscribers receive independent executions")
 	func multipleSubscribersReceiveIndependentExecutions() async {
-		var executionCount = 0
+		let executionCount = Locked(0)
 
-		let publisher = Publishers.Async<Int, Never> {
-			executionCount += 1
-			return executionCount
+        let publisher = Publishers.Async<Int, Never> {
+            executionCount.wrappedValue += 1
+            return executionCount.wrappedValue
 		}
 
 		let expectation1 = Expectation<Int>(limit: 1)
@@ -386,7 +386,7 @@ struct AsyncTests {
 		let received2 = await expectation2.values
 
 		// Each subscriber triggers independent execution
-		#expect(executionCount == 2)
+        #expect(executionCount.wrappedValue == 2)
 		#expect(received1.first != received2.first)
 	}
 }
