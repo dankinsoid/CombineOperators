@@ -37,7 +37,7 @@ public extension Reactive where Base: UIView {
 		.create { [weak base] sbr in
 			AnyCancellable(base?.observeIsOnScreen { _ = sbr.receive($0) } ?? {})
 		}
-		.skipFailure()
+		.silenсeFailure()
 		.eraseToAnyPublisher()
 	}
 
@@ -48,7 +48,7 @@ public extension Reactive where Base: UIView {
 		.create { [weak base] observer in
 			AnyCancellable(base?.observeFrame { _ = observer.receive($0.frame) } ?? {})
 		}
-		.skipFailure()
+		.silenсeFailure()
 		.removeDuplicates()
 		.eraseToAnyPublisher()
 	}
@@ -60,7 +60,7 @@ public extension Reactive where Base: UIView {
 		.create { [weak base] sbr in
 			AnyCancellable(base?.observeFrameInWindow { _ = sbr.receive($0) } ?? {})
 		}
-		.skipFailure()
+		.silenсeFailure()
 		.removeDuplicates()
 		.eraseToAnyPublisher()
 	}
@@ -84,7 +84,7 @@ public extension Reactive where Base: UIView {
 				return AnyCancellable()
 			}
 		}
-		.skipFailure()
+		.silenсeFailure()
 		.eraseToAnyPublisher()
 	}
 }

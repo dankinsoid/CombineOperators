@@ -262,7 +262,7 @@ struct MergeBuilderTests {
 
         let completed = await expectation.values.first ?? false
 
-		// Failing publisher is skipped due to skipFailure()
+		// Failing publisher is skipped due to silenсeFailure()
         #expect(completed)
 	}
 

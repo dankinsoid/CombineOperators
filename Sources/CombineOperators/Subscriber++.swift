@@ -142,27 +142,3 @@ public extension Subscribers {
 		}
 	}
 }
-
-/// Combines two subscribers to receive the same events.
-///
-/// Both subscribers receive all subscriptions, values, and completions.
-/// Demand is the minimum of both subscribers' demands.
-///
-/// ```swift
-/// let combined = subscriberA + subscriberB
-/// ```
-public func + <T: Subscriber, O: Subscriber>(_ lhs: T, _ rhs: O) -> AnySubscriber<O.Input, O.Failure> where O.Input == T.Input, O.Failure == T.Failure {
-	AnySubscriber(
-		receiveSubscription: {
-			lhs.receive(subscription: $0)
-			rhs.receive(subscription: $0)
-		},
-		receiveValue: {
-			min(lhs.receive($0), rhs.receive($0))
-		},
-		receiveCompletion: {
-			lhs.receive(completion: $0)
-			rhs.receive(completion: $0)
-		}
-	)
-}

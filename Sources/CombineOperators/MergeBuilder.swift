@@ -90,7 +90,7 @@ public extension MergeBuilder where Failure == Error {
 public extension MergeBuilder where Failure == Never {
 
 	static func buildExpression<P: Publisher>(_ expression: P) -> AnyPublisher<Output, Failure> where P.Output == Output {
-		expression.skipFailure().eraseToAnyPublisher()
+		expression.silenсeFailure().eraseToAnyPublisher()
 	}
 
 	static func buildExpression<P: Publisher>(_ expression: P) -> AnyPublisher<Output, Failure> where P.Output == Output, P.Failure == Never {

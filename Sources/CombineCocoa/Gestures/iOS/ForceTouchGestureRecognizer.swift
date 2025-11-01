@@ -112,7 +112,7 @@ public extension Publisher where Output: ForceTouchGestureRecognizer {
 						}
 					}
 					.prefix(1)
-					.skipFailure()
+					.silenсeFailure()
 					.eraseToAnyPublisher()
 			}
 			.switchToLatest()

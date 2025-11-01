@@ -4,7 +4,7 @@ import Foundation
 public extension Publisher {
 
 	/// Ignores failures, completing silently on error.
-	func skipFailure() -> Publishers.Catch<Self, Empty<Output, Never>> {
+	func silenсeFailure() -> Publishers.Catch<Self, Empty<Output, Never>> {
 		self.catch { _ in Empty() }
 	}
 

@@ -89,16 +89,6 @@ public extension AnyCancellable {
 	}
 }
 
-/// Combines two cancellables using `+` operator.
-///
-/// ```swift
-/// let combined = subscription1 + subscription2
-/// combined.cancel()  // cancels both
-/// ```
-public func + (_ lhs: Cancellable, _ rhs: Cancellable) -> Cancellable {
-	ManualAnyCancellable(lhs, rhs)
-}
-
 /// Lightweight cancellable that executes custom cancellation logic. It does not cancel automatically on deinit.
 public struct ManualAnyCancellable: Cancellable {
 
