@@ -20,7 +20,7 @@ public extension Publishers {
 
 			private var subscriber: S?
 			private var operation: ((Output) -> Void) async -> Result<Void, Failure>
-			private let lock = NSLock()
+			private let lock = Lock()
 
 			init(
 				subscriber: S,
@@ -38,9 +38,7 @@ public extension Publishers {
 						let localSubscriber = self.lock.withLock { self.subscriber }
 
 						if let subscriber = localSubscriber {
-							onMainIfNeeded {
-								_ = subscriber.receive(output)
-							}
+							_ = subscriber.receive(output)
 						}
 					}
 
@@ -49,14 +47,10 @@ public extension Publishers {
 					switch result {
 					case .success:
 						let finalSubscriber = lock.withLock { self.subscriber }
-						onMainIfNeeded {
-							finalSubscriber?.receive(completion: .finished)
-						}
+						finalSubscriber?.receive(completion: .finished)
 					case let .failure(error):
 						let finalSubscriber = lock.withLock { self.subscriber }
-						onMainIfNeeded {
-							finalSubscriber?.receive(completion: .failure(error))
-						}
+						finalSubscriber?.receive(completion: .failure(error))
 					}
 				}
 			}
@@ -67,16 +61,6 @@ public extension Publishers {
 				operation = { _ in .success(()) }
 				lock.unlock()
 			}
-		}
-	}
-}
-
-private func onMainIfNeeded(_ operation: @escaping () -> Void) {
-	if Thread.isMainThread {
-		operation()
-	} else {
-		DispatchQueue.main.async {
-			operation()
 		}
 	}
 }

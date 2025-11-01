@@ -39,11 +39,6 @@ public extension Publisher {
 		handleEvents(receiveSubscription: action)
 	}
 
-	/// Performs side-effect when cancelled.
-	func onCancel(_ action: @escaping () -> Void) -> Publishers.HandleEvents<Self> {
-		handleEvents(receiveCancel: action)
-	}
-
 	/// Performs side-effect when demand is requested.
 	func onRequest(_ action: @escaping (Subscribers.Demand) -> Void) -> Publishers.HandleEvents<Self> {
 		handleEvents(receiveRequest: action)

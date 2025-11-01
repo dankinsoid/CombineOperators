@@ -26,25 +26,25 @@ infix operator ==>: CombinePrecedence
 /// Converts the publisher to a Driver for thread-safe, main-queue delivery.
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output, O.Failure == T.Failure {
-	lhs.asDriver().subscribe(rhs)
+    lhs.receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 /// Subscribes as Driver, converting failure to Error.
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output, O.Failure == Error {
-	lhs.asDriver().eraseFailure().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).eraseFailure().subscribe(rhs)
 }
 
 /// Subscribes a never-failing publisher as Driver.
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output, T.Failure == Never {
-	lhs.asDriver().setFailureType(to: O.Failure.self).subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).setFailureType(to: O.Failure.self).subscribe(rhs)
 }
 
 /// Subscribes as Driver, wrapping output in Optional.
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output?, O.Failure == T.Failure {
-	lhs.asDriver().optional().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 /// Subscribes with a closure on the main actor.
@@ -54,7 +54,7 @@ public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input 
 /// - Warning: Use `[weak self]` capture list to avoid retain cycles, or wrap in `Binder`.
 @inlinable
 public func ==> <O: Publisher>(_ lhs: O, _ rhs: @escaping @MainActor (O.Output) -> Void) -> AnyCancellable {
-	lhs.asDriver().sink(
+	lhs.receive(on: MainScheduler.instance).sink(
 		receiveCompletion: { _ in },
 		receiveValue: { input in
 			MainActor.assumeIsolated {
@@ -68,80 +68,80 @@ public func ==> <O: Publisher>(_ lhs: O, _ rhs: @escaping @MainActor (O.Output) 
 
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output, O.Failure == T.Failure, O.Failure == Error {
-	lhs.asDriver().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output, O.Failure == T.Failure, O.Failure == Never {
-	lhs.asDriver().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output, T.Failure == Never, O.Failure == Error {
-	lhs.asDriver().setFailureType(to: O.Failure.self).subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).setFailureType(to: O.Failure.self).subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where O.Output == T.Output, O.Failure == T.Failure {
-	lhs.asDriver().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where O.Output == T.Output, O.Failure == T.Failure, O.Failure == Error {
-	lhs.asDriver().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where O.Output == T.Output, O.Failure == T.Failure, O.Failure == Never {
-	lhs.asDriver().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where O.Output == T.Output, O.Failure == Error {
-	lhs.asDriver().eraseFailure().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).eraseFailure().subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output?, O.Failure == T.Failure, O.Failure == Error {
-	lhs.asDriver().optional().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output?, O.Failure == T.Failure, O.Failure == Never {
-	lhs.asDriver().optional().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output?, O.Failure == Error {
-	lhs.asDriver().eraseFailure().optional().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).eraseFailure().optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output?, T.Failure == Never {
-	lhs.asDriver().optional().setFailureType(to: O.Failure.self).subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).optional().setFailureType(to: O.Failure.self).subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output?, T.Failure == Never, O.Failure == Error {
-	lhs.asDriver().optional().setFailureType(to: O.Failure.self).subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).optional().setFailureType(to: O.Failure.self).subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where O.Output == T.Output?, O.Failure == T.Failure {
-	lhs.asDriver().optional().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where O.Output == T.Output?, O.Failure == T.Failure, O.Failure == Error {
-	lhs.asDriver().optional().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where O.Output == T.Output?, O.Failure == T.Failure, O.Failure == Never {
-	lhs.asDriver().optional().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where O.Output == T.Output?, O.Failure == Error {
-	lhs.asDriver().optional().eraseFailure().subscribe(rhs)
+	lhs.receive(on: MainScheduler.instance).optional().eraseFailure().subscribe(rhs)
 }

@@ -1,4 +1,5 @@
 import CombineOperators
+import Foundation
 
 /// Namespace for reactive extensions via the `cb` property.
 ///
@@ -24,6 +25,8 @@ public struct Reactive<Base> {
 		self.base = base
 	}
 }
+
+extension NSObject: ReactiveCompatible {}
 
 public extension Reactive where Base: AnyObject {
 

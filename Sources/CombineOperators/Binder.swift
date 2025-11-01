@@ -13,12 +13,12 @@ import Foundation
 /// }
 /// textPublisher.subscribe(binder)
 /// ```
-public struct Binder<Input>: Subscriber {
+public struct Binder<Input>: Subscriber, @unchecked Sendable {
 
 	public typealias Failure = Never
 
-	private let binding: (Input) -> Void
-	private weak var _target: AnyObject?
+	private let binding: @Sendable (Input) -> Void
+	private weak var _target: (AnyObject & Sendable)?
 	public let combineIdentifier = CombineIdentifier()
 
 	/// Creates a binder with custom scheduler.
@@ -28,7 +28,7 @@ public struct Binder<Input>: Subscriber {
 	///     model.process(value)
 	/// }
 	/// ```
-	public init<Target: AnyObject, S: Scheduler>(
+	public init<Target: AnyObject & Sendable, S: Scheduler>(
 		_ target: Target,
 		scheduler: S,
 		binding: @escaping (Target, Input) -> Void
@@ -52,7 +52,7 @@ public struct Binder<Input>: Subscriber {
 	///     button.isEnabled = isEnabled
 	/// }
 	/// ```
-	public init<Target: AnyObject>(
+	public init<Target: AnyObject & Sendable>(
 		_ target: Target,
 		binding: @escaping @MainActor (Target, Input) -> Void
 	) {
@@ -64,8 +64,8 @@ public struct Binder<Input>: Subscriber {
 	}
 
 	private init(
-		target: AnyObject?,
-		binding: @escaping (Input) -> Void
+		target: (AnyObject & Sendable)?,
+		binding: @escaping @Sendable (Input) -> Void
 	) {
 		self.binding = binding
 		_target = target
@@ -111,7 +111,7 @@ public struct Binder<Input>: Subscriber {
 		}
 	}
 
-	private var target: AnyObject? {
+	private var target: (AnyObject & Sendable)? {
 		// Since Binder is usually used to bind UI elements on main thread, it's more efficient to use Main thread check instead of lock
 		if Thread.isMainThread {
 			return _target

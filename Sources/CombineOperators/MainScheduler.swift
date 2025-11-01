@@ -31,7 +31,7 @@ public struct MainScheduler: Scheduler {
 	}
 
 	/// Synchronously executes MainActor-isolated closure, respecting isolation.
-	public func synchSchedule<T>(_ action: @MainActor () -> T) -> T {
+	public func syncSchedule<T>(_ action: @MainActor () -> T) -> T {
 		if Thread.isMainThread {
 			return MainActor.assumeIsolated {
 				action()

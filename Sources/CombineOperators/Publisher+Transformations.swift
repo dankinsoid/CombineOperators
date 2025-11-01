@@ -6,16 +6,16 @@ public extension Publisher {
 	/// Emits values at regular intervals.
 	///
 	/// Combines publisher with timer, emitting original values at specified rate.
-	func interval(_ period: TimeInterval, runLoop: RunLoop = .main) -> AnyPublisher<Output, Never> {
-		skipFailure()
-			.zip(
-				Timer.TimerPublisher(interval: period, runLoop: runLoop, mode: .default)
-					.autoconnect()
-					.prepend(Date())
-			)
-			.map { $0.0 }
-			.eraseToAnyPublisher()
-	}
+    func interval(_ period: TimeInterval, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
+        zip(
+            Timer.TimerPublisher(interval: period, runLoop: runLoop, mode: .default)
+                .autoconnect()
+                .prepend(Date())
+                .setFailureType(to: Failure.self)
+        )
+        .map { $0.0 }
+        .eraseToAnyPublisher()
+    }
 
 	/// Emits tuples of (previous, current) values with initial value.
 	///

@@ -24,6 +24,11 @@ public extension Subscriber {
 		Subscribers.MapFailure<Self, NewFailure>(self, transform: transform)
 	}
 
+	/// Performs an action when a completion event is received.
+	func onCompletion(_ action: @escaping (Subscribers.Completion<Failure>) -> Void) -> Subscribers.OnCompletion<Self> {
+		Subscribers.OnCompletion<Self>(self, action: action)
+	}
+
 	/// Converts to a non-failing subscriber (Never failure type).
 	func nonFailing() -> Subscribers.MapFailure<Self, Never> {
 		mapFailure { never in
@@ -103,6 +108,37 @@ public extension Subscribers {
 				let newError = transform(error)
 				base.receive(completion: .failure(newError))
 			}
+		}
+	}
+
+	struct OnCompletion<Base: Subscriber>: Subscriber {
+
+		public typealias Input = Base.Input
+		public typealias Failure = Base.Failure
+
+		public var combineIdentifier: CombineIdentifier {
+			base.combineIdentifier
+		}
+
+		private let base: Base
+		private let action: (Subscribers.Completion<Failure>) -> Void
+
+		public init(_ base: Base, action: @escaping (Subscribers.Completion<Failure>) -> Void) {
+			self.base = base
+			self.action = action
+		}
+
+		public func receive(subscription: Subscription) {
+			base.receive(subscription: subscription)
+		}
+
+		public func receive(_ input: Input) -> Subscribers.Demand {
+			base.receive(input)
+		}
+
+		public func receive(completion: Subscribers.Completion<Failure>) {
+			action(completion)
+			base.receive(completion: completion)
 		}
 	}
 }

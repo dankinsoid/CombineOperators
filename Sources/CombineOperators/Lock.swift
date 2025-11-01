@@ -4,24 +4,32 @@ import os
 /// Thread-safe lock using `os_unfair_lock` for performance.
 package final class Lock {
 
-	private var _lock = os_unfair_lock()
+	private let p: UnsafeMutablePointer<os_unfair_lock> = {
+		let p = UnsafeMutablePointer<os_unfair_lock>.allocate(capacity: 1)
+		p.initialize(to: .init())
+		return p
+	}()
 
-	init() {
-		_lock = os_unfair_lock()
+	public init() {}
+
+	public func lock() {
+		os_unfair_lock_lock(p)
 	}
 
-	func lock() {
-		os_unfair_lock_lock(&_lock)
+	public func unlock() {
+		os_unfair_lock_unlock(p)
 	}
 
-	func unlock() {
-		os_unfair_lock_unlock(&_lock)
+	@discardableResult
+	public func withLock<R>(_ body: () throws -> R) rethrows -> R {
+		os_unfair_lock_lock(p)
+		defer { os_unfair_lock_unlock(p) }
+		return try body()
 	}
 
-	func withLock<T>(_ action: () throws -> T) rethrows -> T {
-		lock()
-		defer { unlock() }
-		return try action()
+	deinit {
+		p.deinitialize(count: 1)
+		p.deallocate()
 	}
 }
 
@@ -67,7 +75,7 @@ package final class Locked<Value> {
 
 package extension Locked {
 
-	package convenience init() where Value: ExpressibleByNilLiteral {
+	convenience init() where Value: ExpressibleByNilLiteral {
 		self.init(wrappedValue: nil)
 	}
 }

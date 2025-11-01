@@ -9,7 +9,7 @@ import Foundation
 final class HasObserver<Output>: Subject {
 	typealias Failure = Error
 	private let subject = PassthroughSubject<Output, Error>()
-	var hasObservers: Bool { lock.performLocked { subscriptionsCount > 0 } }
+	var hasObservers: Bool { lock.withLock { subscriptionsCount > 0 } }
 	private var subscriptionsCount = 0
 	private let lock = Lock()
 
@@ -28,7 +28,7 @@ final class HasObserver<Output>: Subject {
 	func send(subscription: Subscription) {
 		subscriptionsCount += 1
 		subject.send(subscription: SubscriptionHas(subscription: subscription, onCancelled: { [weak self] in
-			self?.lock.performLocked { self?.subscriptionsCount -= 1 }
+			self?.lock.withLock { self?.subscriptionsCount -= 1 }
 		}))
 	}
 

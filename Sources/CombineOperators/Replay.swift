@@ -28,6 +28,7 @@ public final class ReplaySubject<Output, Failure: Error>: Subject {
 	/// - Parameter bufferSize: Number of recent values to replay (0 = none)
 	public init(_ bufferSize: Int = 0) {
 		self.bufferSize = bufferSize
+		buffer.reserveCapacity(bufferSize)
 	}
 
 	/// Provides this Subject an opportunity to establish demand for any new upstream subscriptions
@@ -38,8 +39,10 @@ public final class ReplaySubject<Output, Failure: Error>: Subject {
 	/// Sends a value to the subscriber.
 	public func send(_ value: Output) {
 		lock.withLock {
-			buffer.append(value)
-			buffer = buffer.suffix(bufferSize)
+			if bufferSize > 0 {
+				buffer.removeFirst(Swift.max(0, buffer.count - bufferSize + 1))
+				buffer.append(value)
+			}
 			return subscriptions.values
 		}
 		.forEach { $0.receive(value) }
@@ -63,13 +66,15 @@ public final class ReplaySubject<Output, Failure: Error>: Subject {
 			self?.cancel(id: id)
 		}
 		let (buffer, completion) = lock.withLock { () -> ([Output], Subscribers.Completion<Failure>?) in
-			if completion == nil {
+			if self.completion == nil {
 				subscriptions[id] = subscription
 			}
 			return (self.buffer, self.completion)
 		}
 		subscriber.receive(subscription: subscription)
-		subscription.replay(buffer, completion: completion)
+		if !buffer.isEmpty || completion != nil {
+			subscription.replay(buffer, completion: completion)
+		}
 	}
 
 	private func cancel(id: UUID) {
@@ -79,12 +84,12 @@ public final class ReplaySubject<Output, Failure: Error>: Subject {
 	}
 }
 
-public final class ReplaySubjectSubscription<Output, Failure: Error>: Subscription {
+private final class ReplaySubjectSubscription<Output, Failure: Error>: Subscription {
 
-	private let downstream: AnySubscriber<Output, Failure>
-	private var isCompleted = false
+	private var downstream: AnySubscriber<Output, Failure>?
 	private var demand: Subscribers.Demand = .none
-	private let finish: () -> Void
+	private var finish: () -> Void
+	private let lock = Lock()
 
 	public init(_ downstream: AnySubscriber<Output, Failure>, cancel: @escaping () -> Void) {
 		self.downstream = downstream
@@ -93,30 +98,79 @@ public final class ReplaySubjectSubscription<Output, Failure: Error>: Subscripti
 
 	/// Tells a publisher that it may send more values to the subscriber.
 	public func request(_ newDemand: Subscribers.Demand) {
-		demand += newDemand
+		lock.withLock {
+			demand += newDemand
+		}
 	}
 
 	public func cancel() {
-		isCompleted = true
-		finish()
+		lock.withLock {
+			defer {
+				downstream = nil
+				finish = {}
+				demand = .none
+			}
+			return finish
+		}()
 	}
 
 	public func receive(_ value: Output) {
-		guard !isCompleted, demand > 0 else { return }
-
-		demand += downstream.receive(value) - 1
+		let (downstream, demand) = lock.withLock {
+			(self.downstream, self.demand)
+		}
+		guard let downstream, demand > 0 else { return }
+		let deltaDemand = downstream.receive(value)
+		lock.withLock {
+			if self.demand > 0 {
+				self.demand -= 1
+				self.demand += deltaDemand
+			} else if deltaDemand > 0 {
+				self.demand += deltaDemand - 1
+			}
+		}
 	}
 
 	public func receive(completion: Subscribers.Completion<Failure>) {
-		guard !isCompleted else { return }
-		isCompleted = true
+		let (downstream, finish) = lock.withLock {
+			defer {
+				self.downstream = nil
+				self.finish = {}
+				demand = .none
+			}
+			return (self.downstream, self.finish)
+		}
+		guard let downstream else { return }
 		downstream.receive(completion: completion)
+		finish()
 	}
 
 	public func replay(_ values: [Output], completion: Subscribers.Completion<Failure>?) {
-		guard !isCompleted else { return }
-		values.forEach { value in receive(value) }
-		if let completion { receive(completion: completion) }
+		var (downstream, demand) = lock.withLock {
+			(self.downstream, self.demand)
+		}
+		guard let downstream, demand > 0 else { return }
+		var deltaDemand: Int? = 0
+		for value in values {
+			guard demand > 0 else { break }
+			demand -= 1
+			deltaDemand = deltaDemand.flatMap { $0 - 1 }
+			let newDemand = downstream.receive(value)
+			demand += newDemand
+			deltaDemand = deltaDemand.flatMap { i in newDemand.max.map { i + $0 } }
+		}
+		if let completion {
+			receive(completion: completion)
+		} else {
+			lock.withLock {
+				if let rawDemand = self.demand.max {
+					if let deltaDemand {
+						self.demand = .max(max(0, rawDemand + deltaDemand))
+					} else {
+						self.demand = .unlimited
+					}
+				}
+			}
+		}
 	}
 }
 

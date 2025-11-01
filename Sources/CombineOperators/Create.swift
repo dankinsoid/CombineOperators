@@ -38,7 +38,7 @@ extension Subscriptions {
 		Failure == SubscriberType.Failure
 	{
 
-		private let subscriber: SubscriberType
+		private var subscriber: SubscriberType?
 		private var cancellable: Cancellable?
 		private let lock = Lock()
 		private var closure: (AnySubscriber<Output, Failure>) -> Cancellable
@@ -49,7 +49,7 @@ extension Subscriptions {
 		}
 
 		func request(_ demand: Subscribers.Demand) {
-			guard demand > 0 else { return }
+			guard demand > 0, let subscriber else { return }
 			let cancellable = closure(AnySubscriber(subscriber))
 			lock.withLock {
 				self.cancellable = cancellable
@@ -60,6 +60,7 @@ extension Subscriptions {
 			let cancellable = lock.withLock { () -> Cancellable? in
 				let cancellable = self.cancellable
 				self.cancellable = nil
+				self.subscriber = nil
 				return cancellable
 			}
 			cancellable?.cancel()

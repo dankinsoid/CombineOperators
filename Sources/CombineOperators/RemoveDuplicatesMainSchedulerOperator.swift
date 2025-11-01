@@ -3,7 +3,7 @@ import Combine
 /// Thread-safe subscription operator with Driver semantics and duplicate removal.
 ///
 /// The `==>>` operator combines Driver guarantees with automatic duplicate filtering.
-/// Equivalent to `removeDuplicates().asDriver()`.
+/// Equivalent to `removeDuplicates().receive(on: MainScheduler.instance)`.
 ///
 /// **Usage:**
 /// ```swift
@@ -25,25 +25,25 @@ infix operator ==>>: CombinePrecedence
 /// Subscribes to a publisher as a Driver, removing consecutive duplicates.
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output, O.Failure == T.Failure {
-	lhs.removeDuplicates().asDriver().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 /// Subscribes as Driver with duplicate removal, converting failure to Error.
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output, O.Failure == Error {
-	lhs.removeDuplicates().asDriver().eraseFailure().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).eraseFailure().subscribe(rhs)
 }
 
 /// Subscribes a never-failing publisher as Driver with duplicate removal.
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output, T.Failure == Never {
-	lhs.removeDuplicates().asDriver().setFailureType(to: O.Failure.self).subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).setFailureType(to: O.Failure.self).subscribe(rhs)
 }
 
 /// Subscribes as Driver with duplicate removal, wrapping output in Optional.
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output?, O.Failure == T.Failure {
-	lhs.removeDuplicates().asDriver().optional().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 /// Subscribes with a closure on the main actor, removing duplicates.
@@ -53,7 +53,7 @@ public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Outpu
 /// - Warning: Use `[weak self]` capture list to avoid retain cycles, or wrap in `Binder`.
 @inlinable
 public func ==>> <O: Publisher>(_ lhs: O, _ rhs: @escaping @MainActor (O.Output) -> Void) -> AnyCancellable where O.Output: Equatable {
-	lhs.removeDuplicates().asDriver().removeDuplicates().asDriver().sink(
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).removeDuplicates().receive(on: MainScheduler.instance).sink(
 		receiveCompletion: { _ in },
 		receiveValue: { input in
 			MainActor.assumeIsolated {
@@ -67,80 +67,80 @@ public func ==>> <O: Publisher>(_ lhs: O, _ rhs: @escaping @MainActor (O.Output)
 
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output, O.Failure == T.Failure, O.Failure == Error {
-	lhs.removeDuplicates().asDriver().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output, O.Failure == T.Failure, O.Failure == Never {
-	lhs.removeDuplicates().asDriver().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output, T.Failure == Never, O.Failure == Error {
-	lhs.removeDuplicates().asDriver().setFailureType(to: O.Failure.self).subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).setFailureType(to: O.Failure.self).subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where T.Output: Equatable, O.Output == T.Output, O.Failure == T.Failure {
-	lhs.removeDuplicates().asDriver().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where T.Output: Equatable, O.Output == T.Output, O.Failure == T.Failure, O.Failure == Error {
-	lhs.removeDuplicates().asDriver().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where T.Output: Equatable, O.Output == T.Output, O.Failure == T.Failure, O.Failure == Never {
-	lhs.removeDuplicates().asDriver().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where T.Output: Equatable, O.Output == T.Output, O.Failure == Error {
-	lhs.removeDuplicates().asDriver().eraseFailure().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).eraseFailure().subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output?, O.Failure == T.Failure, O.Failure == Error {
-	lhs.removeDuplicates().asDriver().optional().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output?, O.Failure == T.Failure, O.Failure == Never {
-	lhs.removeDuplicates().asDriver().optional().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output?, O.Failure == Error {
-	lhs.removeDuplicates().asDriver().eraseFailure().optional().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).eraseFailure().optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output?, T.Failure == Never {
-	lhs.removeDuplicates().asDriver().optional().setFailureType(to: O.Failure.self).subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).optional().setFailureType(to: O.Failure.self).subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where T.Output: Equatable, O.Input == T.Output?, T.Failure == Never, O.Failure == Error {
-	lhs.removeDuplicates().asDriver().optional().setFailureType(to: O.Failure.self).subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).optional().setFailureType(to: O.Failure.self).subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where T.Output: Equatable, O.Output == T.Output?, O.Failure == T.Failure {
-	lhs.removeDuplicates().asDriver().optional().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where T.Output: Equatable, O.Output == T.Output?, O.Failure == T.Failure, O.Failure == Error {
-	lhs.removeDuplicates().asDriver().optional().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where T.Output: Equatable, O.Output == T.Output?, O.Failure == T.Failure, O.Failure == Never {
-	lhs.removeDuplicates().asDriver().optional().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).optional().subscribe(rhs)
 }
 
 @inlinable
 public func ==>> <T: Publisher, O: Subject>(_ lhs: T, _ rhs: O) -> AnyCancellable where T.Output: Equatable, O.Output == T.Output?, O.Failure == Error {
-	lhs.removeDuplicates().asDriver().optional().eraseFailure().subscribe(rhs)
+	lhs.removeDuplicates().receive(on: MainScheduler.instance).optional().eraseFailure().subscribe(rhs)
 }
