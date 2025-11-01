@@ -46,9 +46,14 @@ public struct CancellableBuilder {
 	}
 
 	@inlinable
-	public static func buildExpression(_ expression: Cancellable) -> Cancellable {
+	public static func buildExpression(_ expression: any Cancellable) -> Cancellable {
 		expression
 	}
+    
+    @inlinable
+    public static func buildExpression(_ expression: some Cancellable) -> Cancellable {
+        expression
+    }
 
 	@inlinable
 	public static func create(from: [Cancellable]) -> Cancellable {
@@ -71,14 +76,13 @@ public extension AnyCancellable {
 	/// Creates cancellable using result builder syntax.
 	///
 	/// ```swift
-	/// let bag = AnyCancellable {
+	/// let bag = AnyCancellable.build {
 	///     publisher1.sink { }
 	///     publisher2.sink { }
 	/// }
 	/// ```
-    @_disfavoredOverload
-	convenience init(@CancellableBuilder _ builder: () -> Cancellable) {
-		self.init(builder())
+	static func build(@CancellableBuilder _ builder: () -> Cancellable) -> AnyCancellable {
+        AnyCancellable(builder())
 	}
 
 	/// Creates cancellable from a sequence.

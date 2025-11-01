@@ -3,7 +3,7 @@ import Combine
 public extension Subscriber where Failure == Error {
 
 	/// Type-erases specific error to generic `Error`.
-	func setFailureType<F: Error>(to: F.Type = F.self) -> Subscribers.MapFailure<Self, Error> {
+	func setFailureType<F: Error>(to: F.Type = F.self) -> Subscribers.MapFailure<Self, F> {
 		mapFailure { $0 as Error }
 	}
 }
