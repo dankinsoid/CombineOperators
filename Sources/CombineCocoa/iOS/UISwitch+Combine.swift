@@ -19,7 +19,7 @@ public extension Reactive where Base: UISwitch {
 	/// ⚠️ Versions prior to iOS 10.2 leak `UISwitch` instances - sequence won't complete
 	/// when nothing holds a strong reference on those versions.
 	var value: ControlProperty<Bool> {
-		controlPropertyWithDefaultEvents(
+		controlProperty(
 			getter: { uiSwitch in
 				uiSwitch.isOn
 			}, setter: { uiSwitch, value in

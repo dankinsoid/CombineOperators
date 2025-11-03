@@ -7,13 +7,15 @@ public extension Publisher {
 	///
 	/// Combines publisher with timer, emitting original values at specified rate.
     func interval(_ period: TimeInterval, runLoop: RunLoop = .main) -> AnyPublisher<Output, Failure> {
-        zip(
-            Timer.TimerPublisher(interval: period, runLoop: runLoop, mode: .default)
-                .autoconnect()
-                .prepend(Date())
-                .setFailureType(to: Failure.self)
-        )
-        .map { $0.0 }
+        Deferred {
+            zip(
+                Timer.TimerPublisher(interval: period, runLoop: runLoop, mode: .default)
+                    .autoconnect()
+                    .prepend(Date())
+                    .setFailureType(to: Failure.self)
+            )
+            .map { $0.0 }
+        }
         .eraseToAnyPublisher()
     }
 

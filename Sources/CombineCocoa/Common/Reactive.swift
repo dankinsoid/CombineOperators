@@ -30,11 +30,22 @@ extension NSObject: ReactiveCompatible {}
 
 public extension Reactive where Base: AnyObject {
 
+    /// Synthesizes binder for writable property binding via dynamic member lookup.
+    ///
+    /// Enables reactive binding to object properties:
+    /// ```swift
+    /// publisher.subscribe(label.cb[\.text]) // Binds publisher output to label.text
+    /// ```
+    subscript<T>(_ keyPath: ReferenceWritableKeyPath<Base, T>) -> ReactiveBinder<Base, T, ReferenceWritableKeyPath<Base, T>> {
+        ReactiveBinder<Base, T, ReferenceWritableKeyPath<Base, T>>(base, keyPath: keyPath)
+    }
+
 	/// Synthesizes binder for read-only property access via dynamic member lookup.
 	///
 	/// ```swift
 	/// label.cb.text // Returns ReactiveBinder<UILabel, String?, KeyPath<...>>
 	/// ```
+    @_disfavoredOverload
 	subscript<T>(dynamicMember keyPath: KeyPath<Base, T>) -> ReactiveBinder<Base, T, KeyPath<Base, T>> {
 		ReactiveBinder<Base, T, KeyPath<Base, T>>(base, keyPath: keyPath)
 	}

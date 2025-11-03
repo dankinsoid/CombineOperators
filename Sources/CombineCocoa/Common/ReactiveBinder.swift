@@ -12,11 +12,11 @@ import Foundation
 /// publisher.subscribe(label.cb.text) // Updates label.text on main thread
 /// ```
 @dynamicMemberLookup
-public struct ReactiveBinder<Target: AnyObject, Input, KP: KeyPath<Target, Input>>: CustomCombineIdentifierConvertible {
+public final class ReactiveBinder<Target: AnyObject, Input, KP: KeyPath<Target, Input>>: CustomCombineIdentifierConvertible, @unchecked Sendable {
 
 	fileprivate weak var _target: Target?
 	fileprivate let keyPath: KP
-	public let combineIdentifier = CombineIdentifier()
+    fileprivate var deinitCancellable: AnyCancellable?
 
 	private init(
 		target: Target?,
@@ -26,42 +26,29 @@ public struct ReactiveBinder<Target: AnyObject, Input, KP: KeyPath<Target, Input
 		self.keyPath = keyPath
 	}
 
-	public init(_ target: Target, keyPath: KP) {
+	public convenience init(_ target: Target, keyPath: KP) {
 		self.init(target: target, keyPath: keyPath)
 	}
 
 	/// Chains read-only keypath for nested property access.
 	public subscript<T>(dynamicMember keyPath: KeyPath<Input, T>) -> ReactiveBinder<Target, T, KeyPath<Target, T>> {
-		ReactiveBinder<Target, T, KeyPath<Target, T>>(
-			target: target,
-			keyPath: self.keyPath.appending(path: keyPath)
-		)
+        ReactiveBinder<Target, T, KeyPath<Target, T>>(
+            target: target,
+            keyPath: self.keyPath.appending(path: keyPath)
+        )
 	}
 
-	/// Chains writable keypath for nested property binding.
-	///
-	/// ```swift
-	/// publisher.subscribe(view.cb.layer.opacity) // Binds to view.layer.opacity
-	/// ```
-	public subscript<T>(dynamicMember keyPath: ReferenceWritableKeyPath<Input, T>) -> ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>> {
-		ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>>(
-			target: target,
-			keyPath: self.keyPath.append(reference: keyPath)
-		)
-	}
-
-	private final class Deiniter {
-
-		let onDeinit: () -> Void
-
-		init(onDeinit: @escaping () -> Void = {}) {
-			self.onDeinit = onDeinit
-		}
-
-		deinit {
-			onDeinit()
-		}
-	}
+    /// Chains writable keypath for nested property binding.
+    ///
+    /// ```swift
+    /// publisher.subscribe(view.cb.layer.opacity) // Binds to view.layer.opacity
+    /// ```
+    public subscript<T>(dynamicMember keyPath: ReferenceWritableKeyPath<Input, T>) -> ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>> {
+        ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>>(
+            target: target,
+            keyPath: self.keyPath.append(reference: keyPath)
+        )
+    }
 
 	private var target: Target? {
 		// Since ReactiveBinder is used to bind UI elements on main thread, it's more efficient to use Main thread check instead of lock
@@ -84,14 +71,10 @@ extension ReactiveBinder: Subscriber where KP: ReferenceWritableKeyPath<Target, 
 	/// Starts subscription, cancels automatically when target deallocates.
 	public func receive(subscription: Subscription) {
 		if let target {
-			objc_setAssociatedObject(
-				target,
-				&deiniterKey,
-				Deiniter {
-					subscription.cancel()
-				},
-				.OBJC_ASSOCIATION_RETAIN_NONATOMIC
-			)
+            let cancellable = onDeinit(of: target, perform: subscription.cancel)
+            MainScheduler.instance.syncSchedule {
+                deinitCancellable = cancellable
+            }
 			subscription.request(.unlimited)
 		} else {
 			subscription.cancel()
@@ -100,24 +83,30 @@ extension ReactiveBinder: Subscriber where KP: ReferenceWritableKeyPath<Target, 
 
 	/// Receives value and updates target property on main thread.
 	public func receive(_ input: Input) -> Subscribers.Demand {
-		if let target {
-			MainScheduler.instance.schedule { [keyPath] in
-				target[keyPath: keyPath] = input
-			}
-			return .unlimited
-		} else {
-			return .none
-		}
+        MainScheduler.instance.syncSchedule {
+            if let target = _target {
+                target[keyPath: keyPath] = input
+                return .unlimited
+            } else {
+                return .none
+            }
+        }
 	}
 
-	public func receive(completion: Subscribers.Completion<Never>) {}
+	public func receive(completion: Subscribers.Completion<Never>) {
+        MainScheduler.instance.syncSchedule {
+            _target = nil
+            deinitCancellable = nil
+        }
+    }
 
-	public subscript<T>(dynamicMember keyPath: WritableKeyPath<Input, T>) -> ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>> {
-		ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>>(
-			target: target,
-			keyPath: self.keyPath.append(writable: keyPath)
-		)
-	}
+    @_disfavoredOverload
+    public subscript<T>(dynamicMember keyPath: WritableKeyPath<Input, T>) -> ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>> {
+        ReactiveBinder<Target, T, ReferenceWritableKeyPath<Target, T>>(
+            target: target,
+            keyPath: self.keyPath.append(writable: keyPath)
+        )
+    }
 }
 
 extension KeyPath {

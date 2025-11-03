@@ -13,13 +13,13 @@ import Foundation
 /// }
 /// textPublisher.subscribe(binder)
 /// ```
-public struct Binder<Input>: Subscriber, @unchecked Sendable {
+public final class Binder<Input>: Subscriber, @unchecked Sendable {
 
 	public typealias Failure = Never
 
-	private let binding: @Sendable (Input) -> Void
+    private let binding: @Sendable (Input) -> Subscribers.Demand
+    private var deinitCancellable: AnyCancellable?
 	private weak var _target: (AnyObject & Sendable)?
-	public let combineIdentifier = CombineIdentifier()
 
 	/// Creates a binder with custom scheduler.
 	///
@@ -28,17 +28,20 @@ public struct Binder<Input>: Subscriber, @unchecked Sendable {
 	///     model.process(value)
 	/// }
 	/// ```
-	public init<Target: AnyObject & Sendable, S: Scheduler>(
+	public convenience init<Target: AnyObject & Sendable, S: Scheduler>(
 		_ target: Target,
 		scheduler: S,
-		binding: @escaping (Target, Input) -> Void
+        binding: @escaping (Target, Input) -> Void
 	) {
 		self.init(target: target) { [weak target] input in
 			if let target {
 				scheduler.schedule {
 					binding(target, input)
 				}
-			}
+                return .unlimited
+            } else {
+                return .none
+            }
 		}
 	}
 
@@ -52,7 +55,7 @@ public struct Binder<Input>: Subscriber, @unchecked Sendable {
 	///     button.isEnabled = isEnabled
 	/// }
 	/// ```
-	public init<Target: AnyObject & Sendable>(
+	public convenience init<Target: AnyObject & Sendable>(
 		_ target: Target,
 		binding: @escaping @MainActor (Target, Input) -> Void
 	) {
@@ -63,9 +66,26 @@ public struct Binder<Input>: Subscriber, @unchecked Sendable {
 		}
 	}
 
+    /// Creates a binder that executes on the main actor.
+    ///
+    /// Preferred for UI bindings that require main actor isolation.
+    ///
+    /// ```swift
+    /// let label = UILabel()
+    /// let binder = Binder(label, \.text)
+    /// ```
+    public convenience init<Target: AnyObject & Sendable>(
+        _ target: Target,
+        _ keyPath: ReferenceWritableKeyPath<Target, Input>
+    ) {
+        self.init(target) { target, input in
+            target[keyPath: keyPath] = input
+        }
+    }
+    
 	private init(
 		target: (AnyObject & Sendable)?,
-		binding: @escaping @Sendable (Input) -> Void
+        binding: @escaping @Sendable (Input) -> Subscribers.Demand
 	) {
 		self.binding = binding
 		_target = target
@@ -73,14 +93,10 @@ public struct Binder<Input>: Subscriber, @unchecked Sendable {
 
 	public func receive(subscription: Subscription) {
 		if let target {
-			objc_setAssociatedObject(
-				target,
-				&deiniterKey,
-				Deiniter {
-					subscription.cancel()
-				},
-				.OBJC_ASSOCIATION_RETAIN_NONATOMIC
-			)
+            let cancellable = onDeinit(of: target, perform: subscription.cancel)
+            MainScheduler.instance.syncSchedule {
+                deinitCancellable = cancellable
+            }
 			subscription.request(.unlimited)
 		} else {
 			subscription.cancel()
@@ -91,34 +107,21 @@ public struct Binder<Input>: Subscriber, @unchecked Sendable {
 		if target == nil {
 			return .none
 		} else {
-			binding(input)
-			return .unlimited
+            return binding(input)
 		}
 	}
 
-	public func receive(completion: Subscribers.Completion<Never>) {}
-
-	private final class Deiniter {
-
-		let onDeinit: () -> Void
-
-		init(onDeinit: @escaping () -> Void = {}) {
-			self.onDeinit = onDeinit
-		}
-
-		deinit {
-			onDeinit()
-		}
-	}
+	public func receive(completion: Subscribers.Completion<Never>) {
+        MainScheduler.instance.syncSchedule {
+            _target = nil
+            deinitCancellable = nil
+        }
+    }
 
 	private var target: (AnyObject & Sendable)? {
 		// Since Binder is usually used to bind UI elements on main thread, it's more efficient to use Main thread check instead of lock
-		if Thread.isMainThread {
-			return _target
-		} else {
-			return DispatchQueue.main.sync {
-				_target
-			}
+        MainScheduler.instance.syncSchedule {
+            _target
 		}
 	}
 }

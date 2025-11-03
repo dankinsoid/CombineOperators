@@ -44,21 +44,21 @@ public extension Reactive where Base: UIButton {
 	/// ```swift
 	/// publisher.subscribe(button.cb.title())
 	/// ```
-	func title(for controlState: UIControl.State = []) -> Binder<String?> {
+    func title(for controlState: UIControl.State = .normal) -> Binder<String?> {
 		Binder(base) { button, title in
 			button.setTitle(title, for: controlState)
 		}
 	}
 
 	/// Binds to button image for specified state.
-	func image(for controlState: UIControl.State = []) -> Binder<UIImage?> {
+    func image(for controlState: UIControl.State = .normal) -> Binder<UIImage?> {
 		Binder(base) { button, image in
 			button.setImage(image, for: controlState)
 		}
 	}
 
 	/// Binds to button background image for specified state.
-	func backgroundImage(for controlState: UIControl.State = []) -> Binder<UIImage?> {
+    func backgroundImage(for controlState: UIControl.State = .normal) -> Binder<UIImage?> {
 		Binder(base) { button, image in
 			button.setBackgroundImage(image, for: controlState)
 		}
@@ -73,7 +73,7 @@ import UIKit
 public extension Reactive where Base: UIButton {
 
 	/// Binds to button attributed title for specified state.
-	func attributedTitle(for controlState: UIControl.State = []) -> Binder<NSAttributedString?> {
+    func attributedTitle(for controlState: UIControl.State = .normal) -> Binder<NSAttributedString?> {
 		Binder(base) { button, attributedTitle in
 			button.setAttributedTitle(attributedTitle, for: controlState)
 		}

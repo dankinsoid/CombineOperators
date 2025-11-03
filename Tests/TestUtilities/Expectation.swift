@@ -2,7 +2,7 @@ import Foundation
 import Testing
 import CombineOperators
 
-public final class Expectation<Value> {
+public final class Expectation<Value>: @unchecked Sendable {
 
     public let limit: Int?
     @Locked private(set) package var isFinished = false

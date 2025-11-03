@@ -3,7 +3,7 @@ import Combine
 /// Basic subscription operator without thread-safety guarantees.
 ///
 /// The `=>` operator connects publishers to subscribers with automatic type conversions.
-/// Unlike `==>` (Driver), this operator does not enforce main thread delivery.
+/// Unlike `==>` this operator does not enforce main thread delivery.
 ///
 /// **Usage:**
 /// ```swift

@@ -1,9 +1,6 @@
 import Combine
 
-/// Thread-safe subscription operator with Driver semantics.
-///
-/// The `==>` operator converts publishers to Drivers before subscribing,
-/// ensuring main thread delivery and replay on subscription.
+/// Main thread delivery and replaying operator.
 ///
 /// **Usage:**
 /// ```swift
@@ -11,37 +8,30 @@ import Combine
 /// publisher ==> { print($0) }    // Closure called on main thread
 /// ```
 ///
-/// **Driver guarantees:**
-/// - Values delivered on main thread
-/// - Last value replayed to new subscribers
-/// - Never fails (errors are handled)
-///
 /// For duplicate removal, use `==>>` instead.
 infix operator ==>: CombinePrecedence
 
 // MARK: - Simple subscribe
 
-/// Subscribes to a publisher as a Driver.
-///
-/// Converts the publisher to a Driver for thread-safe, main-queue delivery.
+/// Subscribes to a publisher with main thread delivery.
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output, O.Failure == T.Failure {
     lhs.receive(on: MainScheduler.instance).subscribe(rhs)
 }
 
-/// Subscribes as Driver, converting failure to Error.
+/// Subscribes to a publisher with main thread delivery, converting failure to Error.
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output, O.Failure == Error {
 	lhs.receive(on: MainScheduler.instance).eraseFailure().subscribe(rhs)
 }
 
-/// Subscribes a never-failing publisher as Driver.
+/// Subscribes a never-failing publisher with main thread delivery.
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output, T.Failure == Never {
 	lhs.receive(on: MainScheduler.instance).setFailureType(to: O.Failure.self).subscribe(rhs)
 }
 
-/// Subscribes as Driver, wrapping output in Optional.
+/// Subscribes a publisher with main thread delivery, wrapping output in Optional.
 @inlinable
 public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input == T.Output?, O.Failure == T.Failure {
 	lhs.receive(on: MainScheduler.instance).optional().subscribe(rhs)
@@ -51,7 +41,7 @@ public func ==> <T: Publisher, O: Subscriber>(_ lhs: T, _ rhs: O) where O.Input 
 ///
 /// Values are delivered on the main thread. The closure executes in main actor isolation.
 ///
-/// - Warning: Use `[weak self]` capture list to avoid retain cycles, or wrap in `Binder`.
+/// - Warning: Use `[weak self]` capture list to avoid retain cycles, or wrap in `Binder` and use `=>` operator since `Binder` already enforces main thread delivery.
 @inlinable
 public func ==> <O: Publisher>(_ lhs: O, _ rhs: @escaping @MainActor (O.Output) -> Void) -> AnyCancellable {
 	lhs.receive(on: MainScheduler.instance).sink(

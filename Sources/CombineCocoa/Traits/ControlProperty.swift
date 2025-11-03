@@ -79,17 +79,34 @@ public struct ControlProperty<PropertyType>: ControlPropertyType {
 	}
 }
 
+public extension ControlPropertyType {
+    
+    /// Transforms property values using provided mapping functions.
+    func map<T>(
+        get transform: @escaping (Output) -> T,
+        set reverseTransform: @escaping (T) -> Output
+    ) -> ControlProperty<T> {
+        let original = asControlProperty()
+        let values = original.values.map(transform)
+        let valueSink = AnySubscriber<T, Never> { subscription in
+            original.valueSink.receive(subscription: subscription)
+        } receiveValue: { value in
+            let transformed = reverseTransform(value)
+            return original.valueSink.receive(transformed)
+        } receiveCompletion: { completion in
+            original.valueSink.receive(completion: .finished)
+        }
+        return ControlProperty<T>(values: values, valueSink: valueSink)
+    }
+}
+
 public extension ControlPropertyType where Output == String? {
 
 	/// Transforms optional string property to non-optional (nil → "").
 	var orEmpty: ControlProperty<String> {
-		let original: ControlProperty<String?> = asControlProperty()
-		let values = original.values.map { $0 ?? "" }
-		let valueSink = Subscribers.Sink<String, Never> { _ in
-			original.valueSink.receive(completion: .finished)
-		} receiveValue: {
-			_ = original.valueSink.receive($0)
-		}
-		return ControlProperty<String>(values: values, valueSink: valueSink)
+        map(
+            get: { $0 ?? "" },
+            set: { $0 }
+        )
 	}
 }

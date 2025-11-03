@@ -10,7 +10,7 @@ public extension Reactive where Base: UISegmentedControl {
 	/// segmentedControl.cb.selectedSegmentIndex.sink { print("Index: \($0)") }
 	/// ```
 	var selectedSegmentIndex: ControlProperty<Int> {
-		controlPropertyWithDefaultEvents(
+		controlProperty(
 			getter: { segmentedControl in
 				segmentedControl.selectedSegmentIndex
 			}, setter: { segmentedControl, value in

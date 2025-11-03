@@ -14,10 +14,10 @@ public extension Reactive where Base: UITextField {
 	///
 	/// publisher.subscribe(textField.cb.text) // Bind to text field
 	/// ```
-	var text: ControlProperty<String?> {
-		controlPropertyWithDefaultEvents(
+	var text: ControlProperty<String> {
+		controlProperty(
 			getter: { textField in
-				textField.text
+				textField.text ?? ""
 			},
 			setter: { textField, value in
 				// This check is important because setting text value always clears control state
@@ -33,10 +33,10 @@ public extension Reactive where Base: UITextField {
 	/// Bidirectional binding for text field's `attributedText` property.
 	///
 	/// Setter preserves IME marked text selection by checking before assignment.
-	var attributedText: ControlProperty<NSAttributedString?> {
-		controlPropertyWithDefaultEvents(
+	var attributedText: ControlProperty<NSAttributedString> {
+		controlProperty(
 			getter: { textField in
-				textField.attributedText
+                textField.attributedText ?? NSAttributedString(string: "")
 			},
 			setter: { textField, value in
 				// This check is important because setting text value always clears control state

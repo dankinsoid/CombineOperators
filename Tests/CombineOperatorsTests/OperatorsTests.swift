@@ -188,6 +188,111 @@ struct OperatorsTests {
 		#expect(received[1].id == 2)
 	}
 
+	// MARK: - RemoveDuplicatesMainScheduler Operator (==>>)
+
+	@Test("RemoveDuplicatesMainScheduler operator filters duplicates on main thread")
+	func removeDuplicatesMainSchedulerOperatorFiltersDuplicates() async {
+		let subject = PassthroughSubject<Int, Never>()
+		let expectation = Expectation<Int>(limit: 3)
+		var onMainThread = true
+
+		let object = NSObject()
+		let binder = Binder(object) { _, value in
+			onMainThread = onMainThread && Thread.isMainThread
+			expectation.fulfill(value)
+		}
+
+		subject ==>> binder
+
+		subject.send(1)
+		subject.send(1)
+		subject.send(2)
+		subject.send(2)
+		subject.send(3)
+
+		let received = await expectation.values
+
+		#expect(received == [1, 2, 3])
+		#expect(onMainThread)
+	}
+
+	@Test("RemoveDuplicatesMainScheduler operator with closure")
+	func removeDuplicatesMainSchedulerOperatorWithClosure() async {
+		let values = [1, 1, 2, 2, 3, 3]
+		let expectation = Expectation<Int>(limit: 3)
+
+		let cancellable = values.publisher ==>> { @MainActor value in
+			expectation.fulfill(value)
+		}
+		defer { cancellable.cancel() }
+
+		let received = await expectation.values
+
+		#expect(received == [1, 2, 3])
+	}
+
+	@Test("RemoveDuplicatesMainScheduler operator delivers on main thread")
+	func removeDuplicatesMainSchedulerOperatorDeliversOnMainThread() async {
+		let expectation = Expectation<Bool>(limit: 1)
+
+		let publisher = Just(42)
+		let object = NSObject()
+		let binder = Binder<Int>(object) { _, _ in
+			expectation.fulfill(Thread.isMainThread)
+		}
+
+		publisher ==>> binder
+
+		let receivedOnMain = await expectation.values.first ?? false
+
+		#expect(receivedOnMain)
+	}
+
+	@Test("RemoveDuplicatesMainScheduler operator with equatable struct")
+	func removeDuplicatesMainSchedulerOperatorWithEquatableStruct() async {
+		struct TestValue: Equatable {
+			let id: Int
+			let name: String
+		}
+
+		let values = [
+			TestValue(id: 1, name: "A"),
+			TestValue(id: 1, name: "A"),
+			TestValue(id: 2, name: "B"),
+			TestValue(id: 2, name: "B"),
+		]
+
+		let expectation = Expectation<TestValue>(limit: 2)
+		let object = NSObject()
+		let binder = Binder(object) { _, value in
+			expectation.fulfill(value)
+		}
+
+		values.publisher ==>> binder
+
+		let received = await expectation.values
+
+		#expect(received.count == 2)
+		#expect(received[0].id == 1)
+		#expect(received[1].id == 2)
+	}
+
+	@Test("RemoveDuplicatesMainScheduler operator non-consecutive duplicates")
+	func removeDuplicatesMainSchedulerOperatorNonConsecutiveDuplicates() async {
+		let values = [1, 2, 1, 3, 2]
+		let expectation = Expectation<Int>(limit: 5)
+
+		let cancellable = values.publisher ==>> { @MainActor value in
+			expectation.fulfill(value)
+		}
+		defer { cancellable.cancel() }
+
+		let received = await expectation.values
+
+		// Only consecutive duplicates are removed
+		#expect(received == [1, 2, 1, 3, 2])
+	}
+
 	// MARK: - Operator Combinations
 
 	@Test("Chaining operators")
@@ -201,7 +306,7 @@ struct OperatorsTests {
 		subject.send(1)
 		subject.send(1)
 		subject.send(2)
-    
+
 		#expect(received == [1, 2])
 		#expect(cancellables.count == 1)
 	}

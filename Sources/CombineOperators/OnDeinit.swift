@@ -41,7 +41,7 @@ public extension Publishers {
 			private var subscriber: S?
 			weak var object: AnyObject?
 			private let lock = Lock()
-            private var id: UUID?
+            private var cancellable: AnyCancellable?
 			private var didSubscribe = false
 
 			init(subscriber: S, object: AnyObject?) {
@@ -61,23 +61,19 @@ public extension Publishers {
 					finish()
 					return
 				}
-				let deinitWrapper = (objc_getAssociatedObject(object, &deiniterKey) as? DeinitWrapper) ?? DeinitWrapper()
-                lock.withLock {
-                    id = deinitWrapper.add { [weak self] in
-                        self?.finish()
-                    }
+                let cancellable = onDeinit(of: object) { [weak self] in
+                    self?.finish()
                 }
-				objc_setAssociatedObject(object, &deiniterKey, deinitWrapper, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+                lock.withLock {
+                    self.cancellable = cancellable
+                }
 			}
 
 			func cancel() {
-				let object = lock.withLock {
-					subscriber = nil
-					return self.object
-				}
-				if let object, let id, let wrapper = objc_getAssociatedObject(object, &deiniterKey) as? DeinitWrapper {
-                    wrapper.remove(id: id)
-				}
+                lock.withLock {
+                    subscriber = nil
+                    cancellable = nil
+                }
 			}
 
 			private func finish() {
@@ -91,6 +87,22 @@ public extension Publishers {
 			}
 		}
 	}
+}
+
+/// Registers a closure to be executed when the given object is deinitialized.
+/// - Parameters:
+/// - object: The object to observe for deinitialization.
+/// - perform: The closure to execute upon deinitialization.
+/// - Returns: An `AnyCancellable` that can be used to unregister the closure before deinitialization.
+package func onDeinit(of object: AnyObject, perform: @escaping () -> Void) -> AnyCancellable {
+    let deinitWrapper = (objc_getAssociatedObject(object, &deiniterKey) as? DeinitWrapper) ?? DeinitWrapper()
+    let id = deinitWrapper.add {
+        perform()
+    }
+    objc_setAssociatedObject(object, &deiniterKey, deinitWrapper, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    return AnyCancellable { [weak deinitWrapper] in
+        deinitWrapper?.remove(id: id)
+    }
 }
 
 private final class DeinitWrapper {

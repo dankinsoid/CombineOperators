@@ -1,93 +1,7 @@
 #if canImport(UIKit)
 import Combine
+import CombineOperators
 import UIKit
-
-public extension Reactive where Base: UIView {
-
-	/// Binds to accessibility identifier.
-	var accessibilityIdentifier: Binder<String?> {
-		Binder(base, binding: { $0.accessibilityIdentifier = $1 })
-	}
-
-	/// Binds to view's transform.
-	var transform: Binder<CGAffineTransform> {
-		Binder(base, binding: { $0.transform = $1 })
-	}
-
-	/// Emits once when view moves to window (first occurrence only).
-	var movedToWindow: AnyPublisher<Void, Never> {
-		AnyPublisher<Void, Never>.create { [weak base] in
-			let cancellable = base?.observeMoveToWindow(subscriber: $0)
-			return AnyCancellable {
-				cancellable?.cancel()
-			}
-		}
-		.map { [weak base] _ in base?.window != nil }
-		.prepend(base.window != nil)
-		.filter { $0 == true }
-		.map { _ in }
-		.prefix(1)
-		.eraseToAnyPublisher()
-	}
-
-	/// Emits whether view is visible on screen (within window bounds).
-	///
-	/// Tracks frame changes across view hierarchy. Useful for lazy loading.
-	var isOnScreen: AnyPublisher<Bool, Never> {
-		.create { [weak base] sbr in
-			AnyCancellable(base?.observeIsOnScreen { _ = sbr.receive($0) } ?? {})
-		}
-		.silenсeFailure()
-		.eraseToAnyPublisher()
-	}
-
-	/// Emits view's frame in its own coordinate space on changes.
-	///
-	/// Observes layer position, bounds, and transform. Skips duplicate frames.
-	var frame: AnyPublisher<CGRect, Never> {
-		.create { [weak base] observer in
-			AnyCancellable(base?.observeFrame { _ = observer.receive($0.frame) } ?? {})
-		}
-		.silenсeFailure()
-		.removeDuplicates()
-		.eraseToAnyPublisher()
-	}
-
-	/// Emits view's frame in window coordinate space on changes.
-	///
-	/// Tracks entire view hierarchy for comprehensive frame monitoring.
-	var frameOnWindow: AnyPublisher<CGRect, Never> {
-		.create { [weak base] sbr in
-			AnyCancellable(base?.observeFrameInWindow { _ = sbr.receive($0) } ?? {})
-		}
-		.silenсeFailure()
-		.removeDuplicates()
-		.eraseToAnyPublisher()
-	}
-
-	/// Emits layer's `isHidden` value on changes.
-	var isHidden: AnyPublisher<Bool, Never> {
-		value(at: \.isHidden)
-	}
-
-	/// Emits layer's opacity as `CGFloat` on changes.
-	var alpha: AnyPublisher<CGFloat, Never> {
-		value(at: \.opacity).map { CGFloat($0) }.eraseToAnyPublisher()
-	}
-
-	private func value<T: Equatable>(at keyPath: KeyPath<CALayer, T>) -> AnyPublisher<T, Never> {
-		.create { [weak base] sbr in
-			if let observer = base?.layer.observe(keyPath, { _ = sbr.receive($0) }) {
-				base?.layerObservers.observers.append(observer)
-				return AnyCancellable(observer.invalidate)
-			} else {
-				return AnyCancellable()
-			}
-		}
-		.silenсeFailure()
-		.eraseToAnyPublisher()
-	}
-}
 
 private final class MovedToWindowObserver: UIView {
 
@@ -112,10 +26,28 @@ private final class MovedToWindowObserver: UIView {
 
 	override func didMoveToWindow() {
 		super.didMoveToWindow()
+
+        UITextField().cb.text => ValueSubject("Yess") => cb.cancellables
+        ValueSubject("Yess") => UIButton().cb.title()
+
+        UIButton().cb.tap
+        UIButton().cb.title()
+        UIView().cb.longPressGesture() => Binder(self) { $0.longPre(state: $1.state) }
+
 		for item in onMoveToWindow {
 			_ = item.receive(())
 		}
 	}
+
+    private func longPre(state: UILongPressGestureRecognizer.State) {
+        
+    }
+
+    private var longPress: Binder<UILongPressGestureRecognizer.State> {
+        Binder(self) { it, state in
+            
+        }
+    }
 }
 
 extension UIView {
