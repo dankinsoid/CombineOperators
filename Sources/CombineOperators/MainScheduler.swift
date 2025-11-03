@@ -19,6 +19,15 @@ public struct MainScheduler: Scheduler {
 	/// Shared main scheduler instance.
 	public static let instance = MainScheduler()
 
+	/// Ensures execution is on main thread. Fatal errors if not.
+	public static func ensureRunningOnMainThread(file: StaticString = #file, line: UInt = #line) {
+		#if DEBUG
+		if !Thread.isMainThread {
+			fatalError("Running on background thread. This operation must be executed on the main thread.", file: file, line: line)
+		}
+		#endif
+	}
+
 	/// Schedules action on main thread. Executes synchronously if already on main.
 	public func schedule(options: SchedulerOptions?, _ action: @escaping () -> Void) {
 		if Thread.isMainThread {

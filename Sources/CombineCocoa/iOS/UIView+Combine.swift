@@ -35,7 +35,7 @@ private final class MovedToWindowObserver: UIView {
         UIView().cb.longPressGesture() => Binder(self) { $0.longPre(state: $1.state) }
 
 		for item in onMoveToWindow {
-			_ = item.receive(())
+			_ = item.receive()
 		}
 	}
 

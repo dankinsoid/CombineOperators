@@ -22,8 +22,14 @@ let package = Package(
 			]
 		),
 		.target(
+			name: "CombineCocoaRuntime",
+			dependencies: [],
+            resources: [.copy("PrivacyInfo.xcprivacy")],
+			publicHeadersPath: "include"
+		),
+		.target(
 			name: "CombineCocoa",
-			dependencies: ["CombineOperators"],
+			dependencies: ["CombineOperators", "CombineCocoaRuntime"],
 			swiftSettings: [
 				.unsafeFlags(["-package-name", "CombineOperators"]),
 			]
