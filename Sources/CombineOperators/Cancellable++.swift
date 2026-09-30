@@ -81,7 +81,7 @@ public extension AnyCancellable {
 	///     publisher2.sink { }
 	/// }
 	/// ```
-	static func build(@CancellableBuilder _ builder: () -> Cancellable) -> AnyCancellable {
+	static func combine(@CancellableBuilder _ builder: () -> Cancellable) -> AnyCancellable {
         AnyCancellable(builder())
 	}
 

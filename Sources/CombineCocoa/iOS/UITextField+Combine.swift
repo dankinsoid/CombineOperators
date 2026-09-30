@@ -10,7 +10,7 @@ public extension Reactive where Base: UITextField {
 	///
 	/// ```swift
 	/// textField.cb.text
-	///     .sink { print("Text: \($0 ?? "")") }
+	///     .sink { print("Text: \($0)") }
 	///
 	/// publisher.subscribe(textField.cb.text) // Bind to text field
 	/// ```

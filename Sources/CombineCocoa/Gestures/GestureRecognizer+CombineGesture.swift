@@ -30,7 +30,7 @@ public extension Publisher where Output: CombineGestureRecognizer {
 	}
 
 	/// Filters gesture events by recognizer state (internal array version).
-	internal func when(_ states: [CombineGestureRecognizerState]) -> AnyPublisher<Output, Failure> {
+    func when(_ states: [CombineGestureRecognizerState]) -> AnyPublisher<Output, Failure> {
 		filter { gesture in
 			states.contains(gesture.state)
 		}

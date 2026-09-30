@@ -39,7 +39,7 @@ open class DelegateProxy<P: AnyObject, D>: _CBDelegateProxy {
         self._currentDelegateFor = delegateProxy._currentDelegate
         self._setCurrentDelegateTo = delegateProxy._setCurrentDelegate
 
-        MainScheduler.ensureRunningOnMainThread()
+        DispatchQueue.ensureRunningOnMainThread()
         #if TRACE_RESOURCES
             _ = Resources.incrementTotal()
         #endif
@@ -89,7 +89,7 @@ open class DelegateProxy<P: AnyObject, D>: _CBDelegateProxy {
      - returns: Publisher of arguments passed to `selector` method.
      */
     open func sentMessage(_ selector: Selector) -> AnyPublisher<[Any], Never> {
-        MainScheduler.ensureRunningOnMainThread()
+        DispatchQueue.ensureRunningOnMainThread()
 
         let subject = self._sentMessageForSelector[selector]
 
@@ -146,7 +146,7 @@ open class DelegateProxy<P: AnyObject, D>: _CBDelegateProxy {
      - returns: Publisher of arguments passed to `selector` method.
      */
     open func methodInvoked(_ selector: Selector) -> AnyPublisher<[Any], Never> {
-        MainScheduler.ensureRunningOnMainThread()
+        DispatchQueue.ensureRunningOnMainThread()
 
         let subject = self._methodInvokedForSelector[selector]
 
@@ -161,7 +161,7 @@ open class DelegateProxy<P: AnyObject, D>: _CBDelegateProxy {
     }
 
     fileprivate func checkSelectorIsObservable(_ selector: Selector) {
-        MainScheduler.ensureRunningOnMainThread()
+        DispatchQueue.ensureRunningOnMainThread()
 
         if self.hasWiredImplementation(for: selector) {
             print("⚠️ Delegate proxy is already implementing `\(selector)`, a more performant way of registering might exist.")
@@ -205,7 +205,7 @@ open class DelegateProxy<P: AnyObject, D>: _CBDelegateProxy {
     /// - parameter retainDelegate: Should `self` retain `forwardToDelegate`.
     open func setForwardToDelegate(_ delegate: Delegate?, retainDelegate: Bool) {
         #if DEBUG // 4.0 all configurations
-            MainScheduler.ensureRunningOnMainThread()
+            DispatchQueue.ensureRunningOnMainThread()
         #endif
         self._setForwardToDelegate(delegate, retainDelegate: retainDelegate)
 

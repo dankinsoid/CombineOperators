@@ -9,7 +9,7 @@ public extension Reactive where Base: UITextView {
     ///
     /// ```swift
     /// textView.cb.text
-    ///     .sink { print("Text: \($0 ?? "")") }
+    ///     .sink { print("Text: \($0)") }
     ///
     /// publisher.subscribe(textView.cb.text) // Bind to text field
     /// ```

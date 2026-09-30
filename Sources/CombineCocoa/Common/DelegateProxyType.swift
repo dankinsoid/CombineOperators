@@ -180,7 +180,7 @@ extension DelegateProxyType {
     ///         }
     ///     }
     public static func proxy(for object: ParentObject) -> Self {
-        MainScheduler.ensureRunningOnMainThread()
+        DispatchQueue.ensureRunningOnMainThread()
 
         let maybeProxy = self.assignedProxy(for: object)
 
@@ -227,7 +227,7 @@ extension DelegateProxyType {
         proxy.setForwardToDelegate(forwardDelegate, retainDelegate: retainDelegate)
 
         return AnyCancellable {
-            MainScheduler.ensureRunningOnMainThread()
+            DispatchQueue.ensureRunningOnMainThread()
 
             let delegate: AnyObject? = weakForwardDelegate
 
@@ -378,7 +378,7 @@ private class DelegateProxyFactory {
     private static var _sharedFactories: [UnsafeRawPointer: DelegateProxyFactory] = [:]
 
     fileprivate static func sharedFactory<DelegateProxy: DelegateProxyType>(for proxyType: DelegateProxy.Type) -> DelegateProxyFactory {
-        MainScheduler.ensureRunningOnMainThread()
+        DispatchQueue.ensureRunningOnMainThread()
         let identifier = DelegateProxy.identifier
         if let factory = _sharedFactories[identifier] {
             return factory
@@ -400,7 +400,7 @@ private class DelegateProxyFactory {
     }
 
     fileprivate func extend<DelegateProxy: DelegateProxyType, ParentObject>(make: @escaping (ParentObject) -> DelegateProxy) {
-            MainScheduler.ensureRunningOnMainThread()
+            DispatchQueue.ensureRunningOnMainThread()
             precondition(self._identifier == DelegateProxy.identifier, "Delegate proxy has inconsistent identifier")
             guard self._factories[ObjectIdentifier(ParentObject.self)] == nil else {
                 cbFatalError("The factory of \(ParentObject.self) is duplicated. DelegateProxy is not allowed of duplicated base object type.")
@@ -409,7 +409,7 @@ private class DelegateProxyFactory {
     }
 
     fileprivate func createProxy(for object: AnyObject) -> AnyObject {
-        MainScheduler.ensureRunningOnMainThread()
+        DispatchQueue.ensureRunningOnMainThread()
         var maybeMirror: Mirror? = Mirror(reflecting: object)
         while let mirror = maybeMirror {
             if let factory = self._factories[ObjectIdentifier(mirror.subjectType)] {

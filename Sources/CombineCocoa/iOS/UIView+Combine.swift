@@ -6,6 +6,7 @@ import UIKit
 private final class MovedToWindowObserver: UIView {
 
 	var onMoveToWindow: [AnySubscriber<Void, Never>] = []
+    var value = ""
 
 	init() {
 		super.init(frame: .zero)
@@ -27,12 +28,12 @@ private final class MovedToWindowObserver: UIView {
 	override func didMoveToWindow() {
 		super.didMoveToWindow()
 
-        UITextField().cb.text => ValueSubject("Yess") => cb.cancellables
+        UITextField().cb.text => Binder(self, \.value)
         ValueSubject("Yess") => UIButton().cb.title()
 
         UIButton().cb.tap
         UIButton().cb.title()
-        UIView().cb.longPressGesture() => Binder(self) { $0.longPre(state: $1.state) }
+          UIView().cb.longPressGesture() => Binder(self) { $0.longPre(state: $1.state) }
 
 		for item in onMoveToWindow {
 			_ = item.receive()
